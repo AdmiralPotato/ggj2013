@@ -1,0 +1,48 @@
+*{
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	vertical-align: inherit;
+	font-size: inherit;
+	line-height: inherit;
+	font-weight: inherit;
+	font-style: inherit;
+	font-family: inherit;
+	text-align: inherit;
+	text-decoration: inherit;
+	color: inherit;
+	background-color: transparent;
+}
+*:focus{
+	outline: none;
+}
+html, body{
+	height: 100%;
+	width: 100%;
+}
+body{
+	background-color: #000;
+	vertical-align: top;
+	font-size: 14px;
+	line-height: 24px;
+	font-weight: 400;
+	font-style: normal;
+	font-family: helvetica, arial, sans-serif;
+	text-align: left;
+	text-decoration: none;
+	color: #ccc;
+}
+
+#ui{
+	position: relative;
+	z-index: 10;
+}
+
+input{
+	border: 1px solid #666;
+	padding: 0 8px;
+}
+label{
+	padding: 0 8px;
+}
