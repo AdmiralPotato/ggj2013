@@ -8,16 +8,25 @@ var shipShape = {
 	points: [
 		[20, 0, 0],
 		[-20, 20, 0],
-		[-20, -20, 0]
+		[-10, 0, 0],
+		[-20, -20, 0],
+		[-5, 0, 10]
 	],
 	lines: [
 		[0,1],
 		[1,2],
-		[2,0]
+		[2,3],
+		[3,0],
+		[3,4],
+		[2,4],
+		[1,4],
+		[0,4]
 	]
 };
 var ship = new n.Ob3D({
-	shape: shipShape
+	shape: shipShape,
+	rot: [deg*45,0,0],
+	color: '#fc0'
 });
 
 var animationController = {
