@@ -1,1 +1,40 @@
 /*button Styles go in here*/
+.alert{
+	color: #000;
+	background-color: #2D3;
+	line-height: 24px;
+	font-size: 16px;
+	padding: 0 8px;
+	border-radius: 12px;
+	box-shadow:
+		0 1px 2px #fff, /*bottom external highlight*/
+		0 -1px 1px #666, /*top external shadow*/
+		inset 0 -1px 1px rgba(0,0,0,0.5), /*bottom internal shadow*/
+		inset 0 1px 1px rgba(255,255,255,0.8); /*top internal highlight*/
+}
+.alert:hover{
+	color: #000;
+	background-color: #082;
+	line-height: 24px;
+	font-size: 16px;
+	padding: 0 8px;
+	border-radius: 12px;
+	box-shadow:
+		0 1px 2px #fff, /*bottom external highlight*/
+		0 -1px 1px #666, /*top external shadow*/
+		inset 0 -1px 1px rgba(0,0,0,0.5), /*bottom internal shadow*/
+		inset 0 1px 1px rgba(255,255,255,0.8); /*top internal highlight*/
+}
+.alert:active{
+	color: #fff;
+	background-color: #061;
+	line-height: 24px;
+	font-size: 16px;
+	padding: 0 8px;
+	border-radius: 12px;
+	box-shadow:
+		0 1px 2px #fff, /*bottom external highlight*/
+		0 -1px 1px #666, /*top external shadow*/
+		inset 0 -1px 1px rgba(0,0,0,0.5), /*bottom internal shadow*/
+		inset 0 1px 1px rgba(255,255,255,0.8); /*top internal highlight*/
+}
