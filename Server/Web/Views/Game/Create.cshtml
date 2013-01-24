@@ -1,0 +1,32 @@
+﻿@using WebGame.Core
+@model Game
+
+@{
+    ViewBag.Title = "Create a New Game";
+}
+
+<h2>Create a New Game</h2>
+
+@using (Html.BeginForm())
+{
+    <br />
+    <table>
+        <tr>
+            <td class="Label">Max Number of Players</td>
+            <td>
+                @Html.DropDownListFor(m => m.MaxPlayers, new SelectList(new[] { 2, 3, 4, 5, 6, 7, 8 }))
+                @Html.ValidationMessageFor(m => m.MaxPlayers)
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2"> &nbsp; </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <br />
+                <input type="submit" value="Create Game" />
+            </td>
+        </tr>
+    </table>
+}
