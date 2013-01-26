@@ -360,7 +360,17 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
             Initalize(id);
 
             if (game.DefaultShip != null)
-                game.DefaultShip.StarSystem.AddEntity(new Starbase(1000000) { Position = game.DefaultShip.Position });
+                game.DefaultShip.StarSystem.AddEntity(new Starbase() { Position = game.DefaultShip.Position });
+
+            return null;
+        }
+
+        public ActionResult BuildShip(int id)
+        {
+            Initalize(id);
+
+            if (game.DefaultShip != null)
+                game.DefaultShip.StarSystem.AddEntity(new Ship() { Position = game.DefaultShip.Position });
 
             return null;
         }
