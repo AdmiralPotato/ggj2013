@@ -116,7 +116,7 @@ namespace WebGame
 
         internal static void Say(Game game, string message)
         {
-            if (game != null)
+            if (game != null && game.DefaultShip != null)
             {
                 var groupName = GetShipGroupName(game.Id, game.DefaultShip.Id);
 

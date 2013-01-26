@@ -105,6 +105,8 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Command.cs" />
+    <Compile Include="Station.cs" />
     <Compile Include="Starbase.cs" />
     <Compile Include="Framework\BaseViews.cs" />
     <Compile Include="Controllers\AccountController.cs" />
@@ -184,6 +186,7 @@
     <Content Include="images\key.gif" />
     <Content Include="images\offline.gif" />
     <Content Include="images\online.gif" />
+    <Content Include="images\Orion_Nebula_2600wide.jpg" />
     <Content Include="images\p.gif" />
     <Content Include="images\passcode.gif" />
     <Content Include="images\pc.gif" />

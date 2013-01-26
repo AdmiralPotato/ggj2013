@@ -62,7 +62,6 @@ namespace WebGame
         /// <summary>
         /// Meters
         /// </summary>
-        [ProtoMember(6)]
         public abstract double Radius { get; }
 
         [ProtoMember(7)]
@@ -145,6 +144,10 @@ namespace WebGame
         {
             this.IsDestroyed = true;
             this.StarSystem.RemoveEntity(this);
+        }
+
+        internal void ReceiveCommand(Ship ship, Command command)
+        {
         }
     }
 }

@@ -28,6 +28,7 @@ namespace WebGame
         [ProtoMember(13)]
         public int RatingChange { get; set; }
 
+        public Station Station;
         public string SessionId;
         public Game Game;
 

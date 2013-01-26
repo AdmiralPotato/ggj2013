@@ -205,6 +205,11 @@ namespace WebGame
             }
         }
 
+        internal void ToggleShields()
+        {
+            throw new NotImplementedException();
+        }
+
         protected override IEnumerable<string> PartList
         {
             get
@@ -213,6 +218,10 @@ namespace WebGame
                 yield return "Engines";
                 yield return "Weapons";
             }
+        }
+
+        internal void SetPower(string part, float amount)
+        {
         }
     }
 }
