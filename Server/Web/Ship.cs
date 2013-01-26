@@ -146,7 +146,7 @@ namespace WebGame
                 var update = new UpdateToClient();
                 foreach (var entity in StarSystem.Entites)
                 {
-                    update.Entities.Add(new EntityUpdate() { Id = entity.Id, Type = entity.Type, Rotation = (float)entity.Orientation/*, Position = entity.Position*/ });
+                    update.Entities.Add(new EntityUpdate() { Id = entity.Id, Type = entity.Type, Rotation = (float)entity.Orientation, Position = entity.Position });
                 }
                 GameHub.SendUpdate(Game.Id, Id, update);
                 System.Diagnostics.Debug.WriteLine("Update Sent.");

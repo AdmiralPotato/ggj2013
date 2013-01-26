@@ -330,9 +330,43 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
             return null;
         }
 
-        public ActionResult Done(int id)
+        public ActionResult SetImpulse(int id, int amount)
         {
             Initalize(id);
+
+            if (game.DefaultShip != null)
+                game.DefaultShip.ImpulsePercentage = amount;
+
+            return null;
+        }
+
+
+        public ActionResult SetDesiredHeading(int id, float amount)
+        {
+            Initalize(id);
+
+            if (game.DefaultShip != null)
+                game.DefaultShip.DesiredOrientation = amount;
+
+            return null;
+        }
+
+        public ActionResult SetDesiredSpeed(int id, int amount)
+        {
+            Initalize(id);
+
+            if (game.DefaultShip != null)
+                game.DefaultShip.TargetSpeedMetersPerSecond = amount;
+
+            return null;
+        }
+
+        public ActionResult BuildBase(int id)
+        {
+            Initalize(id);
+
+            if (game.DefaultShip != null)
+                game.DefaultShip.StarSystem.AddEntity(new Base() { Position = game.DefaultShip.Position });
 
             return null;
         }

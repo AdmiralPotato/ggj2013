@@ -40,7 +40,7 @@ namespace WebGame
             entity.StarSystem = this;
 
             if (entity.Id == 0)
-                entity.Id = Game.NextEntityId++;
+                entity.Id = ++Game.NextEntityId;
             Entites.Add(entity);
 
             var ship = entity as Ship;

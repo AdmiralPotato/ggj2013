@@ -44,7 +44,19 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.AspNet.SignalR.Core">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.1.0.0-rc2\lib\net40\Microsoft.AspNet.SignalR.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.Owin">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Owin.1.0.0-rc2\lib\net40\Microsoft.AspNet.SignalR.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.SystemWeb">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.1.0.0-rc2\lib\net40\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Owin.Host.SystemWeb">
+      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.1.0.0-rc2\lib\net40\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
@@ -54,23 +66,15 @@
       <HintPath>..\References\MySql.Data.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.4.5.7\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Owin">
+      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
     <Reference Include="protobuf-net, Version=1.0.0.280, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\protobuf-net.2.0.0.480\lib\net40\protobuf-net.dll</HintPath>
-    </Reference>
-    <Reference Include="SignalR, Version=0.5.1.10615, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\SignalR.Server.0.5.1.1\lib\net40\SignalR.dll</HintPath>
-    </Reference>
-    <Reference Include="SignalR.Hosting.AspNet, Version=0.5.1.10610, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\SignalR.Hosting.AspNet.0.5.1\lib\net40\SignalR.Hosting.AspNet.dll</HintPath>
-    </Reference>
-    <Reference Include="SignalR.Hosting.Common, Version=0.5.1.10610, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\SignalR.Hosting.Common.0.5.1\lib\net40\SignalR.Hosting.Common.dll</HintPath>
     </Reference>
     <Reference Include="System.Data.Entity" />
     <Reference Include="System.Data.Linq" />
@@ -131,6 +135,20 @@
     <Compile Include="XNA\Vector3.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="client\buttons.html" />
+    <Content Include="client\css\buttons.css" />
+    <Content Include="client\css\styles.css" />
+    <Content Include="client\css\widgets.css" />
+    <Content Include="client\index.html" />
+    <Content Include="client\index2.html" />
+    <Content Include="client\js\game.js" />
+    <Content Include="client\js\shapes-wireframe.js" />
+    <Content Include="client\js\signalR.js" />
+    <Content Include="client\js\ui.js" />
+    <Content Include="client\three_test\eyeguy.js" />
+    <Content Include="client\three_test\eyeguy_tex.png" />
+    <Content Include="client\three_test\Test3JS.html" />
+    <Content Include="client\widgets.html" />
     <Content Include="Global.js" />
     <Content Include="Global.asax" />
     <Content Include="images\chat_offline.png" />
@@ -163,8 +181,13 @@
     <Content Include="images\online.gif" />
     <Content Include="images\p.gif" />
     <Content Include="images\passcode.gif" />
+    <Content Include="images\pc.gif" />
+    <Content Include="images\pcd.gif" />
+    <Content Include="images\pd.gif" />
+    <Content Include="images\pe.gif" />
     <Content Include="images\player_empty.gif" />
     <Content Include="images\player_white.gif" />
+    <Content Include="images\px.gif" />
     <Content Include="images\p_cur.gif" />
     <Content Include="images\p_cur_done.gif" />
     <Content Include="images\p_dead.gif" />
@@ -175,8 +198,8 @@
     <Content Include="Scripts\jquery-1.7.2.min.js" />
     <Content Include="Scripts\jquery-ui-1.8.20.js" />
     <Content Include="Scripts\jquery-ui-1.8.20.min.js" />
-    <Content Include="Scripts\jquery.signalR-0.5.1.js" />
-    <Content Include="Scripts\jquery.signalR-0.5.1.min.js" />
+    <Content Include="Scripts\jquery.signalR-1.0.0-rc2.js" />
+    <Content Include="Scripts\jquery.signalR-1.0.0-rc2.min.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Scripts\jquery.validate-vsdoc.js" />
@@ -261,7 +284,6 @@
     <None Include="Properties\PublishProfiles\Profile1.pubxml" />
     <Content Include="Views\Game\_PlayerList.cshtml" />
     <Content Include="Views\Game\Lobby.cshtml" />
-    <Content Include="Views\Game\Local.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -51,6 +51,8 @@ namespace WebGame
         {
             AreaRegistration.RegisterAllAreas();
 
+            RouteTable.Routes.MapHubs();
+
             RegisterGlobalFilters(GlobalFilters.Filters);
             RegisterRoutes(RouteTable.Routes);
         }
