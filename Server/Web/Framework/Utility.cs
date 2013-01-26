@@ -105,10 +105,27 @@ namespace WebGame
         //    return angle._NormalizeAngle(-Math.PI / 2, Math.PI / 2, Math.PI);
         //}
 
-        public static bool SphereIntersectsLineSegment(Vector3 segementBegin, Vector3 segmentEnd, Vector3 sphereCenter, double radius)
+        public static double PointToSegmentDistance(Vector3 segmentBegin, Vector3 segmentEnd, Vector3 point)
         {
-            return false;
-            //throw new NotImplementedException("Adam would implement");
+            Vector3 lineVec = segmentEnd - segmentBegin;
+            Vector3 pVec = point - segmentBegin;
+
+            double c1 = dot(pVec, lineVec);
+            if (c1 <= 0)
+                return d(point, segmentBegin);
+
+            double c2 = dot(lineVec, lineVec);
+            if (c2 <= c1)
+                return d(point, segmentEnd);
+ 
+            double b = c1 / c2;
+            Point pointOnLine = segmentBegin + b * lineVec;
+            return d(point, pointOnLine);
+        }
+
+        public static bool SphereIntersectsLineSegment(Vector3 segmentBegin, Vector3 segmentEnd, Vector3 sphereCenter, double radius)
+        {
+            return PointToSegmentDistance( segmentBegin, segmentEnd, sphereCenter ) <= radius;
         }
     }
 }
