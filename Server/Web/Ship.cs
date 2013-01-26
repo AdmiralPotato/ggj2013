@@ -230,6 +230,10 @@ namespace WebGame
         {
         }
 
+        internal void SetCoolant(string part, int amount)
+        {
+        }
+
         internal void ToggleAlert()
         {
             Alert = !Alert;
@@ -238,6 +242,10 @@ namespace WebGame
         internal void SetMainScreenView(MainView view)
         {
             MainView = view;
+        }
+
+        internal void SetRepairTarget(string part)
+        {
         }
     }
 }

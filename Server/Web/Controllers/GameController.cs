@@ -438,6 +438,28 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
 
             return null;
         }
+        public ActionResult SetCoolantLevel(int id, string part, int amount)
+        {
+            Initalize(id);
+
+            if (game.DefaultShip != null && player.Station == Station.Engineering)
+            {
+                game.DefaultShip.SetCoolant(part, amount);
+            }
+
+            return null;
+        }
+        public ActionResult SetRepairTarget(int id, string part)
+        {
+            Initalize(id);
+
+            if (game.DefaultShip != null && player.Station == Station.Engineering)
+            {
+                game.DefaultShip.SetRepairTarget(part);
+            }
+
+            return null;
+        }
         #endregion
 
         #region Communication
