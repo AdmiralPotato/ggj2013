@@ -19,13 +19,8 @@
         <br />
         <input type="text" id="desiredHeading" value="0" />
         <input type="submit" onclick='$.post("SetDesiredHeading", "amount=" + $("#desiredHeading").val());' value="Set Heading" />
-        <div id="modal">
-            <h1>NOT Artemis</h1>
-            <div>
-                <label for="server_ip">Input Server IP</label><input type="text" name="server_ip" id="server_ip">
-                <input type="submit" value="connect">
-            </div>
-        </div>
+        <br />
+        <input type="submit" onclick='$.post("BuildBase");' value="Build Base" />
     </div>
 
     <script src="https://raw.github.com/AdmiralPotato/npos3d/master/src/core.js"></script>

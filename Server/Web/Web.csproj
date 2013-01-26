@@ -181,8 +181,13 @@
     <Content Include="images\online.gif" />
     <Content Include="images\p.gif" />
     <Content Include="images\passcode.gif" />
+    <Content Include="images\pc.gif" />
+    <Content Include="images\pcd.gif" />
+    <Content Include="images\pd.gif" />
+    <Content Include="images\pe.gif" />
     <Content Include="images\player_empty.gif" />
     <Content Include="images\player_white.gif" />
+    <Content Include="images\px.gif" />
     <Content Include="images\p_cur.gif" />
     <Content Include="images\p_cur_done.gif" />
     <Content Include="images\p_dead.gif" />

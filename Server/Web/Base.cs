@@ -13,7 +13,7 @@ namespace WebGame
 
         public override void Update(TimeSpan elapsed)
         {
-            throw new NotImplementedException();
+            ApplyVelocity(elapsed);
         }
     }
 }
