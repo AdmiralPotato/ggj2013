@@ -42,26 +42,12 @@ window.requestAnimFrame = (function(){
 	render();
 	
 	var geometryObjects = {};
-	var imageLoadHandler = function(){
-		 this.texture.needsUpdate = true;
-		 console.log( this.src + ' it loaded!');
-	};
 	var parseAllGeometry = function(_jsonObjectSet, callback) {
 		var propertyName, modelData, modelCount = 0, modelsLoaded = 0;
 		for(propertyName in _jsonObjectSet){
 			if(_jsonObjectSet.hasOwnProperty(propertyName)){
 				modelCount += 1;
 				modelData = _jsonObjectSet[propertyName];
-				var materialData = modelData.materials[0];
-				var img = new Image();
-				var tex = new THREE.Texture(img);
-				img.texture = tex;
-				img.onload = imageLoadHandler;
-				img.src = materialData.mapDiffuse;
-				var mat = new THREE.MeshLambertMaterial({
-					color: 0xffffff,
-					map: tex
-				});
 				var meshCreationHandler = function(geometry, materials) {
 					geometry.materials = materials;
 					geometryObjects[propertyName] = geometry;
@@ -71,14 +57,21 @@ window.requestAnimFrame = (function(){
 					}
 				};
 				var jsonDataLoader = new THREE.JSONLoader();
-				jsonDataLoader.createModel(modelData, meshCreationHandler, './');
+				jsonDataLoader.createModel(modelData, meshCreationHandler, './' + );
 			}
 		}
 	}
+	
+	/*
+	texture = THREE.ImageUtils.loadTexture('crate.gif'),
+    material = new THREE.MeshBasicMaterial({map: texture}),
+	*/
 	var whatToDoWhenAllTheGeometriesAreParsedOkayYupSeriously = function(){
 		var myMesh = new THREE.Mesh(geometryObjects.eyeguy, geometryObjects.eyeguy.material);
 		scene.add(myMesh);
 	};
+	
+	
 	
 	parseAllGeometry(
 		{
