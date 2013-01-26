@@ -330,11 +330,16 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
             return null;
         }
 
-        public ActionResult Done(int id)
+        public ActionResult SetImpulse(int id, int amount = -1)
         {
             Initalize(id);
 
+            if (game.DefaultShip != null)
+                game.DefaultShip.ImpulsePercentage = amount;
+
             return null;
         }
+
+
     }
 }

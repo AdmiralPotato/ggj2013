@@ -25,32 +25,32 @@ client.entityTypes.Ship.prototype = {
 	shape: wireframes.ship,
 	update: function() {
 		var t = this;
-		t.rot[2] += deg;
+//		t.rot[2] += deg;
 		t.render();
 	},
 	updateFromData: function(entityData){
 		var t = this;
-		t.pos[0] = entityData.position[0];
-		t.pos[1] = entityData.position[1];
-		t.pos[2] = entityData.position[2];
-		//t.rot[2] = entityData.rotation;
+		t.pos[0] = entityData.Position.X;
+		t.pos[1] = entityData.Position.Y;
+		t.pos[2] = entityData.Position.Z;
+		t.rot[2] = entityData.Rotation;
 	}
 };
 
 
 var setGameStateFromServer = function(data) {
 	var entityDataIndex,
-		numEntities = data.entityList.length,
+		numEntities = data.Entities.length,
 		entityData,
 		entity,
 		entityIdString;
 	console.log('game state update!');
 	for(entityDataIndex = 0; entityDataIndex < numEntities; entityDataIndex += 1) {
-		entityData = data.entityList[entityDataIndex];
-		entityIdString = 'entity-' + entityData.id;
+	    entityData = data.Entities[entityDataIndex];
+		entityIdString = 'entity-' + entityData.Id;
 		entity = client.entityList[entityIdString];
 		if(entity === undefined){
-			entity = client.entityList[entityIdString] = new client.entityTypes[entityData.type]();
+			entity = client.entityList[entityIdString] = new client.entityTypes[entityData.Type]();
 		}
 		entity.updateFromData(entityData);
 	}

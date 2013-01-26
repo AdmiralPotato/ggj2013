@@ -588,38 +588,38 @@ function AppendChatMessage(sourceId, sourceName, message) {
 
 
 
-$(function () {
-    var isFocused;
-    $(window).blur(function () {
-        isFocused = false;
-    });
-    $(window).focus(function () {
-        isFocused = true;
-    });
+//$(function () {
+//    var isFocused;
+//    $(window).blur(function () {
+//        isFocused = false;
+//    });
+//    $(window).focus(function () {
+//        isFocused = true;
+//    });
 
-    var gameHub = $.connection.gameHub;
+//    var gameHub = $.connection.gameHub;
 
-    gameHub.sendNotification = function (title, message, targetUri) {
-        if (window.location.pathname != targetUri || !isFocused) {
-            PlayNotifySound();
+//    gameHub.sendNotification = function (title, message, targetUri) {
+//        if (window.location.pathname != targetUri || !isFocused) {
+//            PlayNotifySound();
 
-            $.desknoty({
-                icon: "/images/icon.png",
-                title: title,
-                body: message
-            });
+//            $.desknoty({
+//                icon: "/images/icon.png",
+//                title: title,
+//                body: message
+//            });
 
-            noty({ "text": title + "<br /> " + message, "layout": "bottomRight", "closeButton": true });
-        }
-    };
+//            noty({ "text": title + "<br /> " + message, "layout": "bottomRight", "closeButton": true });
+//        }
+//    };
 
-    gameHub.reload = function () {
-        location.reload();
-    };
+//    gameHub.reload = function () {
+//        location.reload();
+//    };
 
-    gameHub.recieveMessage = function (sourceId, sourceName, message) {
-        AppendChatMessage(sourceId, sourceName, message);
-    };
+//    gameHub.recieveMessage = function (sourceId, sourceName, message) {
+//        AppendChatMessage(sourceId, sourceName, message);
+//    };
 
-    $.connection.hub.start();
-});
+//    $.connection.hub.start();
+//});
