@@ -15,14 +15,26 @@
 </head>
 <body>
     <div id="ui">
-        <input type="submit" onclick='$.post("Start");' value="Reset" />
-        <br />
+        <select id="desiredStation">
+            <option value="None">None</option>
+            <option value="Main">Main</option>
+            <option value="Helm">Helm</option>
+            <option value="Weapons">Weapons</option>
+            <option value="Engineering">Engineering</option>
+            <option value="Communication">Communication</option>
+            <option value="GameMaster">Game Master</option>
+        </select>
+        <input type="submit" onclick='$.post("SelectStation", "station=" + $("#desiredStation").val());' value="Select Station" />
+        <h3>Helm</h3>
         <input type="submit" onclick='$.post("SetImpulse", "amount=100");' value="Go" />
         <input type="submit" onclick='$.post("SetDesiredSpeed", "amount=0");' value="Stop" />
         <br />
         <input type="text" id="desiredHeading" value="0" />
         <input type="submit" onclick='$.post("SetDesiredHeading", "amount=" + $("#desiredHeading").val());' value="Set Heading" />
-        <br />
+        <h3>Weapons</h3>
+        <input type="submit" onclick='$.post("ToggleShields");' value="Toggle Shields" />
+        <h3>Game Master</h3>
+        <input type="submit" onclick='$.post("Start");' value="Reset" />
         <input type="submit" onclick='$.post("BuildBase");' value="Build Base" />
         <input type="submit" onclick='$.post("BuildShip");' value="Build Ship" />
     </div>

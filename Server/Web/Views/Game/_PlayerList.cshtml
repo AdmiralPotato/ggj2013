@@ -6,7 +6,7 @@
         foreach (var player in (from p in Model.Players orderby p.Place select p))
         {
             <tr>
-                <td align="right">@AccountLink(player.AccountId, player.Name, player.GetColor())</td>
+                <td align="right">@AccountLink(player.AccountId, player.Name, "")</td>
                 <td>&nbsp;</td>
                 <td>
                     @if (player.Place > 0)
@@ -20,11 +20,13 @@
                 }
                 else
                 {
-                    if (ViewBag.IsHost)
+
+@*                    if (ViewBag.IsHost)
                     {
                         <td><a href="Kick?PlayerNumber=@player.Number" >Kick</a></td>
+                    }*@
+                
                     }
-                }
             </tr>
         }
     }

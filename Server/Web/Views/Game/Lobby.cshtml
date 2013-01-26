@@ -21,10 +21,6 @@
         gameHub.addMessage = function (message) {
             $('#Messages').prepend(message);
         };
-
-        gameHub.setDone = function (playerNumber) {
-            $('#Player' + playerNumber).append('- Done&nbsp;');
-        };
     });
 </script>
 
@@ -67,11 +63,7 @@ else
     </form>
     <br />
     <a href="Quit">Quit Game</a>
-
-    if (Player.Number == 1)
-    {
-        @:- <a href="Start">Start Game</a>
-    }
+    <a href="Start">Start Game</a>
 }
 </div>
 

@@ -162,5 +162,10 @@ namespace WebGame
                 System.Diagnostics.Debug.WriteLine("Update Sent.");
             }
         }
+
+        internal void ToggleShields()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
