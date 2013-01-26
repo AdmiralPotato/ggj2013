@@ -344,7 +344,9 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
             Initalize(id);
 
             if (game.DefaultShip != null)
+            {
                 game.DefaultShip.DesiredOrientation = amount;
+            }
 
             return null;
         }
@@ -364,7 +366,7 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
             Initalize(id);
 
             if (game.DefaultShip != null)
-                game.DefaultShip.StarSystem.AddEntity(new Base() { Position = game.DefaultShip.Position });
+                game.DefaultShip.StarSystem.AddEntity(new Starbase(1000000) { Position = game.DefaultShip.Position });
 
             return null;
         }
