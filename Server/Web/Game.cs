@@ -78,7 +78,6 @@ namespace WebGame
             }
         }
 
-
         public static Random Random = new Random();
         public bool IsRunning;
 
@@ -101,9 +100,12 @@ namespace WebGame
 
         public void StopRunning()
         {
-            timer.Stop();
-            timer = null;
-            IsRunning = false;
+            if (timer != null)
+            {
+                timer.Stop();
+                timer = null;
+                IsRunning = false;
+            }
         }
 
         void timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -138,11 +140,6 @@ namespace WebGame
             return null;
         }
 
-        public Player GetPlayerByNumber(int playerNumber)
-        {
-            return (from p in Players where p.Number == playerNumber select p).FirstOrDefault();
-        }
-
         public Player Join(int accountId, string name, int rating)
         {
             var result = new Player() { AccountId = accountId, Name = name, Rating = rating };
@@ -154,7 +151,6 @@ namespace WebGame
         {
             player.Game = this;
             Players.Add(player);
-            player.Number = Players.Count;
 
             foreach (var invite in (from i in Invites where i.AccountId == player.AccountId select i))
             {
@@ -172,16 +168,7 @@ namespace WebGame
         {
             Players.Remove(player);
 
-            UpdatePlayerNumbers();
-
             SendForumMessage(player.Name + " left the game.");
-        }
-
-        void UpdatePlayerNumbers()
-        {
-            // update player numbers
-            foreach (var player in Players)
-                player.Number = Players.IndexOf(player) + 1;
         }
 
         public void SendForumMessage(string text, int sourceId = 1, string sourceName = "Computer")
@@ -192,7 +179,7 @@ namespace WebGame
             }
 
             var message = new Message() { Sent = DateTime.UtcNow, Text = text, SourceId = sourceId, SourceName = sourceName };
-            GameHub.Say("Game-" + Id, message.Print(false));
+            GameHub.Say(Id, message.Print(false));
         }
 
         public void Start()
@@ -220,7 +207,7 @@ namespace WebGame
             DefaultShip.DesiredOrientation = 1;
             starSystem.AddEntity(DefaultShip);
 
-            Run();
+//            Run();
 
             GameServer.SaveGame(this);
 
@@ -277,7 +264,7 @@ namespace WebGame
             double scoreExpected = 0;
             foreach (var otherPlayer in Players)
             {
-                if (otherPlayer.Number != player.Number)
+                if (otherPlayer != player)
                     scoreExpected += GenScoreExpected(player.Rating, otherPlayer.Rating);
             }
             scoreExpected /= CurrentPlayers - 1;
@@ -434,6 +421,8 @@ namespace WebGame
 
                 if (!IsRunning)
                     Run();
+
+                GameHub.Say(Id, player.Name + " connected.");
             }
 
             return player;
@@ -454,6 +443,8 @@ namespace WebGame
 
                 if (GetActivePlayerCount() <= 0)
                     StopRunning();
+
+                GameHub.Say(this, player.Name + " disconnected.");
             }
         }
 

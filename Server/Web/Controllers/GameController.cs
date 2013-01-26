@@ -15,7 +15,6 @@ namespace WebGame
         Player player;
 
         bool IsPlaying { get { return player != null; } }
-        bool IsHost { get { return (LoggedIn && Account.IsAdmin) || (IsPlaying && player.Number == 1); } }
 
         void Initalize(int id)
         {
@@ -34,8 +33,6 @@ namespace WebGame
                 ViewBag.Player = player;
                 player.SessionId = Request.Cookies["ASP.Net_SessionId"].Value;
             }
-
-            ViewBag.IsHost = IsHost;
         }
 
         void LoadMessages()
@@ -267,32 +264,32 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
             return View("Index", game);
         }
 
-        public ActionResult Kick(int id, int playerNumber)
-        {
-            Initalize(id);
+        //public ActionResult Kick(int id, int playerNumber)
+        //{
+        //    Initalize(id);
 
-            if (!LoggedIn)
-                return Redirect("/Game-" + game.Id + "/");
+        //    if (!LoggedIn)
+        //        return Redirect("/Game-" + game.Id + "/");
 
-            if (!game.Started && IsHost)
-            {
-                var kickPlayer = game.GetPlayerByNumber(playerNumber);
-                if (kickPlayer != null)
-                {
-                    game.Unjoin(kickPlayer);
-                    GameServer.PlayerUnjoined(game, kickPlayer.AccountId);
+        //    if (!game.Started && IsHost)
+        //    {
+        //        var kickPlayer = game.GetPlayerByNumber(playerNumber);
+        //        if (kickPlayer != null)
+        //        {
+        //            game.Unjoin(kickPlayer);
+        //            GameServer.PlayerUnjoined(game, kickPlayer.AccountId);
 
-                    if (game.Players.Count <= 0)
-                        return Redirect("/");
-                }
-            }
+        //            if (game.Players.Count <= 0)
+        //                return Redirect("/");
+        //        }
+        //    }
 
-            Initalize(id);
+        //    Initalize(id);
 
-            LoadMessages();
+        //    LoadMessages();
 
-            return View("Index", game);
-        }
+        //    return View("Index", game);
+        //}
 
         public ActionResult Start(int id)
         {
@@ -301,11 +298,8 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
             if (!LoggedIn)
                 return Redirect("/Game-" + game.Id + "/");
 
-            //if (!game.Started && IsHost && game.CurrentPlayers >= 2)
-            //{
-                game.MaxPlayers = game.CurrentPlayers;
-                game.Start();
-            //}
+            game.MaxPlayers = game.CurrentPlayers;
+            game.Start();
 
             Initalize(id);
 

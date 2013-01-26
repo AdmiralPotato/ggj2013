@@ -109,10 +109,20 @@ namespace WebGame
             throw new NotImplementedException();
         }
 
-        public static void Say(string group, string message)
+        internal static void Say(int gameId, string message)
         {
-            var context = GlobalHost.ConnectionManager.GetHubContext<GameHub>();
-            context.Clients.Group(group).addMessage(message);
+            Say(GameServer.GetGame(gameId), message);
+        }
+
+        internal static void Say(Game game, string message)
+        {
+            if (game != null)
+            {
+                var groupName = GetShipGroupName(game.Id, game.DefaultShip.Id);
+
+                var context = GlobalHost.ConnectionManager.GetHubContext<GameHub>();
+                context.Clients.Group(groupName).addMessage(0, "System", message);
+            }
         }
 
         public static void SendUpdate(int gameId, int shipId, UpdateToClient update)

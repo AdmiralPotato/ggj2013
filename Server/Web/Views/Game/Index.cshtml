@@ -8,6 +8,7 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
     <script src="/Scripts/jquery.signalR-1.0.0-rc2.js"></script>
     <script src="/signalr/hubs" type="text/javascript"></script>
+    <script src="/Global.js" type="text/javascript"></script>
 
     <link rel="stylesheet" href="/Style.css" />
     <link rel="stylesheet" href="/client/css/styles.css" />
@@ -39,16 +40,20 @@
             setGameStateFromServer(update);
         };
 
+        gameHub.client.addMessage = function (sourceId, sourceName, message) {
+            AppendChatMessage(sourceId, sourceName, message);
+        };
+
         //$.connection.hub.start()
         //    .done(function () { alert("Now connected!"); })
         //    .fail(function () { alert("Could not Connect!"); });
 
         $.connection.hub.start()
-            .done(function () { gameHub.server.setShip(705804, 0); })
+            .done(function () { gameHub.server.setShip(@Model.Id, 0); })
             .fail(function () { alert("Could not Connect!"); });
 
         $(window).unload(function () {
-            gameHub.server.disconnecting(705804, 0);
+            gameHub.server.disconnecting(@Model.Id, 0);
         });
     </script>
 </body>
