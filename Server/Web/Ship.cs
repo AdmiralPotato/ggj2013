@@ -53,10 +53,10 @@ namespace WebGame
         /// <summary>
         /// How long ago the projectile was loaded
         /// </summary>
-        [ProtoMember(4)]
+        [ProtoMember(6)]
         public TimeSpan ProjectileLoadTime { get; private set; }
 
-        [ProtoMember(5)]
+        [ProtoMember(7)]
         public ProjectileStatus ProjectileStatus { get; set; }
 
         private static TimeSpan timeToLoadProjectile = TimeSpan.FromSeconds(5);
@@ -112,28 +112,23 @@ namespace WebGame
 
         public void LoadProjectile()
         {
-            if (this.ProjectileStatus != ProjectileStatus.Unloaded)
+            if (this.ProjectileStatus == ProjectileStatus.Unloaded)
             {
-                throw new InvalidOperationException("The tube must be empty to load a projectile.");
+                this.ProjectileLoadTime = TimeSpan.Zero;
+                this.ProjectileStatus = ProjectileStatus.Loading;
             }
-            this.ProjectileLoadTime = TimeSpan.Zero;
-            this.ProjectileStatus = ProjectileStatus.Loading;
         }
 
         public Projectile LaunchProjectile(Entity target)
         {
-            if (this.ProjectileStatus != ProjectileStatus.Loaded)
+            if (this.ProjectileStatus == ProjectileStatus.Loaded && this.StarSystem == target.StarSystem)
             {
-                throw new InvalidOperationException("The tube must be loaded to launch a projectile");
+                var projectile = new Projectile();
+                projectile.Target = target;
+                this.StarSystem.AddEntity(projectile);
+                return projectile;
             }
-            if (this.StarSystem != target.StarSystem)
-            {
-                throw new ArgumentException("The target is not in the current star system");
-            }
-            var projectile = new Projectile();
-            projectile.Target = target;
-            this.StarSystem.AddEntity(projectile);
-            return projectile;
+            return null;
         }
 
         public override void Update(TimeSpan elapsed)
@@ -254,7 +249,6 @@ namespace WebGame
 
         internal void ToggleShields()
         {
-            throw new NotImplementedException();
         }
 
         protected override IEnumerable<string> PartList

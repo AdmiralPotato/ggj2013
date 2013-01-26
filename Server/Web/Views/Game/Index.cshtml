@@ -44,6 +44,7 @@
         <h3>Weapons</h3>
         <input type="submit" onclick='$.post("ToggleShields");' value="Toggle Shields" />
         <br />
+        <input type="submit" onclick='$.post("LoadProjectile");' value="Load" />
         <input type="text" id="desiredTarget" value="0" />
         <input type="submit" onclick='$.post("LaunchProjectile", "targetId=" + $("#desiredTarget").val());' value="Launch Projectile" />
 

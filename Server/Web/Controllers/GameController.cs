@@ -411,6 +411,17 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
             return null;
         }
 
+        public ActionResult LoadProjectile(int id)
+        {
+            Initalize(id);
+
+            if (game.DefaultShip != null && player.Station == Station.Weapons)
+            {
+                game.DefaultShip.LoadProjectile();
+            }
+
+            return null;
+        }
         public ActionResult LaunchProjectile(int id, int targetId)
         {
             Initalize(id);
