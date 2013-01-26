@@ -8,11 +8,10 @@ namespace WebGame
 {
     public abstract class Entity
     {
-        public Vector3 Position { get; set; }
-
-        public Vector3 Velocity { get; set; }
-
-        public float MassMetricTons { get; set; }
+        public Vector3 Position { get; protected set; }
+        public Vector3 Velocity { get; protected set; }
+        public double Orientation { get; protected set; }
+        public double MassMetricTons { get; protected set; }
 
         public abstract void Update(TimeSpan elapsed);
 
