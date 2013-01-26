@@ -15,7 +15,7 @@
     <script src="https://raw.github.com/AdmiralPotato/npos3d/master/src/core.js"></script>
     <script src="https://raw.github.com/AdmiralPotato/npos3d/master/src/font.js"></script>
     <script src="https://raw.github.com/AdmiralPotato/ggj2013/master/client/js/shapes-wireframe.js"></script>
-    <script src="https://raw.github.com/AdmiralPotato/ggj2013/master/client/js/game.js"></script>
+@*    <script src="https://raw.github.com/AdmiralPotato/ggj2013/master/client/js/game.js"></script>*@
 
     <script type="text/javascript">
         $(function () {
@@ -23,6 +23,7 @@
 
             gameHub.handleUpdate = function (update) {
                 console.log(JSON.stringify(update));
+                //        AppendChatMessage(1, "Testing", JSON.stringify(update));
             };
         });
     </script>
