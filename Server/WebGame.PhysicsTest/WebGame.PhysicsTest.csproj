@@ -50,8 +50,9 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="ShipTests.cs" />
+    <Compile Include="RotationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VelocityTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Web\Web.csproj">

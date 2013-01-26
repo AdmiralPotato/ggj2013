@@ -3,11 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Text;
+using Microsoft.Xna.Framework;
 
 namespace WebGame
 {
     public static class Utility
     {
+        public static Vector3 Multiply(this Vector3 vector, double coefficient)
+        {
+            return new Vector3((float)(vector.X * coefficient), (float)(vector.Y * coefficient), (float)(vector.Z * coefficient));
+        }
+
         public static Random Random = new Random();
 
         /// <summary>
