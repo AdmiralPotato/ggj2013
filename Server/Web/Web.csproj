@@ -106,6 +106,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Command.cs" />
+    <Compile Include="ProjectileStatus.cs" />
     <Compile Include="Station.cs" />
     <Compile Include="Starbase.cs" />
     <Compile Include="Framework\BaseViews.cs" />

@@ -45,6 +45,25 @@ namespace WebGame
         private double _desiredOrientation;
 
         /// <summary>
+        /// How long ago the projectile was loaded
+        /// </summary>
+        [ProtoMember(4)]
+        public TimeSpan ProjectileLoadTime { get; private set; }
+
+        [ProtoMember(5)]
+        public ProjectileStatus ProjectileStatus { get; set; }
+
+        private static TimeSpan timeToLoadProjectile = TimeSpan.FromSeconds(5);
+
+        public TimeSpan EffectiveTimeToLoadProjectile
+        {
+            get
+            {
+                return this.Effective(timeToLoadProjectile, "Projectile Tube");
+            }
+        }
+
+        /// <summary>
         /// Angle Per Second
         /// </summary>
         private const double turnRate = Math.PI / 4;
@@ -85,8 +104,22 @@ namespace WebGame
             Players = new List<Player>();
         }
 
+        public void LoadProjectile()
+        {
+            if (this.ProjectileStatus != ProjectileStatus.Unloaded)
+            {
+                throw new InvalidOperationException("The tube must be empty to load a projectile.");
+            }
+            this.ProjectileLoadTime = TimeSpan.Zero;
+            this.ProjectileStatus = ProjectileStatus.Loading;
+        }
+
         public Projectile LaunchProjectile(Entity target)
         {
+            if (this.ProjectileStatus != ProjectileStatus.Loaded)
+            {
+                throw new InvalidOperationException("The tube must be loaded to launch a projectile");
+            }
             if (this.StarSystem != target.StarSystem)
             {
                 throw new ArgumentException("The target is not in the current star system");
@@ -99,6 +132,14 @@ namespace WebGame
 
         public override void Update(TimeSpan elapsed)
         {
+            if (this.ProjectileStatus == ProjectileStatus.Loading)
+            {
+                this.ProjectileLoadTime += elapsed;
+                if (this.ProjectileLoadTime >= EffectiveTimeToLoadProjectile)
+                {
+                    this.ProjectileStatus = ProjectileStatus.Loaded;
+                }
+            }
             if (this.TargetSpeedMetersPerSecond.HasValue)
             {
                 var speed = this.Velocity.Magnitude();
@@ -216,7 +257,7 @@ namespace WebGame
             {
                 yield return "Thrusters";
                 yield return "Engines";
-                yield return "Weapons";
+                yield return "Projectile Tube";
             }
         }
 
