@@ -343,6 +343,17 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
             return null;
         }
 
+        public ActionResult SetMainScreen(int id, MainView view)
+        {
+            Initalize(id);
+
+            if (game.DefaultShip != null)
+                game.DefaultShip.SetMainScreenView(view);
+
+            return null;
+        }
+
+        #region Helm
         public string SetImpulse(int id, int amount)
         {
             Initalize(id);
@@ -377,8 +388,19 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
 
             return null;
         }
+        #endregion
 
         #region Weapons
+        public ActionResult ToggleAlert(int id)
+        {
+            Initalize(id);
+
+            if (game.DefaultShip != null && player.Station == Station.Weapons)
+                game.DefaultShip.ToggleAlert();
+
+            return null;
+        }
+
         public ActionResult ToggleShields(int id)
         {
             Initalize(id);
