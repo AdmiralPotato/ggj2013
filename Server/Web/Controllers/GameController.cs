@@ -32,6 +32,9 @@ namespace WebGame
             {
                 player = game.GetPlayer(Account.Id);
                 ViewBag.Player = player;
+
+                if (game.DefaultShip != null)
+                    game.DefaultShip.AddPlayer(player);
             }
 
             ViewBag.IsHost = IsHost;
@@ -70,8 +73,24 @@ namespace WebGame
             }
 
             Initalize(id);
-
             LoadMessages();
+
+            if (!game.Started || game.Ended)
+                return View("Lobby", game);
+
+            return View(game);
+        }
+
+        public ActionResult Local(int id = -1)
+        {
+            if (id == -1)
+                return HttpNotFound();
+
+            Initalize(id);
+            LoadMessages();
+
+            if (!game.Started || game.Ended)
+                return View("Lobby", game);
 
             return View(game);
         }
@@ -307,12 +326,6 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
 
             message = HttpUtility.HtmlEncode(message);
             game.SendForumMessage(message, Account.Id, Account.Name);
-
-            while (true)
-            {
-                GameHub.SendUpdate("Game-" + game.Id, new { Id = 1, X = 100, Y = 100, Rotation = 20 });
-                System.Threading.Thread.Sleep(250);
-            }
 
             return null;
         }

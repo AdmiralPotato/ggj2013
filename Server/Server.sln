@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web", "Web\Web.csproj", "{925113FE-AE39-4231-B3E0-C798B88CCCB3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebGame.PhysicsTest", "WebGame.PhysicsTest\WebGame.PhysicsTest.csproj", "{B05B4F2A-EA19-4EA8-98C2-94FDE3C51953}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|.NET = Debug|.NET
@@ -28,6 +30,18 @@ Global
 		{925113FE-AE39-4231-B3E0-C798B88CCCB3}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{925113FE-AE39-4231-B3E0-C798B88CCCB3}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{925113FE-AE39-4231-B3E0-C798B88CCCB3}.Release|x86.ActiveCfg = Release|Any CPU
+		{B05B4F2A-EA19-4EA8-98C2-94FDE3C51953}.Debug|.NET.ActiveCfg = Debug|Any CPU
+		{B05B4F2A-EA19-4EA8-98C2-94FDE3C51953}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B05B4F2A-EA19-4EA8-98C2-94FDE3C51953}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B05B4F2A-EA19-4EA8-98C2-94FDE3C51953}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{B05B4F2A-EA19-4EA8-98C2-94FDE3C51953}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{B05B4F2A-EA19-4EA8-98C2-94FDE3C51953}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B05B4F2A-EA19-4EA8-98C2-94FDE3C51953}.Release|.NET.ActiveCfg = Release|Any CPU
+		{B05B4F2A-EA19-4EA8-98C2-94FDE3C51953}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B05B4F2A-EA19-4EA8-98C2-94FDE3C51953}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B05B4F2A-EA19-4EA8-98C2-94FDE3C51953}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{B05B4F2A-EA19-4EA8-98C2-94FDE3C51953}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{B05B4F2A-EA19-4EA8-98C2-94FDE3C51953}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
