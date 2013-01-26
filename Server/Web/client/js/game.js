@@ -7,14 +7,55 @@ var n = NPos3d,
 		ui: [],
 		entityTypes: {}
 	};
+var timeSinceLastFrame = 0;
+var timeOfLastFrame = new Date().getTime();
+var timeSinceLastUpdate = 0;
+var timeOfLastUpdate = timeOfLastFrame;
+var deltaSinceUpdate = 0;
+var animationController = {
+	update: function() {
+		var currentTime = new Date().getTime();
+		timeSinceLastFrame =  currentTime - timeOfLastFrame;
+		timeOfLastFrame = currentTime;
+		deltaSinceUpdate = 250 / timeSinceLastUpdate;
+	}
+};
+s.add(animationController);
 
-
+var deltaInit = function(o){
+	o.posLast = [0,0,0];
+	o.posNext = [0,0,0];
+	o.posDiff = [0,0,0];
+	o.lastRot = 0;
+	o.rotDiff = 0;
+};
+var deltaUpdate = function(o, entityData){
+	o.posLast[0] = o.posNext[0];
+	o.posLast[1] = o.posNext[1];
+	o.posLast[2] = o.posNext[2];
+	o.posNext[0] = entityData.Position.X;
+	o.posNext[1] = entityData.Position.Y;
+	o.posNext[2] = entityData.Position.Z;
+	o.posDiff[0] = o.posNext[0] - o.posLast[0];
+	o.posDiff[1] = o.posNext[1] - o.posLast[1];
+	o.posDiff[2] = o.posNext[2] - o.posLast[2];
+	o.lastRot = o.rotNext;
+	o.rotNext = entityData.Rotation;
+	o.rotDiff = o.rotNext - o.lastRot;
+};
+var deltaInterpolate = function(o){
+	o.pos[0] = o.posLast[0] + (o.posNext[0] * deltaSinceUpdate);
+	o.pos[1] = o.posLast[1] + (o.posNext[1] * deltaSinceUpdate);
+	o.pos[2] = o.posLast[2] + (o.posNext[2] * deltaSinceUpdate);
+	o.rot[2] = o.lastRot + (o.posNext[2] * deltaSinceUpdate);
+};
 
 client.entityTypes.Ship = function(args){
 	var t = this, type = 'Ship';
 	if(t.type !== type){throw type + ' constructor must be invoked using the `new` keyword.';}
 	args = args || {};
 	n.blessWith3DBase(t,args);
+	deltaInit(t);
 	s.add(t);
 	return t;
 };
@@ -22,18 +63,42 @@ client.entityTypes.Ship = function(args){
 client.entityTypes.Ship.prototype = {
 	type: 'Ship',
 	color: '#0f0',
-	shape: wireframes.ship,
+	shape: wireframes.simpleShip,
 	update: function() {
 		var t = this;
-//		t.rot[2] += deg;
+		deltaInterpolate(t);
 		t.render();
 	},
 	updateFromData: function(entityData){
 		var t = this;
-		t.pos[0] = entityData.Position.X;
-		t.pos[1] = entityData.Position.Y;
-		t.pos[2] = entityData.Position.Z;
-		t.rot[2] = entityData.Rotation;
+		deltaUpdate(t, entityData);
+	}
+};
+
+
+client.entityTypes.Starbase = function(args){
+	var t = this, type = 'StarBase';
+	if(t.type !== type){throw type + ' constructor must be invoked using the `new` keyword.';}
+	args = args || {};
+	n.blessWith3DBase(t,args);
+	t.scale = [100,100,100];
+	deltaInit(t);
+	s.add(t);
+	return t;
+};
+
+client.entityTypes.Starbase.prototype = {
+	type: 'StarBase',
+	color: '#0f0',
+	shape: wireframes.starBase,
+	update: function() {
+		var t = this;
+		deltaInterpolate(t);
+		t.render();
+	},
+	updateFromData: function(entityData){
+		var t = this;
+		deltaUpdate(t, entityData);
 	}
 };
 
@@ -43,8 +108,11 @@ var setGameStateFromServer = function(data) {
 		numEntities = data.Entities.length,
 		entityData,
 		entity,
-		entityIdString;
-	console.log('game state update!');
+		entityIdString,
+		currentTime = new Date().getTime();
+	timeSinceLastUpdate =  currentTime - timeOfLastUpdate;
+	timeOfLastUpdate = currentTime;
+	//console.log('game state update!');
 	for(entityDataIndex = 0; entityDataIndex < numEntities; entityDataIndex += 1) {
 	    entityData = data.Entities[entityDataIndex];
 		entityIdString = 'entity-' + entityData.Id;
@@ -55,20 +123,3 @@ var setGameStateFromServer = function(data) {
 		entity.updateFromData(entityData);
 	}
 };
-
-
-//var tempGameStateUpdate = function(){
-//	var tempGameStateData = {
-//		entityList: [
-//			{
-//				id: 0,
-//				type: 'Ship',
-//				position: [0,0,0],
-//				rotation: deg * 45
-//			}
-//		]
-//	};
-//	setGameStateFromServer(tempGameStateData);
-//};
-
-//var tempGameStateInterval = setInterval(tempGameStateUpdate, 250);
