@@ -95,6 +95,11 @@ namespace WebGame
             return Math.Sqrt(vector.Quadrance());
         }
 
+        public static bool ApproximatelyEqual(double left, double right, double epsilon = 0.001)
+        {
+            return Math.Abs(left - right) < epsilon;
+        }
+
         //public static double NormalizeAlign(this double angle)
         //{
         //    return angle._NormalizeAngle(-Math.PI / 2, Math.PI / 2, Math.PI);

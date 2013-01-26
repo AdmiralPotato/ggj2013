@@ -20,6 +20,16 @@ namespace WebGame.PhysicsTest
         }
 
         [TestMethod]
+        public void TestRotate5Radians()
+        {
+            var ship = new Ship(4000);
+            Assert.AreEqual(0, ship.VelocityMetersPerSecond.Magnitude(), "new ship wasn't stopped");
+            ship.DesiredOrientation = 5;
+            ship.Update(TimeSpan.FromSeconds(50));
+            Assert.AreEqual(5.0, ship.Orientation, "ship wasn't finished turning");
+        }
+
+        [TestMethod]
         public void RotationBigManySmallUpdates()
         {
             var ship = new Ship();

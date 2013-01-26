@@ -53,7 +53,7 @@ namespace WebGame
                 else
                 {
                     // align with velocity
-                    var velocityDirection = Math.Atan2(this.VelocityMetersPerSecond.Y, this.VelocityMetersPerSecond.X);
+                    var velocityDirection = Math.Atan2(this.VelocityMetersPerSecond.Y, this.VelocityMetersPerSecond.X).NormalizeOrientation();
                     var velocityOrientationAngle = this.Orientation - velocityDirection;
                     this.DesiredOrientation = velocityDirection;
                     if (Math.Abs(velocityOrientationAngle) > Math.PI / 2)
