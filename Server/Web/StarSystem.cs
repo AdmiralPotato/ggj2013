@@ -57,5 +57,10 @@ namespace WebGame
                 Ships.Remove(ship);
             }
         }
+
+        internal Entity GetEntity(int targetId)
+        {
+            return (from e in Entites where e.Id == targetId select e).FirstOrDefault();
+        }
     }
 }

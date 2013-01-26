@@ -219,5 +219,9 @@ namespace WebGame
                 yield return "Weapons";
             }
         }
+
+        internal void SetPower(string part, float amount)
+        {
+        }
     }
 }

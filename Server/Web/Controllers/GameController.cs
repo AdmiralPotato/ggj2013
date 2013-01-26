@@ -394,7 +394,41 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
             Initalize(id);
 
             if (game.DefaultShip != null && player.Station == Station.Weapons)
-                game.DefaultShip.ToggleShields();
+            {
+                var target = game.DefaultShip.StarSystem.GetEntity(targetId);
+                if (target != null)
+                    game.DefaultShip.LaunchProjectile(target);
+            }
+
+            return null;
+        }
+        #endregion
+
+        #region Engineering
+        public ActionResult SetPower(int id, string part, float amount)
+        {
+            Initalize(id);
+
+            if (game.DefaultShip != null && player.Station == Station.Engineering)
+            {
+                game.DefaultShip.SetPower(part, amount);
+            }
+
+            return null;
+        }
+        #endregion
+
+        #region Communication
+        public ActionResult SendCommand(int id, int targetId, Command command)
+        {
+            Initalize(id);
+
+            if (game.DefaultShip != null && player.Station == Station.Communication)
+            {
+                var target = game.DefaultShip.StarSystem.GetEntity(targetId);
+                if (target != null)
+                    target.ReceiveCommand(game.DefaultShip, command);
+            }
 
             return null;
         }

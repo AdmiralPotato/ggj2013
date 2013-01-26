@@ -145,5 +145,9 @@ namespace WebGame
             this.IsDestroyed = true;
             this.StarSystem.RemoveEntity(this);
         }
+
+        internal void ReceiveCommand(Ship ship, Command command)
+        {
+        }
     }
 }
