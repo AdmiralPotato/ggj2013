@@ -110,17 +110,17 @@ namespace WebGame
             Vector3 lineVec = segmentEnd - segmentBegin;
             Vector3 pVec = point - segmentBegin;
 
-            double c1 = dot(pVec, lineVec);
+            double c1 = pVec.X * lineVec.X + pVec.Y * lineVec.Y + pVec.Z * lineVec.Z;
             if (c1 <= 0)
-                return d(point, segmentBegin);
+                return Quadrance(point - segmentBegin);
 
-            double c2 = dot(lineVec, lineVec);
+            double c2 = Quadrance(lineVec);
             if (c2 <= c1)
-                return d(point, segmentEnd);
+                return Quadrance(point - segmentEnd);
  
-            double b = c1 / c2;
-            Point pointOnLine = segmentBegin + b * lineVec;
-            return d(point, pointOnLine);
+            float b = (float)(c1 / c2);
+            Vector3 pointOnLine = segmentBegin + lineVec * b;
+            return Quadrance(point - pointOnLine);
         }
 
         public static bool SphereIntersectsLineSegment(Vector3 segmentBegin, Vector3 segmentEnd, Vector3 sphereCenter, double radius)
