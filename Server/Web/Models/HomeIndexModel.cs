@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Web.Mvc;
 using System.Web.Security;
 using System.Collections;
-using WebGame.Core;
+using WebGame;
 using System.Web;
 
 namespace WebGame

@@ -7,7 +7,7 @@ using System.IO;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 
-namespace WebGame.Core
+namespace WebGame
 {
     [ProtoContract]
     public class Game
@@ -48,6 +48,8 @@ namespace WebGame.Core
         [ProtoMember(22, IsRequired = false)]
         public List<Invite> Invites { get; set; }
 
+        public List<StarSystem> StarSystems = new List<StarSystem>();
+
         public bool Running
         {
             get { return Started && !Ended; }
@@ -77,6 +79,19 @@ namespace WebGame.Core
 
             Players = new List<Player>();
             Invites = new List<Invite>();
+        }
+
+        public void Update(TimeSpan elapsed)
+        {
+            foreach (var starSystem in StarSystems)
+            {
+                starSystem.Update(elapsed);
+            }
+
+            foreach (var player in Players)
+            {
+                // send an update thru signalr
+            }
         }
 
         public Player GetPlayer(int accountId)

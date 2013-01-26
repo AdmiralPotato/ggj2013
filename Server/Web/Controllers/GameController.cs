@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Text;
-using WebGame.Core;
+using WebGame;
 using LT;
 
 namespace WebGame

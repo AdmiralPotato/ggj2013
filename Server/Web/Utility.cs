@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Text;
 
-namespace WebGame.Core
+namespace WebGame
 {
     public static class Utility
     {

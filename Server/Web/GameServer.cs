@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using ProtoBuf;
 using System.IO;
-using WebGame.Core;
+using WebGame;
 using System.Web.Caching;
 using LT;
 using System.Net.Mail;

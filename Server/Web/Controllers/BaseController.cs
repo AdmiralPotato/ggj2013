@@ -5,7 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Collections;
 using LT;
-using WebGame.Core;
+using WebGame;
 using System.Text;
 using System.Security.Cryptography;
 

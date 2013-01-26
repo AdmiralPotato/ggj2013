@@ -4,7 +4,7 @@ using System.Text;
 using System.Web;
 using ProtoBuf;
 using System.Collections;
-using WebGame.Core;
+using WebGame;
 using LT;
 
 namespace WebGame

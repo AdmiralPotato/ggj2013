@@ -97,10 +97,13 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Base.cs" />
     <Compile Include="BaseViews.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\GameController.cs" />
+    <Compile Include="Entity.cs" />
+    <Compile Include="EntityUpdate.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GameHub.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -112,6 +115,8 @@
     <Compile Include="LT\DBConnection.cs" />
     <Compile Include="LT\HtmlUtils.cs" />
     <Compile Include="Account.cs" />
+    <Compile Include="MathHelper.cs" />
+    <Compile Include="Matrix.cs" />
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="Models\HomeIndexModel.cs" />
@@ -119,7 +124,11 @@
     <Compile Include="GameServer.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Ship.cs" />
+    <Compile Include="StarSystem.cs" />
+    <Compile Include="UpdateToClient.cs" />
     <Compile Include="Utility.cs" />
+    <Compile Include="Vector3.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.js" />

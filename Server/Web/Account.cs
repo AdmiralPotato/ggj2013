@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using ProtoBuf;
 using System.Collections;
-using WebGame.Core;
+using WebGame;
 
 namespace WebGame
 {

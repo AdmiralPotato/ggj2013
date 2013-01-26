@@ -5,7 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using LT;
 using System.Collections;
-using WebGame.Core;
+using WebGame;
 using System.Text;
 
 namespace WebGame

@@ -1,8 +1,8 @@
 ﻿@using WebGame
-@model WebGame.Core.Game
+@model WebGame.Game
 @{
     ViewBag.Title = Model.GameName;
-    WebGame.Core.Player Player = ViewBag.Player;
+    WebGame.Player Player = ViewBag.Player;
     var IsPlaying = Player != null;
 }
 

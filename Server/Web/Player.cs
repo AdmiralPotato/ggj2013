@@ -4,7 +4,7 @@ using System.Text;
 using ProtoBuf;
 using System.ComponentModel;
 
-namespace WebGame.Core
+namespace WebGame
 {
     [ProtoContract]
     public class Player

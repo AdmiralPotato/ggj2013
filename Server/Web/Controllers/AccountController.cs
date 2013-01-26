@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 using System.Text;
 using LT;
 using System.Collections;
-using WebGame.Core;
+using WebGame;
 using System.Net.Mail;
 
 namespace WebGame
