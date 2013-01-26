@@ -32,6 +32,9 @@ namespace WebGame
             {
                 player = game.GetPlayer(Account.Id);
                 ViewBag.Player = player;
+
+                if (game.DefaultShip != null)
+                    game.DefaultShip.AddPlayer(player);
             }
 
             ViewBag.IsHost = IsHost;
@@ -70,11 +73,10 @@ namespace WebGame
             }
 
             Initalize(id);
-
-            if (game.DefaultShip != null)
-                game.DefaultShip.AddPlayer(player);
-
             LoadMessages();
+
+            if (!game.Started || game.Ended)
+                return View("Lobby", game);
 
             return View(game);
         }

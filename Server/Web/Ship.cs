@@ -16,6 +16,8 @@ namespace WebGame
         private const double turnRateAnglePerSecond = Math.PI / 4; // this will likely get changed to something from engineering
         private const double maximumAvailableForceMetersPerSecondPerTon = 1; // force = mass * acceleration
 
+        public override string Type { get { return "Ship"; } }
+
         public Ship()
         {
             Players = new List<Player>();
@@ -96,7 +98,12 @@ namespace WebGame
             if (Players.Count > 0)
             {
                 var update = new UpdateToClient();
+                foreach (var entity in StarSystem.Entites)
+                {
+                    update.Entities.Add(new EntityUpdate() { Id = entity.Id, Type = entity.Type, Rotation = (float)entity.Orientation/*, Position = entity.Position*/ });
+                }
                 GameHub.SendUpdate(Game.Id, Id, update);
+                System.Diagnostics.Debug.WriteLine("Update Sent.");
             }
         }
     }

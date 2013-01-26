@@ -53,7 +53,7 @@ namespace WebGame
         public Ship DefaultShip;
         public int NextEntityId { get; set; }
 
-        Timer timer;
+        System.Timers.Timer timer;
         DateTime lastUpdate;
 
         public bool Running
@@ -90,18 +90,22 @@ namespace WebGame
         public void Run()
         {
             System.Diagnostics.Debug.WriteLine("Game " + Id + " thread started");
-            timer = new Timer(new TimerCallback(DoUpdate), null, 0, 250);
+            timer = new System.Timers.Timer(250);
+            timer.Elapsed += timer_Elapsed;
+            timer.Start();
         }
 
-        void DoUpdate(object state)
+        void timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             System.Diagnostics.Debug.WriteLine("Game " + Id + " update");
             var now = DateTime.UtcNow;
             var elapsed = lastUpdate - now;
 
             Update(elapsed);
-            
-            lastUpdate = DateTime.UtcNow;
+
+            lastUpdate = now;
+
+            timer.Enabled = true;
         }
 
         public void Update(TimeSpan elapsed)
@@ -198,6 +202,7 @@ namespace WebGame
             var starSystem = new StarSystem();
             Add(starSystem);
             DefaultShip = new Ship();
+            DefaultShip.DesiredOrientation = 1;
             starSystem.AddEntity(DefaultShip);
 
             Run();

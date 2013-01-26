@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.Xna.Framework;
 
 namespace WebGame
 {
@@ -9,7 +10,7 @@ namespace WebGame
     {
         public int Id;
         public string Type;
-        public float[] Position;
+        public Vector3 Position;
         public float Rotation;
         public int Health;
         public int MaxHealth;

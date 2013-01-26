@@ -10,7 +10,7 @@ namespace WebGame
 {
     public class GameHub : Hub, IConnected, IDisconnect
     {
-        static object GetShipGroupName(int gameId, int shipId)
+        static string GetShipGroupName(int gameId, int shipId)
         {
             return "Ship-" + gameId.ToString() + "-" + shipId.ToString();
         }
@@ -31,7 +31,10 @@ namespace WebGame
                     {
                         var defaultShip = GameServer.GetGame(gameId).DefaultShip;
                         if (defaultShip != null)
-                            SetShip(gameId, defaultShip.Id);
+                        {
+                            Groups.Add(Context.ConnectionId, GetShipGroupName(gameId, defaultShip.Id));
+                            //SetShip(gameId, defaultShip.Id);
+                        }
                     }
                 }
             }

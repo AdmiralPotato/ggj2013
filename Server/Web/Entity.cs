@@ -10,8 +10,12 @@ namespace WebGame
     {
         public int Id { get; set; }
 
-        public Game Game { get; set; }
-        public StarSystem StarSystem { get; set; }
+        public Game Game;
+        public StarSystem StarSystem;
+        public abstract string Type
+        {
+            get;
+        }
 
         public Vector3 Position { get; protected set; }
         public double Orientation { get; protected set; }
