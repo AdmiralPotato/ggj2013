@@ -140,6 +140,11 @@ namespace WebGame
             return maximum * this.Parts[partName] / partsHp;
         }
 
+        public TimeSpan Effective(TimeSpan minimum, string partName)
+        {
+            return TimeSpan.FromTicks((long)(minimum.Ticks / (this.Parts[partName] / (double)partsHp)));
+        }
+
         protected void Destroy()
         {
             this.IsDestroyed = true;
