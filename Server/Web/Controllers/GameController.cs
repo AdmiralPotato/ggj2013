@@ -32,9 +32,7 @@ namespace WebGame
             {
                 player = game.GetPlayer(Account.Id);
                 ViewBag.Player = player;
-
-                if (game.DefaultShip != null)
-                    game.DefaultShip.AddPlayer(player);
+                player.SessionId = Request.Cookies["ASP.Net_SessionId"].Value;
             }
 
             ViewBag.IsHost = IsHost;
@@ -303,11 +301,11 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
             if (!LoggedIn)
                 return Redirect("/Game-" + game.Id + "/");
 
-            if (!game.Started && IsHost && game.CurrentPlayers >= 2)
-            {
+            //if (!game.Started && IsHost && game.CurrentPlayers >= 2)
+            //{
                 game.MaxPlayers = game.CurrentPlayers;
                 game.Start();
-            }
+            //}
 
             Initalize(id);
 

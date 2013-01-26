@@ -30,6 +30,9 @@ namespace WebGame
         [ProtoMember(13)]
         public int RatingChange { get; set; }
 
+        public string SessionId;
+        public Game Game;
+
         public bool IsEliminated
         {
             get { return Place > 0; }

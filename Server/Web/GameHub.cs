@@ -9,47 +9,58 @@ namespace WebGame
 {
     public class GameHub : Hub
     {
+        static bool groupsWorking;
+
+        static Dictionary<string, Player> PlayersByConnectionId = new Dictionary<string,Player>();
+
         static string GetShipGroupName(int gameId, int shipId)
         {
             return "Ship-" + gameId.ToString() + "-" + shipId.ToString();
         }
 
-        //public override Task OnConnected()
-        //{
-        //    var sessionCookie = Context.RequestCookies["ASP.Net_SessionId"];
-        //    if (sessionCookie != null)
-        //        Groups.Add(Context.ConnectionId, sessionCookie.Value);
+        public override Task OnConnected()
+        {
+            var sessionCookie = Context.RequestCookies["ASP.Net_SessionId"];
+            if (sessionCookie != null)
+                Groups.Add(Context.ConnectionId, sessionCookie.Value);
 
-        //    Uri referrer;
-        //    if (Uri.TryCreate(Context.Headers["Referer"], UriKind.RelativeOrAbsolute, out referrer))
-        //    {
-        //        if (referrer.Segments.Length > 1 && referrer.Segments[1].StartsWith("Game-"))
-        //        {
-        //            int gameId;
-        //            if (Int32.TryParse(referrer.Segments[1].TrimEnd('/').Substring("Game-".Length), out gameId))
-        //            {
-        //                var defaultShip = GameServer.GetGame(gameId).DefaultShip;
-        //                if (defaultShip != null)
-        //                {
-        //                    Groups.Add(Context.ConnectionId, GetShipGroupName(gameId, defaultShip.Id));
-        //                    //SetShip(gameId, defaultShip.Id);
-        //                }
-        //            }
-        //        }
-        //    }
+            Uri referrer;
+            if (Uri.TryCreate(Context.Headers["Referer"], UriKind.RelativeOrAbsolute, out referrer))
+            {
+                if (referrer.Segments.Length > 1 && referrer.Segments[1].StartsWith("Game-"))
+                {
+                    int gameId;
+                    if (Int32.TryParse(referrer.Segments[1].TrimEnd('/').Substring("Game-".Length), out gameId))
+                    {
+                        var defaultShip = GameServer.GetGame(gameId).DefaultShip;
+                        if (defaultShip != null)
+                        {
+                            //Groups.Add(Context.ConnectionId, GetShipGroupName(gameId, defaultShip.Id));
+                            //groupsWorking = true;
 
-        //    return base.OnConnected();
-        //}
+                            SetShip(gameId, defaultShip.Id, true);
+                        }
+                    }
+                }
+            }
 
-        //public override Task OnDisconnected()
-        //{
-        //    return base.OnDisconnected();
-        //}
+            return base.OnConnected();
+        }
 
-        //public override Task OnReconnected()
-        //{
-        //    return base.OnReconnected();
-        //}
+        public override Task OnDisconnected()
+        {
+            if (PlayersByConnectionId.ContainsKey(Context.ConnectionId))
+            {
+                var player = PlayersByConnectionId[Context.ConnectionId];
+                player.Game.DisconnectPlayer(player);
+            }
+            return base.OnDisconnected();
+        }
+
+        public override Task OnReconnected()
+        {
+            return base.OnReconnected();
+        }
 
         //public Task SetGroup(int gameId)
         //{
@@ -59,12 +70,39 @@ namespace WebGame
         //    return Groups.Add(Context.ConnectionId, Caller.GroupName);
         //}
 
-        //public Task SetShip(int gameId, int shipId)
-        //{
-        //    //Caller.ShipId = shipId;
-        //    //Caller.GroupName = GetShipGroupName(gameId, shipId);
-        //    return Groups.Add(Context.ConnectionId, GetShipGroupName(gameId, shipId));
-        //}
+        public Task SetShip(int gameId, int shipId, bool useGroups)
+        {
+            var game = GameServer.GetGame(gameId);
+            if (game != null)
+            {
+                var player = game.ConnectPlayer(Context.ConnectionId, Context.RequestCookies["ASP.Net_SessionId"].Value);
+                if (player != null)
+                    PlayersByConnectionId[Context.ConnectionId] = player;
+
+                if (useGroups)
+                {
+                    //Caller.ShipId = shipId;
+                    //Caller.GroupName = GetShipGroupName(gameId, shipId);
+                    groupsWorking = true;
+                    return Groups.Add(Context.ConnectionId, GetShipGroupName(gameId, shipId));
+                }
+            }
+            return null;
+        }
+
+        public Task Disconnecting(int gameId, int shipId)
+        {
+            var game = GameServer.GetGame(gameId);
+            if (game != null)
+            {
+                game.DisconnectPlayer(Context.ConnectionId, Context.RequestCookies["ASP.Net_SessionId"].Value);
+
+                //GameServer.GetGame(gameId);
+                if (groupsWorking)
+                    return Groups.Remove(Context.ConnectionId, GetShipGroupName(gameId, shipId));
+            }
+            return null;
+        }
 
         public void TestThrow()
         {
@@ -83,23 +121,19 @@ namespace WebGame
 
             var context = GlobalHost.ConnectionManager.GetHubContext<GameHub>();
 
-            context.Clients.All.handleUpdate(update);
-
-
-            //var group = context.Clients.Group(groupName);
-            //group.handleUpdate(update);
+            //if (groupsWorking)
+            //{
+            //    var group = context.Clients.Group(groupName);
+            //    group.handleUpdate(update);
+            //}
+            //else
+                context.Clients.All.handleUpdate(update);
         }
 
         public static void Refresh(string group)
         {
             var context = GlobalHost.ConnectionManager.GetHubContext<GameHub>();
             context.Clients.Group(group).reload();
-        }
-
-        public static void SetDone(string group, int playerNumber)
-        {
-            var context = GlobalHost.ConnectionManager.GetHubContext<GameHub>();
-            context.Clients.Group(group).setDone(playerNumber);
         }
 
         public static void SendMessage(string sessionKey, int sourceId, string sourceName, string text)

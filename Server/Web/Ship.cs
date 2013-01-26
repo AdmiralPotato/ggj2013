@@ -139,6 +139,12 @@ namespace WebGame
                 Players.Add(player);
         }
 
+        public void RemovePlayer(Player player)
+        {
+            if (Players.Contains(player))
+                Players.Remove(player);
+        }
+
         internal void SendUpdate()
         {
             if (Players.Count > 0)
