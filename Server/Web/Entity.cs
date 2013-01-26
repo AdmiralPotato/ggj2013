@@ -8,6 +8,11 @@ namespace WebGame
 {
     public abstract class Entity
     {
+        public int Id { get; set; }
+
+        public Game Game { get; set; }
+        public StarSystem StarSystem { get; set; }
+
         public Vector3 Position { get; set; }
 
         public Vector3 Velocity { get; set; }

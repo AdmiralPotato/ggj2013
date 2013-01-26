@@ -42,28 +42,6 @@ namespace WebGame
 
         static GameServer()
         {
-            Game.OnMessage = (game, text, sourceId, sourceName) =>
-                {
-                    using (var db = new DBConnection())
-                    {
-                        SendMessage(db, -game.Id, sourceId, sourceName, text);
-                    }
-
-                    var message = new Message() { Sent = DateTime.UtcNow, Text = text, SourceId = sourceId, SourceName = sourceName };
-                    GameHub.Say("Game-" + game.Id, message.Print(false));
-                };
-
-            //Game.OnStart = (game) =>
-            //    {
-            //        SaveGame(game);
-            //        using (var db = CreateDB())
-            //        {
-            //            db.Execute("delete from player where game_id = {0} and isInvite = 1", game.Id);
-            //        }
-            //        EmailAllPlayers(game, game.GameName + " Started", "The Global Combat game (" + game.GameName + ") has started.\n\nVisit http://globalcombat.com/Game-" + game.Id + " to play your turn.", true);
-            //        GameHub.Refresh("Game-" + game.Id);
-            //    };
-
             //Game.OnEnd = (game, winner) =>
             //{
             //    if (!game.IsTraining)
