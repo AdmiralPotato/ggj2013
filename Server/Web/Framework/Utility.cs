@@ -104,5 +104,11 @@ namespace WebGame
         //{
         //    return angle._NormalizeAngle(-Math.PI / 2, Math.PI / 2, Math.PI);
         //}
+
+        public static bool SphereIntersectsLineSegment(Vector3 segementBegin, Vector3 segmentEnd, Vector3 sphereCenter, double radius)
+        {
+            return false;
+            //throw new NotImplementedException("Adam would implement");
+        }
     }
 }

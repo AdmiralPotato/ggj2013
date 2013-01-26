@@ -130,7 +130,7 @@ namespace WebGame
                 damage--;
             }
 
-            if (damage > 0)
+            if (this.Parts.Values.Sum() == 0)
             {
                 this.Destroy();
             }

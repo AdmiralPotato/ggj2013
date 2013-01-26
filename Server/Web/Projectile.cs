@@ -56,7 +56,7 @@ namespace WebGame
         {
             var collisionQuadrance = Target.Radius * Target.Radius + this.Radius * this.Radius;
             var currentDisplacementQuadrance = DisplacementToTarget().Quadrance();
-            if (currentDisplacementQuadrance < collisionQuadrance) // we may want to have an alternate check for having gone through the target || DisplacementToTarget(oldPosition).Quadrance() < currentDisplacementQuadrance) // this only works if missiles are the fastest thing
+            if (currentDisplacementQuadrance < collisionQuadrance || Utility.SphereIntersectsLineSegment(oldPosition, this.Position, Target.Position, Target.Radius)) // we may want to have an alternate check for having gone through the target || DisplacementToTarget(oldPosition).Quadrance() < currentDisplacementQuadrance) // this only works if missiles are the fastest thing
             {
                 Detonate();
             }
