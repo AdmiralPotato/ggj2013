@@ -44,6 +44,12 @@ namespace WebGame
         }
         private double _desiredOrientation;
 
+        [ProtoMember(4)]
+        public bool Alert { get; set; }
+
+        [ProtoMember(5)]
+        public MainView MainView { get; set; }
+
         /// <summary>
         /// Angle Per Second
         /// </summary>
@@ -221,6 +227,24 @@ namespace WebGame
         }
 
         internal void SetPower(string part, float amount)
+        {
+        }
+
+        internal void SetCoolant(string part, int amount)
+        {
+        }
+
+        internal void ToggleAlert()
+        {
+            Alert = !Alert;
+        }
+
+        internal void SetMainScreenView(MainView view)
+        {
+            MainView = view;
+        }
+
+        internal void SetRepairTarget(string part)
         {
         }
     }
