@@ -1,0 +1,99 @@
+﻿@using WebGame
+@model WebGame.Game
+@{
+    ViewBag.Title = Model.GameName;
+    WebGame.Player Player = ViewBag.Player;
+    var IsPlaying = Player != null;
+}
+
+<script type="text/javascript">
+    function Send()
+    {
+        var messageBox = $("#MessageBox");
+        message = messageBox.val();
+        $.post("Send", { message: message });
+        messageBox.val("");
+    }
+
+    $(function () {
+        var gameHub = $.connection.gameHub;
+
+        gameHub.addMessage = function (message) {
+            $('#Messages').prepend(message);
+        };
+
+        gameHub.setDone = function (playerNumber) {
+            $('#Player' + playerNumber).append('- Done&nbsp;');
+        };
+    });
+</script>
+
+<h2>@Model.GameName</h2>
+<br />
+<table cellspacing="0" cellpadding="2">
+    <tr><td class="Label">Number of Players</td><td>@Model.MaxPlayers</td></tr>
+</table>
+<br />
+
+<h3>Players</h3>
+@Html.Partial("_PlayerList");
+<br />
+
+@if (!Model.Ended && Model.Invites.Count > 0)
+{
+    <h3>Invites</h3>
+    foreach (var invite in Model.Invites)
+    {
+        @AccountLink(invite.AccountId, invite.Name)<br />
+    }
+    <br />
+}
+
+<div class="CommandMenu">
+@if (!IsPlaying)
+{
+    <a href="Join">Join</a>
+}
+else
+{
+    <form action="Invite" method="post">
+        <table><tr>
+            <td><textarea name="InviteEmail" placeholder="Email Addresses or Account Names" cols="40" rows="2" ></textarea></td>
+            <td>
+                <input type="submit" value="Invite Players" style="vertical-align: top;" />
+                <br /> <small style="vertical-align: top">Players do not need an account to be invited via email.</small>
+            </td>
+        </tr></table>
+    </form>
+    <br />
+    <a href="Quit">Quit Game</a>
+
+    if (Player.Number == 1)
+    {
+        @:- <a href="Start">Start Game</a>
+    }
+}
+</div>
+
+@if (!String.IsNullOrEmpty(ViewBag.ErrorMessage))
+{
+    <br />
+    <div class="ErrorMessage" >@Html.Raw(ViewBag.ErrorMessage)</div>
+}
+
+@section UnderCenter {
+    <div class="Forum">
+        @if (LoggedIn)
+        {
+            <form onsubmit="Send(); return false;" >
+                <input type="text" id="MessageBox" class="MessageInput" placeholder="Send a message." size="60" />
+            </form>
+        }
+        <table id="Messages" width="100%">
+            @foreach (Message message in ViewBag.Messages)
+            {
+                @Html.Raw(message.Print())
+            }
+        </table>
+    </div>
+}

@@ -7,14 +7,12 @@ namespace WebGame
 {
     public class StarSystem
     {
-        public Game Game { get; set; }
-        public List<Player> Players = new List<Player>();
+        public Game Game;
         public List<Entity> Entites = new List<Entity>();
         public List<Ship> Ships = new List<Ship>();
 
         public StarSystem()
         {
-            Players = new List<Player>();
             Entites = new List<Entity>();
             Ships = new List<Ship>();
         }
@@ -35,6 +33,7 @@ namespace WebGame
         public void AddEntity(Entity entity)
         {
             entity.Game = Game;
+            entity.StarSystem = this;
 
             if (entity.Id == 0)
                 entity.Id = Game.NextEntityId++;

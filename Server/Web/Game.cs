@@ -198,6 +198,7 @@ namespace WebGame
             var starSystem = new StarSystem();
             Add(starSystem);
             DefaultShip = new Ship();
+            DefaultShip.DesiredOrientation = 1;
             starSystem.AddEntity(DefaultShip);
 
             Run();
