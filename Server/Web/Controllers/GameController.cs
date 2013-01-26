@@ -330,7 +330,7 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
             return null;
         }
 
-        public ActionResult SetImpulse(int id, int amount = -1)
+        public ActionResult SetImpulse(int id, int amount)
         {
             Initalize(id);
 
@@ -341,5 +341,24 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
         }
 
 
+        public ActionResult SetDesiredHeading(int id, float amount)
+        {
+            Initalize(id);
+
+            if (game.DefaultShip != null)
+                game.DefaultShip.DesiredOrientation = amount;
+
+            return null;
+        }
+
+        public ActionResult SetDesiredSpeed(int id, int amount)
+        {
+            Initalize(id);
+
+            if (game.DefaultShip != null)
+                game.DefaultShip.TargetSpeedMetersPerSecond = amount;
+
+            return null;
+        }
     }
 }

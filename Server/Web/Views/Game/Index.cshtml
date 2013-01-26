@@ -15,6 +15,10 @@
 <body>
     <div id="ui">
         <input type="submit" onclick='$.post("SetImpulse", "amount=100");' value="Go" />
+        <input type="submit" onclick='$.post("SetDesiredSpeed", "amount=0");' value="Stop" />
+        <br />
+        <input type="text" id="desiredHeading" value="0" />
+        <input type="submit" onclick='$.post("SetDesiredHeading", "amount=" + $("#desiredHeading").val());' value="Set Heading" />
         <div id="modal">
             <h1>NOT Artemis</h1>
             <div>
@@ -30,12 +34,12 @@
     <script src="/client/js/game.js"></script>
 
     <script type="text/javascript">
-        $.connection.hub.logging = true;
+        //$.connection.hub.logging = true;
 
         var gameHub = $.connection.gameHub;
         gameHub.client.handleUpdate = function (update) {
             console.log(JSON.stringify(update));
-            setGameStateFromServer(tempGameStateData);
+            setGameStateFromServer(update);
         };
 
         //$.connection.hub.start()
