@@ -9,12 +9,12 @@ namespace WebGame
     public class Ship : Entity
     {
         public List<Player> Players { get; private set; }
-        public int ImpulsePercentage { get; set; }
+        public double ImpulsePercentage { get; set; }
         public int? TargetSpeedMetersPerSecond { get; set; }
         public double DesiredOrientation { get; set; }
 
         private const double turnRateAnglePerSecond = Math.PI / 4; // this will likely get changed to something from engineering
-        private const double maximumAvailableForceMetersPerSecondPerTon = 1; // force = mass * acceleration
+        private const double maximumAvailableForceMetersPerSecondPerTon = 10000; // force = mass * acceleration
 
         public override string Type { get { return "Ship"; } }
 
@@ -27,10 +27,39 @@ namespace WebGame
         {
             if (this.TargetSpeedMetersPerSecond.HasValue)
             {
-                AlignShipToVelocity(elapsed);
-                throw new NotImplementedException();
-                // apply impulse proportional to -1 * cosine of the angle between desired and current
-                // consider when velocity is almost zero? Calculate the inverse of the mass to determine impulse
+                var speed = this.VelocityMetersPerSecond.Magnitude();
+                if (this.TargetSpeedMetersPerSecond > speed)
+                {
+                    // speed up
+                    this.ImpulsePercentage = 100;
+                }
+                else if (this.TargetSpeedMetersPerSecond.Value == speed)
+                {
+                    // stop target speed, reset values
+                    this.TargetSpeedMetersPerSecond = null;
+                    this.ImpulsePercentage = 0;
+                    this.DesiredOrientation = this.Orientation;
+                }
+                else
+                {
+                    // align with velocity
+                    var velocityDirection = Math.Atan2(this.VelocityMetersPerSecond.Y, this.VelocityMetersPerSecond.X);
+                    var velocityOrientationAngle = this.Orientation - velocityDirection;
+                    this.DesiredOrientation = velocityDirection;
+                    if (Math.Abs(velocityOrientationAngle) > Math.PI / 2)
+                    {
+                        this.DesiredOrientation = (velocityDirection + Math.PI).NormalizeOrientation();
+                    }
+                    // apply a slowing force
+                    this.ImpulsePercentage = -100 * Math.Cos(velocityOrientationAngle);
+                    // but make sure it won't push us past the desired velocity
+                    var decelerationAmount = this.ImpulsePercentage / 100 * MaxAccelerationMagnitude();
+                    var targetDeceleration = speed - this.TargetSpeedMetersPerSecond.Value;
+                    if (targetDeceleration < Math.Abs(decelerationAmount))
+                    {
+                        this.ImpulsePercentage = targetDeceleration / MaxAccelerationMagnitude() * 100 * Math.Sign(decelerationAmount);
+                    }
+                }
             }
             TurnShipToDesiredOrientation(elapsed);
             AccelerateShip(elapsed);
@@ -39,17 +68,20 @@ namespace WebGame
 
         private void AccelerateShip(TimeSpan elapsed)
         {
-            var accelerationMagnitude = (float)(maximumAvailableForceMetersPerSecondPerTon / this.MassTons);
-            var flatAcceleration = new Vector3(accelerationMagnitude, 0, 0);
+            var accelerationMagnitude = this.ImpulsePercentage / 100 * MaxAccelerationMagnitude();
+            var flatAcceleration = new Vector3((float)accelerationMagnitude, 0, 0);
             var acceleration = Vector3.Transform(flatAcceleration, Matrix.CreateRotationZ((float)this.Orientation));
 
             this.VelocityMetersPerSecond += acceleration;
+            if (this.VelocityMetersPerSecond.Magnitude() < 0.1) // small enough not to care.
+            {
+                this.VelocityMetersPerSecond = Vector3.Zero;
+            }
         }
 
-        private void AlignShipToVelocity(TimeSpan elapsed)
+        private double MaxAccelerationMagnitude()
         {
-            // Expand TurnShip todo this kind of stuff
-            throw new NotImplementedException(); // copy 
+            return maximumAvailableForceMetersPerSecondPerTon / this.MassTons;
         }
 
         private void TurnShipToDesiredOrientation(TimeSpan elapsed)
@@ -63,7 +95,7 @@ namespace WebGame
             }
             else
             {
-                this.Orientation += (currentAllowedDiffAngle * Math.Sign(desiredDiffAngle)).NormalizeOrientation();
+                this.Orientation = (this.Orientation + currentAllowedDiffAngle * Math.Sign(desiredDiffAngle)).NormalizeOrientation();
             }
         }
 
