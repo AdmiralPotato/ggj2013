@@ -15,6 +15,14 @@
 </head>
 <body>
     <div id="ui">
+        <input type="submit" onclick='$.post("SetMainScreen", "view=Front");' value="Front" />
+        <input type="submit" onclick='$.post("SetMainScreen", "view=Left");' value="Left" />
+        <input type="submit" onclick='$.post("SetMainScreen", "view=Right");' value="Right" />
+        <input type="submit" onclick='$.post("SetMainScreen", "view=Rear");' value="Rear" />
+        <input type="submit" onclick='$.post("SetMainScreen", "view=Tactical");' value="Tactical" />
+        <input type="submit" onclick='$.post("SetMainScreen", "view=LongRange");' value="LongRange" />
+        <input type="submit" onclick='$.post("SetMainScreen", "view=Status");' value="Status" />
+        <br />
         <select id="desiredStation">
             <option value="None">None</option>
             <option value="Main">Main</option>
@@ -25,25 +33,44 @@
             <option value="GameMaster">Game Master</option>
         </select>
         <input type="submit" onclick='$.post("SelectStation", "station=" + $("#desiredStation").val());' value="Select Station" />
+
         <h3>Helm</h3>
         <input type="submit" onclick='$.post("SetImpulse", "amount=100");' value="Go" />
         <input type="submit" onclick='$.post("SetDesiredSpeed", "amount=0");' value="Stop" />
         <br />
         <input type="text" id="desiredHeading" value="0" />
         <input type="submit" onclick='$.post("SetDesiredHeading", "amount=" + $("#desiredHeading").val());' value="Set Heading" />
+
         <h3>Weapons</h3>
         <input type="submit" onclick='$.post("ToggleShields");' value="Toggle Shields" />
         <br />
         <input type="text" id="desiredTarget" value="0" />
         <input type="submit" onclick='$.post("LaunchProjectile", "targetId=" + $("#desiredTarget").val());' value="Launch Projectile" />
+
         <h3>Engineering</h3>
-        <input type="text" id="engAmount" value="0" />
         <select id="engPart">
             <option value="Thrusters">Thrusters</option>
             <option value="Engines">Engines</option>
             <option value="Weapons">Weapons</option>
         </select>
+        <input type="text" id="engAmount" value="0" />
         <input type="submit" onclick='$.post("SetPowerLevel", "part=" + $("#engPart").val() + "&amount=" + $("#engAmount").val());' value="Set Power" />
+        <br />
+        <select id="engCoolPart">
+            <option value="Thrusters">Thrusters</option>
+            <option value="Engines">Engines</option>
+            <option value="Weapons">Weapons</option>
+        </select>
+        <input type="text" id="engCoolAmount" value="0" />
+        <input type="submit" onclick='$.post("SetCoolantLevel", "part=" + $("#engCoolPart").val() + "&amount=" + $("#engCoolAmount").val());' value="Set Coolant" />
+        <br />
+        <select id="engRepairPart">
+            <option value="Thrusters">Thrusters</option>
+            <option value="Engines">Engines</option>
+            <option value="Weapons">Weapons</option>
+        </select>
+        <input type="submit" onclick='$.post("SetRepairTarget", "part=" + $("#engRepairPart").val());' value="Set Repair" />
+
         <h3>Communication</h3>
         <input type="text" id="comTarget" value="0" />
         <select id="command">
@@ -55,6 +82,7 @@
             <option value="Stop">Stop</option>
         </select>
         <input type="submit" onclick='$.post("SendCommand", "targetId=" + $("#comTarget").val() + "&command=" + $("#command").val());' value="Send Command" />
+
         <h3>Game Master</h3>
         <input type="submit" onclick='$.post("Start");' value="Reset" />
         <input type="submit" onclick='$.post("BuildBase");' value="Build Base" />
