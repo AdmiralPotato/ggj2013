@@ -7,6 +7,8 @@ namespace WebGame
 {
     public class Base : Entity
     {
+        public override string Type { get { return "Base"; } }
+
         public override void Update(TimeSpan elapsed)
         {
             throw new NotImplementedException();

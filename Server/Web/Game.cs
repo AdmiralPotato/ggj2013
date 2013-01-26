@@ -6,14 +6,14 @@ using ProtoBuf;
 using System.IO;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
+using System.Threading;
+using LT;
 
 namespace WebGame
 {
     [ProtoContract]
     public class Game
     {
-        public static Action<Game, string, int, string> OnMessage;
-        public static Action<Game> OnStart;
         public static Action<Game, Player> OnEnd;
 
         [ProtoMember(1)]
@@ -50,6 +50,12 @@ namespace WebGame
 
         public List<StarSystem> StarSystems = new List<StarSystem>();
 
+        public Ship DefaultShip;
+        public int NextEntityId { get; set; }
+
+        System.Timers.Timer timer;
+        DateTime lastUpdate;
+
         public bool Running
         {
             get { return Started && !Ended; }
@@ -81,16 +87,32 @@ namespace WebGame
             Invites = new List<Invite>();
         }
 
+        public void Run()
+        {
+            System.Diagnostics.Debug.WriteLine("Game " + Id + " thread started");
+            timer = new System.Timers.Timer(250);
+            timer.Elapsed += timer_Elapsed;
+            timer.Start();
+        }
+
+        void timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine("Game " + Id + " update");
+            var now = DateTime.UtcNow;
+            var elapsed = lastUpdate - now;
+
+            Update(elapsed);
+
+            lastUpdate = now;
+
+            timer.Enabled = true;
+        }
+
         public void Update(TimeSpan elapsed)
         {
             foreach (var starSystem in StarSystems)
             {
                 starSystem.Update(elapsed);
-            }
-
-            foreach (var player in Players)
-            {
-                // send an update thru signalr
             }
         }
 
@@ -149,10 +171,15 @@ namespace WebGame
                 player.Number = Players.IndexOf(player) + 1;
         }
 
-        public void SendForumMessage(string message, int sourceId = 1, string sourceName = "Computer")
+        public void SendForumMessage(string text, int sourceId = 1, string sourceName = "Computer")
         {
-            if (OnMessage != null)
-                OnMessage(this, message, sourceId, sourceName);
+            using (var db = new DBConnection())
+            {
+                GameServer.SendMessage(db, -Id, sourceId, sourceName, text);
+            }
+
+            var message = new Message() { Sent = DateTime.UtcNow, Text = text, SourceId = sourceId, SourceName = sourceName };
+            GameHub.Say("Game-" + Id, message.Print(false));
         }
 
         public void Start()
@@ -166,21 +193,33 @@ namespace WebGame
 
             Started = true;
 
-            UpdatePlayerNumbers();
-
-            // initalize players
-            foreach (var player in Players)
-            {
-            }
-
             // update game status
             StartTime = DateTime.UtcNow;
 
             // send player messages
             SendForumMessage("Game #" + GameName + " Started");
 
-            if (OnStart != null)
-                OnStart(this);
+            var starSystem = new StarSystem();
+            Add(starSystem);
+            DefaultShip = new Ship();
+            DefaultShip.DesiredOrientation = 1;
+            starSystem.AddEntity(DefaultShip);
+
+            Run();
+
+            //        SaveGame(game);
+            //        using (var db = CreateDB())
+            //        {
+            //            db.Execute("delete from player where game_id = {0} and isInvite = 1", game.Id);
+            //        }
+            //        EmailAllPlayers(game, game.GameName + " Started", "The Global Combat game (" + game.GameName + ") has started.\n\nVisit http://globalcombat.com/Game-" + game.Id + " to play your turn.", true);
+            //        GameHub.Refresh("Game-" + game.Id);
+        }
+
+        void Add(StarSystem starSystem)
+        {
+            starSystem.Game = this;
+            StarSystems.Add(starSystem);
         }
 
         public void EliminatePlayer(Player loser)
@@ -281,6 +320,8 @@ namespace WebGame
 
                 if (String.IsNullOrEmpty(result.GameName))
                     result.GameName = "Game #" + result.Id;
+
+                result.Run();
 
                 return result;
             }

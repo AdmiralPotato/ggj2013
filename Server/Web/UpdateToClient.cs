@@ -7,14 +7,9 @@ namespace WebGame
 {
     public class UpdateToClient
     {
-        public ShipStatus Status;
-        public List<EntityUpdate> Entities;
-    }
-
-    public class ShipStatus
-    {
         public int Energy;
         public int FrontShield;
         public int RearShield;
+        public List<EntityUpdate> Entities = new List<EntityUpdate>();
     }
 }

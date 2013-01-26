@@ -1,182 +1,36 @@
-﻿@using WebGame
-@model WebGame.Game
-@{
-    ViewBag.Title = Model.GameName;
-    WebGame.Player Player = ViewBag.Player;
-    var IsPlaying = Player != null;
+﻿@{
+    Layout = null;
 }
-
-<script type="text/javascript">
-    function Send()
-    {
-        var messageBox = $("#MessageBox");
-        message = messageBox.val();
-        $.post("Send", { message: message });
-        messageBox.val("");
-    }
-
-    $(function () {
-        var gameHub = $.connection.gameHub;
-
-        gameHub.addMessage = function (message) {
-            $('#Messages').prepend(message);
-        };
-
-        gameHub.setDone = function (playerNumber) {
-            $('#Player' + playerNumber).append('- Done&nbsp;');
-        };
-    });
-</script>
-
-@if (!Model.Started || Model.Ended)
-{
-    <h2>@Model.GameName</h2>
-    <br />
-    <table cellspacing="0" cellpadding="2">
-        <tr><td class="Label">Number of Players</td><td>@Model.MaxPlayers</td></tr>
-    </table>
-    <br />
-
-    <h3>Players</h3>
-    @Html.Partial("_PlayerList");
-    <br />
-
-    if (!Model.Ended && Model.Invites.Count > 0)
-    {
-        <h3>Invites</h3>
-        foreach (var invite in Model.Invites)
-        {
-            @AccountLink(invite.AccountId, invite.Name)<br />
-        }
-        <br />
-    }
-
-    if (LoggedIn && !Model.Ended)
-    {
-        <div class="CommandMenu">
-        @if (!IsPlaying)
-        {
-            <a href="Join">Join</a>
-        }
-        else
-        {
-            <form action="Invite" method="post">
-                <table><tr>
-                    <td><textarea name="InviteEmail" placeholder="Email Addresses or Account Names" cols="40" rows="2" ></textarea></td>
-                    <td>
-                        <input type="submit" value="Invite Players" style="vertical-align: top;" />
-                        <br /> <small style="vertical-align: top">Players do not need an account to be invited via email.</small>
-                    </td>
-                </tr></table>
-            </form>
-            <br />
-            <a href="Quit">Quit Game</a>
-
-            if (Player.Number == 1)
-            {
-                @:- <a href="Start">Start Game</a>
-            }
-        }
-        </div>
-    }
-
-    if (!String.IsNullOrEmpty(ViewBag.ErrorMessage))
-    {
-        <br />
-        <div class="ErrorMessage" >@Html.Raw(ViewBag.ErrorMessage)</div>
-    }
-}
-else
-{    
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Game #705799 - GGJ2013</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="/Style.css" />
+    <script src="/Scripts/jquery.signalR-0.5.1.min.js" type="text/javascript"></script> 
+    <script src="/signalr/hubs" type="text/javascript"></script>
+    <script src="/Global.js" type="text/javascript"></script>
+</head>
+<body>
     <script src="https://raw.github.com/AdmiralPotato/npos3d/master/src/core.js"></script>
-    <script src="https://raw.github.com/AdmiralPotato/npos3d/master/src/font.js"></script>@*
-    <script src="http://192.168.2.24/ggj2013/client/js/game.js"></script>*@
-    <span class="GameName">@Model.GameName</span>    
+    <script src="https://raw.github.com/AdmiralPotato/npos3d/master/src/font.js"></script>
+    <script src="https://raw.github.com/AdmiralPotato/ggj2013/master/client/js/shapes-wireframe.js"></script>
+@*    <script src="https://raw.github.com/AdmiralPotato/ggj2013/master/client/js/game.js"></script>*@
 
-    <div id="PlayerReadout">
-    <table cellpadding="0" cellspacing="0">
-    <tr>
-    @{ var count = 0; }
-    @foreach (var player in Model.Players)
-    {
-        if (count != 0 && count % 2 == 0)
-        {
-            @:</tr><tr>
-        }
-        count++;
-        <td class="Label">@AccountLink(player.AccountId, player.Name, player.GetColor())&nbsp;</td>
-        <td id="Player@(player.Number)">
-        </td>
-    }
-    </tr>
-    </table>
-    </div>
-    
-    <div id="EntryForm">
-    <form method="post">
-            <input id="GameID" type="hidden" name="GameID" value="@Model.Id" />
-            <input id="ActiveArea" type="hidden" name="AreaID" value="0" />
-            <input id="AssignFlag" type="hidden" name="Assign" value="0" />
-            <input id="TransferFlag" type="hidden" name="Transfer" value="0" />
-            <input id="AttackFlag" type="hidden" name="Attack" value="0" />
-            <span id="ActionMessage" style='position: relative;'></span>
-            <span id="AmountField" style='position: relative; display: none;'>
-            <br /><b>Armies</b> <input type="text" id="AmountInput" name="Amount" size="3" />
-            <br /><input type="submit" id="ActionSubmit" name="ActionSubmit" value="        " onclick="return SubmitAction();"/> or </span>[ <a href='javascript:CancelAction();'>Cancel</a> ]
-        </form>
-    </div>
+    <script type="text/javascript">
+        $(function () {
+            var gameHub = $.connection.gameHub;
 
-    @:</div>
-    @:</div>
-    
-    if (Model.CurrentPlayers > 20)
-    {
-        <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-    }
-}
+            gameHub.handleUpdate = function (update) {
+                console.log(JSON.stringify(update));
+                //        AppendChatMessage(1, "Testing", JSON.stringify(update));
+            };
+        });
+    </script>
 
-@section UnderCenter {
-    <div class="Forum">
-        @if (LoggedIn)
-        {
-            <form onsubmit="Send(); return false;" >
-                <input type="text" id="MessageBox" class="MessageInput" placeholder="Send a message." size="60" />
-            </form>
-        }
-        <table id="Messages" width="100%">
-            @foreach (Message message in ViewBag.Messages)
-            {
-                @Html.Raw(message.Print())
-            }
-        </table>
-    </div>
-}
-
-@section Sidebar {
-    @if (LoggedIn && IsPlaying && Model.Started && !Model.Ended)
-    {
-        <div class="gameStatus">
-            <table width="100%">
-                <tr><td colspan="2" align="center"><a class="Player" href="/Player-Info-@Player.AccountId"><font color="@Player.GetColor()">@Player.Name</font></a></td></tr>
-            </table>
-        </div>
-        <span class="InactiveMenu"></span><br />
-
-        if (!Player.IsEliminated)
-        {
-            if (!Player.Done)
-            {
-                <span id="EndTurnLink"><a href="javascript:Done();" class="Menu">End Turn</a><br /></span>
-            }
-
-            <a href="javascript:if (confirm('Are you sure you wish to quit this game?')) { self.location='Quit'; }" class="Menu">Quit Game</a><br />
-            <span class="InactiveMenu"></span><br />
-        }
-
-        <a href="/" class="Menu">Home</a><br />
-    }
-    else
-    {
-        @Html.Partial("_DefaultMenu");
-    }
-}
+    <audio id="notify"> 
+        <source src="/Sounds/chime.ogg" type="audio/ogg" />
+        <source src="/Sounds/chime.mp3" type="audio/mp3" />
+    </audio>
+</body>
+</html>

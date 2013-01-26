@@ -10,6 +10,11 @@ namespace WebGame
 {
     public class GameHub : Hub, IConnected, IDisconnect
     {
+        static string GetShipGroupName(int gameId, int shipId)
+        {
+            return "Ship-" + gameId.ToString() + "-" + shipId.ToString();
+        }
+
         public Task Connect()
         {
             var sessionCookie = Context.RequestCookies["ASP.Net_SessionId"];
@@ -20,10 +25,18 @@ namespace WebGame
             if (Uri.TryCreate(Context.Headers["Referer"], UriKind.RelativeOrAbsolute, out referrer))
             {
                 if (referrer.Segments.Length > 1 && referrer.Segments[1].StartsWith("Game-"))
-                    Groups.Add(Context.ConnectionId, referrer.Segments[1].TrimEnd('/'));
-
-                if (referrer.Segments.Length > 1 && referrer.Segments[1].StartsWith("ProtoGame-"))
-                    Groups.Add(Context.ConnectionId, referrer.Segments[1].TrimEnd('/'));
+                {
+                    int gameId;
+                    if (Int32.TryParse(referrer.Segments[1].TrimEnd('/').Substring("Game-".Length), out gameId))
+                    {
+                        var defaultShip = GameServer.GetGame(gameId).DefaultShip;
+                        if (defaultShip != null)
+                        {
+                            Groups.Add(Context.ConnectionId, GetShipGroupName(gameId, defaultShip.Id));
+                            //SetShip(gameId, defaultShip.Id);
+                        }
+                    }
+                }
             }
 
             return null;
@@ -46,6 +59,13 @@ namespace WebGame
             return Groups.Add(Context.ConnectionId, Caller.GroupName);
         }
 
+        public Task SetShip(int gameId, int shipId)
+        {
+            Caller.ShipId = shipId;
+            Caller.GroupName = GetShipGroupName(gameId, shipId);
+            return Groups.Add(Context.ConnectionId, Caller.GroupName);
+        }
+
         public void TestThrow()
         {
             throw new NotImplementedException();
@@ -57,8 +77,10 @@ namespace WebGame
             context.Clients[group].addMessage(message);
         }
 
-        public static void SendUpdate(string group, object update)
+        public static void SendUpdate(int gameId, int shipId, UpdateToClient update)
         {
+            var group = GetShipGroupName(gameId, shipId);
+
             var context = GlobalHost.ConnectionManager.GetHubContext<GameHub>();
             context.Clients[group].handleUpdate(update);
         }

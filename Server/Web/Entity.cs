@@ -8,17 +8,28 @@ namespace WebGame
 {
     public abstract class Entity
     {
-        public Vector3 Position { get; set; }
+        public int Id { get; set; }
 
-        public Vector3 Velocity { get; set; }
-
-        public float MassMetricTons { get; set; }
-
-        public abstract void Update(TimeSpan elapsed);
-
-        public void ApplyVelocity()
+        public Game Game;
+        public StarSystem StarSystem;
+        public abstract string Type
         {
-            Position += Velocity;
+            get;
+        }
+
+        public Vector3 Position { get; protected set; }
+        public double Orientation { get; protected set; }
+        public Vector3 VelocityMetersPerSecond { get; protected set; }
+        public double MassTons { get; set; }
+
+        public virtual void Update(TimeSpan elapsed)
+        {
+            ApplyVelocity(elapsed);
+        }
+
+        public void ApplyVelocity(TimeSpan elapsed)
+        {
+            Position += VelocityMetersPerSecond.Multiply(elapsed.TotalSeconds);
         }
     }
 }

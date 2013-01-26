@@ -435,7 +435,7 @@ function AppendChatMessage(sourceId, sourceName, message) {
     $.popupChat.windowscount = 0;
 
     $(document).ready(function () {
-        $('.minimize_chatbox').live('click', function () {
+        $(document).on('click', '.minimize_chatbox', function () {
             //remove chat,message area			
             $(this).closest('.chatbox').find('.chat_area,.chat_message,.chat_info').css('height', '0px');
             $(this).closest('.chatbox').css('height', '25px');
@@ -447,7 +447,7 @@ function AppendChatMessage(sourceId, sourceName, message) {
             return false;
         });
 
-        $('.maximize_chatbox').live('click', function () {
+        $(document).on('click', '.maximize_chatbox', function () {
             //remove chat,message area			
             $(this).closest('.chatbox').find('.chat_area').css('height', '180px');
             $(this).closest('.chatbox').find('.chat_message').css('height', '55px');
@@ -463,7 +463,7 @@ function AppendChatMessage(sourceId, sourceName, message) {
             return false;
         });
 
-        $('.close_chatbox').live('click', function () {
+        $(document).on('click', '.close_chatbox', function () {
             var targetChatbox = $(this).closest('.chatbox');
             var to_id = targetChatbox.attr("title");
             var to_name = targetChatbox.children().attr("title");
@@ -485,7 +485,7 @@ function AppendChatMessage(sourceId, sourceName, message) {
         });
 
         //ON USER CLICK POP UP CHAT
-        $('.chat_user').live('click', function () {
+        $(document).on('click', '.chat_user', function () {
             var offline = false;
             var substr = $(this).attr('alt').split('|');
             var user_id = substr[0];
@@ -504,7 +504,7 @@ function AppendChatMessage(sourceId, sourceName, message) {
         });
 
         // set focus in Message area
-        $('.chatbox').live('click', function () {
+        $(document).on('click', '.chatbox', function () {
             $textarea = $('.chat_message textarea', this);
             $textarea.focus();
         });
@@ -515,7 +515,7 @@ function AppendChatMessage(sourceId, sourceName, message) {
         }
 
         //HIGHLIGHT Active chat window
-        $('.chat_message textarea').live('focus', function () {
+        $(document).on('focus', '.chat_message textarea', function () {
             var chatbox = $(this).closest('.chatbox');
             this_chatbox_headerbg = $('.header', chatbox);
             this_chatbox_headerbg.removeClass("header_bg_blink").addClass("header_bg_default");
@@ -523,14 +523,14 @@ function AppendChatMessage(sourceId, sourceName, message) {
             chatbox.data('focused', 1); 	   // enable focus variable
             chatbox.data('havenewmessage', 0); // clear new message
         });
-        $('.chat_message textarea').live('blur', function () {
+        $(document).on('blur', '.chat_message textarea', function () {
             var chatbox = $(this).closest('.chatbox');
             chatbox.removeClass("cb_highlight").addClass("cb_default"); // remove highligt of chat window
             chatbox.data('focused', 0); // disable focus variable
         });
 
         //SEND MESSAGE ON ENTER		
-        $('.chat_message textarea').live('keypress', function (e) {
+        $(document).on('keypress', '.chat_message textarea', function (e) {
             if (e.keyCode == 13 && !e.shiftKey) {
                 e.preventDefault();
 
@@ -551,7 +551,7 @@ function AppendChatMessage(sourceId, sourceName, message) {
             }
         });
 
-        $('.chat_message textarea').live('keyup', function () {
+        $(document).on('keyup', '.chat_message textarea', function () {
             //$is_typing = 0; //1.2 - Remove this line
         });
 
@@ -619,10 +619,6 @@ $(function () {
 
     gameHub.recieveMessage = function (sourceId, sourceName, message) {
         AppendChatMessage(sourceId, sourceName, message);
-    };
-
-    gameHub.handleUpdate = function (update) {
-        alert(JSON.stringify(update));
     };
 
     $.connection.hub.start();
