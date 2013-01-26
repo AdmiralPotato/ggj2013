@@ -346,7 +346,9 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
             Initalize(id);
 
             if (game.DefaultShip != null)
+            {
                 game.DefaultShip.DesiredOrientation = amount;
+            }
 
             return null;
         }

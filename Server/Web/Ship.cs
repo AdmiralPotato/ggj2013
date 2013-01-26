@@ -13,11 +13,35 @@ namespace WebGame
         public List<Player> Players;
 
         [ProtoMember(1)]
-        public double ImpulsePercentage { get; set; }
+        public double ImpulsePercentage
+        {
+            get
+            {
+                return _impulsePercentage;
+            }
+            set
+            {
+                _impulsePercentage = value;
+                TargetSpeedMetersPerSecond = null; // setting impulse means "forget about what I said about 'all stop' or whatever other speed I said to try to get to"
+            }
+        }
+        private double _impulsePercentage;
         [ProtoMember(2)]
         public int? TargetSpeedMetersPerSecond { get; set; }
         [ProtoMember(3)]
-        public double DesiredOrientation { get; set; }
+        public double DesiredOrientation
+        {
+            get
+            {
+                return _desiredOrientation;
+            }
+            set
+            {
+                _desiredOrientation = value;
+                TargetSpeedMetersPerSecond = null; // setting orientation means "forget about what I said about 'all stop' or whatever other speed I said to try to get to"
+            }
+        }
+        private double _desiredOrientation;
 
         private const double turnRateAnglePerSecond = Math.PI / 4; // this will likely get changed to something from engineering
         private const double maximumAvailableForceMetersPerSecondPerTon = 10000; // force = mass * acceleration
