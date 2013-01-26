@@ -81,6 +81,20 @@ namespace WebGame
             return View(game);
         }
 
+        public ActionResult Local(int id = -1)
+        {
+            if (id == -1)
+                return HttpNotFound();
+
+            Initalize(id);
+            LoadMessages();
+
+            if (!game.Started || game.Ended)
+                return View("Lobby", game);
+
+            return View(game);
+        }
+
         public ActionResult Create()
         {
             if (!LoggedIn)

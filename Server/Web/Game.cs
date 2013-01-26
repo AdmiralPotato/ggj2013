@@ -48,9 +48,11 @@ namespace WebGame
         [ProtoMember(22, IsRequired = false)]
         public List<Invite> Invites { get; set; }
 
+        [ProtoMember(23, IsRequired = false)]
         public List<StarSystem> StarSystems = new List<StarSystem>();
 
         public Ship DefaultShip;
+
         public int NextEntityId { get; set; }
 
         System.Timers.Timer timer;
@@ -99,7 +101,7 @@ namespace WebGame
         {
             System.Diagnostics.Debug.WriteLine("Game " + Id + " update");
             var now = DateTime.UtcNow;
-            var elapsed = lastUpdate - now;
+            var elapsed = now - lastUpdate;
 
             Update(elapsed);
 
@@ -207,7 +209,8 @@ namespace WebGame
 
             Run();
 
-            //        SaveGame(game);
+            GameServer.SaveGame(this);
+
             //        using (var db = CreateDB())
             //        {
             //            db.Execute("delete from player where game_id = {0} and isInvite = 1", game.Id);
@@ -320,6 +323,23 @@ namespace WebGame
 
                 if (String.IsNullOrEmpty(result.GameName))
                     result.GameName = "Game #" + result.Id;
+
+                foreach (var starSystem in result.StarSystems)
+                {
+                    starSystem.Game = result;
+                    foreach (var entity in starSystem.Entites)
+                    {
+                        entity.Game = result;
+                        entity.StarSystem = starSystem;
+                        var ship = entity as Ship;
+                        if (ship != null)
+                        {
+                            if (result.DefaultShip == null)
+                                result.DefaultShip = ship;
+                            starSystem.Ships.Add(ship);
+                        }
+                    }
+                }
 
                 result.Run();
 

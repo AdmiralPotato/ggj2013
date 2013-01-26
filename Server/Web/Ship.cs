@@ -3,14 +3,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using ProtoBuf;
 
 namespace WebGame
 {
+    [ProtoContract]
     public class Ship : Entity
     {
-        public List<Player> Players { get; private set; }
+        public List<Player> Players;
+
+        [ProtoMember(1)]
         public int ImpulsePercentage { get; set; }
+        [ProtoMember(2)]
         public int? TargetSpeedMetersPerSecond { get; set; }
+        [ProtoMember(3)]
         public double DesiredOrientation { get; set; }
 
         private const double turnRateAnglePerSecond = Math.PI / 4; // this will likely get changed to something from engineering

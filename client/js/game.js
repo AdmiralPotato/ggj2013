@@ -57,18 +57,18 @@ var setGameStateFromServer = function(data) {
 };
 
 
-var tempGameStateUpdate = function(){
-	var tempGameStateData = {
-		entityList: [
-			{
-				id: 0,
-				type: 'Ship',
-				position: [0,0,0],
-				rotation: deg * 45
-			}
-		]
-	};
-	setGameStateFromServer(tempGameStateData);
-};
+//var tempGameStateUpdate = function(){
+//	var tempGameStateData = {
+//		entityList: [
+//			{
+//				id: 0,
+//				type: 'Ship',
+//				position: [0,0,0],
+//				rotation: deg * 45
+//			}
+//		]
+//	};
+//	setGameStateFromServer(tempGameStateData);
+//};
 
-var tempGameStateInterval = setInterval(tempGameStateUpdate, 250);
+//var tempGameStateInterval = setInterval(tempGameStateUpdate, 250);
