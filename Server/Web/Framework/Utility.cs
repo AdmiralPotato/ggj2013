@@ -62,18 +62,15 @@ namespace WebGame
             return new Vector3((float)(vector.X * coefficient), (float)(vector.Y * coefficient), (float)(vector.Z * coefficient));
         }
 
-        /// <remarks>
-        /// There needs to be at least 2PI between the lowerbound and the upperbound
-        /// </remarks>
-        private static double _NormalizeAngle(this double angle, double lowerBound, double upperBound)
+        private static double _NormalizeAngle(this double angle, double lowerBound, double upperBound, double range = 2 * Math.PI)
         {
             while (angle >= upperBound)
             {
-                angle -= 2 * Math.PI;
+                angle -= range;
             }
             while (angle < lowerBound)
             {
-                angle += 2 * Math.PI;
+                angle += range;
             }
             return angle;
         }
@@ -88,5 +85,19 @@ namespace WebGame
             return angle._NormalizeAngle(-Math.PI, Math.PI);
         }
 
+        public static double Quadrance(this Vector3 vector)
+        {
+            return (double)vector.X * vector.X + (double)vector.Y * vector.Y + (double)vector.Z * vector.Z;
+        }
+
+        public static double Magnitude(this Vector3 vector)
+        {
+            return Math.Sqrt(vector.Quadrance());
+        }
+
+        //public static double NormalizeAlign(this double angle)
+        //{
+        //    return angle._NormalizeAngle(-Math.PI / 2, Math.PI / 2, Math.PI);
+        //}
     }
 }
