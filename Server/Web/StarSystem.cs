@@ -47,5 +47,15 @@ namespace WebGame
             if (ship != null)
                 Ships.Add(ship);
         }
+
+        public void RemoveEntity(Entity entity)
+        {
+            Entites.Remove(entity);
+            var ship = entity as Ship;
+            if (ship != null)
+            {
+                Ships.Remove(ship);
+            }
+        }
     }
 }
