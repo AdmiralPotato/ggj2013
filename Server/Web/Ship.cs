@@ -65,11 +65,11 @@ namespace WebGame
             var absoluteDesiredDiffAngle = Math.Abs(desiredDiffAngle);
             if (currentAllowedDiffAngle >= absoluteDesiredDiffAngle)
             {
-                this.Orientation = this.DesiredOrientation;
+                this.Orientation = this.DesiredOrientation.NormalizeOrientation();
             }
             else
             {
-                this.Orientation += currentAllowedDiffAngle * Math.Sign(desiredDiffAngle);
+                this.Orientation += (currentAllowedDiffAngle * Math.Sign(desiredDiffAngle)).NormalizeOrientation();
             }
         }
 
@@ -78,14 +78,7 @@ namespace WebGame
             // difference
             var remaining = this.DesiredOrientation - this.Orientation;
             // normalize to -pi < remaining < pi
-            while (remaining > Math.PI)
-            {
-                remaining -= 2 * Math.PI;
-            }
-            while (remaining < -Math.PI)
-            {
-                remaining += 2 * Math.PI;
-            }
+            remaining = remaining.NormalizeTurn();
             return remaining;
         }
 
@@ -96,7 +89,7 @@ namespace WebGame
         //public void SetImpluse(int impulsePercentage) // -100 to 100;
         //{
         //}
-        //public void SetDesiredOrientationAngle(int desiredOrientationAngle)
+        //public void SetDesiredOrientationAngle(int desiredOrientationAngle) 0 to 2pi
         //{
         //}
 

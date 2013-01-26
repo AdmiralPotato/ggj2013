@@ -9,11 +9,6 @@ namespace WebGame
 {
     public static class Utility
     {
-        public static Vector3 Multiply(this Vector3 vector, double coefficient)
-        {
-            return new Vector3((float)(vector.X * coefficient), (float)(vector.Y * coefficient), (float)(vector.Z * coefficient));
-        }
-
         public static Random Random = new Random();
 
         /// <summary>
@@ -61,5 +56,37 @@ namespace WebGame
                 return String.Format("{0} min, {1} sec {2}", time.Minutes, time.Seconds, suffix);
             return String.Format("{0} sec {1}", time.Seconds, suffix);
         }
+
+        public static Vector3 Multiply(this Vector3 vector, double coefficient)
+        {
+            return new Vector3((float)(vector.X * coefficient), (float)(vector.Y * coefficient), (float)(vector.Z * coefficient));
+        }
+
+        /// <remarks>
+        /// There needs to be at least 2PI between the lowerbound and the upperbound
+        /// </remarks>
+        private static double _NormalizeAngle(this double angle, double lowerBound, double upperBound)
+        {
+            while (angle >= upperBound)
+            {
+                angle -= 2 * Math.PI;
+            }
+            while (angle < lowerBound)
+            {
+                angle += 2 * Math.PI;
+            }
+            return angle;
+        }
+
+        public static double NormalizeOrientation(this double angle)
+        {
+            return angle._NormalizeAngle(0, 2 * Math.PI);
+        }
+
+        public static double NormalizeTurn(this double angle)
+        {
+            return angle._NormalizeAngle(-Math.PI, Math.PI);
+        }
+
     }
 }
