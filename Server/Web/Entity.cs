@@ -45,6 +45,12 @@ namespace WebGame
         public double Mass { get; private set; }
 
         /// <summary>
+        /// Meters
+        /// </summary>
+        [ProtoMember(6)]
+        public double Radius { get; private set; }
+
+        /// <summary>
         /// Meters Per Second Per Ton
         /// Applied in the direction of the Orientation
         /// Can be positive or negative

@@ -54,6 +54,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MathTests.cs" />
     <Compile Include="AllStopTests.cs" />
+    <Compile Include="MissileTests.cs" />
     <Compile Include="VelocityTests.cs" />
   </ItemGroup>
   <ItemGroup>

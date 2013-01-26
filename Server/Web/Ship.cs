@@ -62,6 +62,18 @@ namespace WebGame
             Players = new List<Player>();
         }
 
+        public Projectile Launch(Entity target)
+        {
+            if (this.StarSystem != target.StarSystem)
+            {
+                throw new ArgumentException("The target is not in the current star system");
+            }
+            var projectile = new Projectile();
+            projectile.Target = target;
+            this.StarSystem.AddEntity(projectile);
+            return projectile;
+        }
+
         public override void Update(TimeSpan elapsed)
         {
             if (this.TargetSpeedMetersPerSecond.HasValue)
