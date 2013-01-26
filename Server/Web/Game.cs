@@ -219,7 +219,7 @@ namespace WebGame
             //        GameHub.Refresh("Game-" + game.Id);
         }
 
-        void Add(StarSystem starSystem)
+        public void Add(StarSystem starSystem)
         {
             starSystem.Game = this;
             StarSystems.Add(starSystem);

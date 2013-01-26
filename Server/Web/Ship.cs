@@ -44,22 +44,57 @@ namespace WebGame
         }
         private double _desiredOrientation;
 
-        private const double turnRateAnglePerSecond = Math.PI / 4; // this will likely get changed to something from engineering
+        /// <summary>
+        /// Angle Per Second
+        /// </summary>
+        private const double turnRate = Math.PI / 4;
+        /// <summary>
+        /// AnglePerSecond
+        /// </summary>
+        public double EffectiveTurnRate
+        {
+            get
+            {
+                return this.Effective(turnRate, "Thrusters");
+            }
+        }
         /// <summary>
         /// Meters Per Second Per Ton
         /// </summary>
-        private const double maximumAvailableForce = 10000;
+        private const double maximumForce = 10000;
+        public double EffectiveMaximumForce
+        {
+            get
+            {
+                return this.Effective(maximumForce, "Engines");
+            }
+        }
 
         public override string Type { get { return "Ship"; } }
+
+
 
         public Ship()
             : this(1000)
         {
         }
 
-        public Ship(double mass) : base(mass)
+        public Ship(double mass)
+            : base(mass)
         {
             Players = new List<Player>();
+        }
+
+        public Projectile LaunchProjectile(Entity target)
+        {
+            if (this.StarSystem != target.StarSystem)
+            {
+                throw new ArgumentException("The target is not in the current star system");
+            }
+            var projectile = new Projectile();
+            projectile.Target = target;
+            this.StarSystem.AddEntity(projectile);
+            return projectile;
         }
 
         public override void Update(TimeSpan elapsed)
@@ -96,7 +131,7 @@ namespace WebGame
                     var targetDeceleration = speed - this.TargetSpeedMetersPerSecond.Value;
                     if (targetDeceleration < Math.Abs(decelerationAmount))
                     {
-                        this._impulsePercentage = targetDeceleration / (maximumAvailableForce / this.Mass) * 100 * Math.Sign(decelerationAmount); // we need to directly access the underscore members so that we don't call the set method, which will unset the target speed 
+                        this._impulsePercentage = targetDeceleration / (this.EffectiveMaximumForce / this.Mass) * 100 * Math.Sign(decelerationAmount); // we need to directly access the underscore members so that we don't call the set method, which will unset the target speed 
                     }
                 }
             }
@@ -108,7 +143,7 @@ namespace WebGame
         private void TurnShipToDesiredOrientation(TimeSpan elapsed)
         {
             var desiredDiffAngle = TurnAngleNeededForDesire();
-            var currentAllowedDiffAngle = elapsed.TotalSeconds * turnRateAnglePerSecond;
+            var currentAllowedDiffAngle = elapsed.TotalSeconds * this.EffectiveTurnRate;
             var absoluteDesiredDiffAngle = Math.Abs(desiredDiffAngle);
             if (currentAllowedDiffAngle >= absoluteDesiredDiffAngle)
             {
@@ -133,7 +168,14 @@ namespace WebGame
         {
             get
             {
-                return this.ImpulsePercentage / 100 * maximumAvailableForce;
+                return this.ImpulsePercentage / 100 * this.EffectiveMaximumForce;
+            }
+        }
+        public override double Radius
+        {
+            get
+            {
+                return 10;
             }
         }
 
@@ -166,6 +208,16 @@ namespace WebGame
         internal void ToggleShields()
         {
             throw new NotImplementedException();
+        }
+
+        protected override IEnumerable<string> PartList
+        {
+            get
+            {
+                yield return "Thrusters";
+                yield return "Engines";
+                yield return "Weapons";
+            }
         }
     }
 }
