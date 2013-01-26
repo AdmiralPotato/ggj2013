@@ -57,7 +57,7 @@ window.requestAnimFrame = (function(){
 				var tex = new THREE.Texture(img);
 				img.texture = tex;
 				img.onload = imageLoadHandler;
-				//img.src = materialData.mapDiffuse;
+				img.src = materialData.mapDiffuse;
 				var mat = new THREE.MeshLambertMaterial({
 					color: 0xffffff,
 					map: tex
