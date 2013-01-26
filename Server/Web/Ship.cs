@@ -24,8 +24,12 @@ namespace WebGame
 
         public override string Type { get { return "Ship"; } }
 
-        public Ship()
+        public Ship() : this(1000)
         {
+        }
+        public Ship(double massTons)
+        {
+            this.MassTons = massTons;
             Players = new List<Player>();
         }
 
@@ -87,6 +91,10 @@ namespace WebGame
 
         private double MaxAccelerationMagnitude()
         {
+            if (this.MassTons == 0)
+            {
+                throw new InvalidOperationException("Can't calculate force on an object without mass.");
+            }
             return maximumAvailableForceMetersPerSecondPerTon / this.MassTons;
         }
 
