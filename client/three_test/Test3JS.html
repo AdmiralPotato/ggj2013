@@ -49,7 +49,7 @@ window.requestAnimFrame = (function(){
 				modelCount += 1;
 				modelData = _jsonObjectSet[propertyName];
 				var meshCreationHandler = function(geometry, materials) {
-					geometry.materials = materials;
+					geometry.material = materials;
 					geometryObjects[propertyName] = geometry;
 					modelsLoaded += 1;
 					if(modelsLoaded === modelCount){
