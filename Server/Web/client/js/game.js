@@ -17,7 +17,8 @@ var animationController = {
 		var currentTime = new Date().getTime();
 		timeSinceLastFrame =  currentTime - timeOfLastFrame;
 		timeOfLastFrame = currentTime;
-		deltaSinceUpdate = 250 / timeSinceLastUpdate;
+		deltaSinceUpdate =  (currentTime - timeOfLastUpdate) / 250;
+		//console.log(deltaSinceUpdate);
 	}
 };
 s.add(animationController);
@@ -26,7 +27,8 @@ var deltaInit = function(o){
 	o.posLast = [0,0,0];
 	o.posNext = [0,0,0];
 	o.posDiff = [0,0,0];
-	o.lastRot = 0;
+	o.rotLast = 0;
+	o.rotNext = 0;
 	o.rotDiff = 0;
 };
 var deltaUpdate = function(o, entityData){
@@ -44,10 +46,10 @@ var deltaUpdate = function(o, entityData){
 	o.rotDiff = o.rotNext - o.lastRot;
 };
 var deltaInterpolate = function(o){
-	o.pos[0] = o.posLast[0] + (o.posNext[0] * deltaSinceUpdate);
-	o.pos[1] = o.posLast[1] + (o.posNext[1] * deltaSinceUpdate);
-	o.pos[2] = o.posLast[2] + (o.posNext[2] * deltaSinceUpdate);
-	o.rot[2] = o.lastRot + (o.posNext[2] * deltaSinceUpdate);
+	o.pos[0] = o.posLast[0] + (o.posDiff[0] * deltaSinceUpdate);
+	o.pos[1] = o.posLast[1] + (o.posDiff[1] * deltaSinceUpdate);
+	o.pos[2] = o.posLast[2] + (o.posDiff[2] * deltaSinceUpdate);
+	o.rot[2] = o.lastRot + (o.rotDiff * deltaSinceUpdate);
 };
 
 client.entityTypes.Ship = function(args){
