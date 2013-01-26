@@ -7,6 +7,11 @@ namespace WebGame
 {
     public class Projectile : Entity
     {
+        public Projectile()
+            : this(1)
+        {
+        }
+
         public Projectile(double mass)
             : base(mass)
         {

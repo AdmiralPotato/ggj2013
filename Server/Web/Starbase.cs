@@ -9,6 +9,11 @@ namespace WebGame
     [ProtoContract]
     public class Starbase : Entity
     {
+        public Starbase()
+            : this(100000)
+        {
+        }
+
         public Starbase(double mass)
             : base(mass)
         {

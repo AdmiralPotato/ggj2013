@@ -52,6 +52,11 @@ namespace WebGame
 
         public override string Type { get { return "Ship"; } }
 
+        public Ship()
+            : this(1000)
+        {
+        }
+
         public Ship(double mass) : base(mass)
         {
             Players = new List<Player>();
