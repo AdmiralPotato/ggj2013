@@ -9,7 +9,7 @@ namespace WebGame.PhysicsTest
         [TestMethod]
         public void RotationBigUpdate()
         {
-            var ship = new Ship();
+            var ship = new Ship(1000);
             var initialOrientation = ship.Orientation;
             var desiredOrientation = initialOrientation + Math.PI / 4;
             ship.DesiredOrientation = desiredOrientation;
@@ -22,8 +22,8 @@ namespace WebGame.PhysicsTest
         [TestMethod]
         public void TestRotate5Radians()
         {
-            var ship = new Ship(4000);
-            Assert.AreEqual(0, ship.VelocityMetersPerSecond.Magnitude(), "new ship wasn't stopped");
+            var ship = new Ship(1000);
+            Assert.AreEqual(0, ship.Velocity.Magnitude(), "new ship wasn't stopped");
             ship.DesiredOrientation = 5;
             ship.Update(TimeSpan.FromSeconds(50));
             Assert.AreEqual(5.0, ship.Orientation, "ship wasn't finished turning");
@@ -32,7 +32,7 @@ namespace WebGame.PhysicsTest
         [TestMethod]
         public void RotationBigManySmallUpdates()
         {
-            var ship = new Ship();
+            var ship = new Ship(1000);
             var initialOrientation = ship.Orientation;
             var desiredOrientation = initialOrientation + Math.PI / 4;
             ship.DesiredOrientation = desiredOrientation;
@@ -48,7 +48,7 @@ namespace WebGame.PhysicsTest
         [TestMethod]
         public void RotateNotWholeAmount()
         {
-            var ship = new Ship();
+            var ship = new Ship(1000);
             var initialOrientation = ship.Orientation;
             var desiredOrientation = initialOrientation + Math.PI / 4;
             ship.DesiredOrientation = desiredOrientation;
@@ -62,7 +62,7 @@ namespace WebGame.PhysicsTest
         [TestMethod]
         public void ShouldNotRotateBackwards()
         {
-            var ship = new Ship();
+            var ship = new Ship(1000);
             ship.DesiredOrientation = 1;
             for (int i = 0; i < 1000; i++)
             {

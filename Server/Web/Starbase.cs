@@ -7,9 +7,14 @@ using ProtoBuf;
 namespace WebGame
 {
     [ProtoContract]
-    public class Base : Entity
+    public class Starbase : Entity
     {
-        public override string Type { get { return "Base"; } }
+        public Starbase(double mass)
+            : base(mass)
+        {
+        }
+
+        public override string Type { get { return "Starbase"; } }
 
         public override void Update(TimeSpan elapsed)
         {

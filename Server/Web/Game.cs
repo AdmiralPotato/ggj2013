@@ -203,7 +203,7 @@ namespace WebGame
 
             var starSystem = new StarSystem();
             Add(starSystem);
-            DefaultShip = new Ship();
+            DefaultShip = new Ship(1000);
             DefaultShip.DesiredOrientation = 1;
             starSystem.AddEntity(DefaultShip);
 
