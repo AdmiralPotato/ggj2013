@@ -2,13 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using ProtoBuf;
 
 namespace WebGame
 {
+    [ProtoContract]
     public class StarSystem
     {
+        [ProtoMember(1)]
+        public List<Entity> Entites { get; set; }
+
         public Game Game;
-        public List<Entity> Entites = new List<Entity>();
         public List<Ship> Ships = new List<Ship>();
 
         public StarSystem()
