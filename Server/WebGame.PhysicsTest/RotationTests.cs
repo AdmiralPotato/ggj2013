@@ -15,6 +15,8 @@ namespace WebGame.PhysicsTest
             ship.DesiredOrientation = desiredOrientation;
             ship.Update(TimeSpan.MaxValue);
             Assert.AreEqual(desiredOrientation, ship.Orientation, "Orientation didn't match");
+            ship.Update(TimeSpan.FromSeconds(0.25));
+            Assert.AreEqual(desiredOrientation, ship.Orientation, "Orientation didn't match, after another update");
         }
 
         [TestMethod]
@@ -29,6 +31,8 @@ namespace WebGame.PhysicsTest
                 ship.Update(TimeSpan.FromMilliseconds(1));
             }
             Assert.AreEqual(desiredOrientation, ship.Orientation, "Orientation didn't match");
+            ship.Update(TimeSpan.FromSeconds(0.25));
+            Assert.AreEqual(desiredOrientation, ship.Orientation, "Orientation didn't match, after another update");
         }
 
         [TestMethod]
