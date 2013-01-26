@@ -19,14 +19,17 @@ namespace WebGame
 
         public Vector3 Position { get; protected set; }
         public double Orientation { get; protected set; }
-        public Vector3 Velocity { get; protected set; }
-        public double MassMetricTons { get; set; }
+        public Vector3 VelocityMetersPerSecond { get; protected set; }
+        public double MassTons { get; set; }
 
-        public abstract void Update(TimeSpan elapsed);
-
-        public void ApplyVelocity()
+        public virtual void Update(TimeSpan elapsed)
         {
-            Position += Velocity;
+            ApplyVelocity(elapsed);
+        }
+
+        public void ApplyVelocity(TimeSpan elapsed)
+        {
+            Position += VelocityMetersPerSecond.Multiply(elapsed.TotalSeconds);
         }
     }
 }

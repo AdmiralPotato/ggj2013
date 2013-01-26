@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -8,14 +9,12 @@ namespace WebGame
     public class Ship : Entity
     {
         public List<Player> Players { get; private set; }
-
         public int ImpulsePercentage { get; set; }
-
         public int? TargetSpeedMetersPerSecond { get; set; }
-
         public double DesiredOrientation { get; set; }
 
-        private const double turnRateAnglePerSecond = Math.PI / 4;
+        private const double turnRateAnglePerSecond = Math.PI / 4; // this will likely get changed to something from engineering
+        private const double maximumAvailableForceMetersPerSecondPerTon = 1; // force = mass * acceleration
 
         public override string Type { get { return "Ship"; } }
 
@@ -28,16 +27,32 @@ namespace WebGame
         {
             if (this.TargetSpeedMetersPerSecond.HasValue)
             {
+                AlignShipToVelocity(elapsed);
                 throw new NotImplementedException();
-                // desire the ship to turn to be along the velocity vector
                 // apply impulse proportional to -1 * cosine of the angle between desired and current
                 // consider when velocity is almost zero? Calculate the inverse of the mass to determine impulse
             }
-            TurnShip(elapsed);
-            // apply new velocity
+            TurnShipToDesiredOrientation(elapsed);
+            AccelerateShip(elapsed);
+            ApplyVelocity(elapsed); // or alternately base.Update
         }
 
-        private void TurnShip(TimeSpan elapsed)
+        private void AccelerateShip(TimeSpan elapsed)
+        {
+            var accelerationMagnitude = (float)(maximumAvailableForceMetersPerSecondPerTon / this.MassTons);
+            var flatAcceleration = new Vector3(accelerationMagnitude, 0, 0);
+            var acceleration = Vector3.Transform(flatAcceleration, Matrix.CreateRotationZ((float)this.Orientation));
+
+            this.VelocityMetersPerSecond += acceleration;
+        }
+
+        private void AlignShipToVelocity(TimeSpan elapsed)
+        {
+            // Expand TurnShip todo this kind of stuff
+            throw new NotImplementedException(); // copy 
+        }
+
+        private void TurnShipToDesiredOrientation(TimeSpan elapsed)
         {
             var desiredDiffAngle = TurnAngleNeededForDesire();
             var currentAllowedDiffAngle = elapsed.TotalSeconds * turnRateAnglePerSecond;
