@@ -16,7 +16,12 @@ namespace WebGame
         public double DesiredOrientation { get; set; }
 
         private const double turnRateAnglePerSecond = Math.PI / 4;
-        
+
+        public Ship()
+        {
+            Players = new List<Player>();
+        }
+
         public override void Update(TimeSpan elapsed)
         {
             if (this.TargetSpeedMetersPerSecond.HasValue)
@@ -71,5 +76,20 @@ namespace WebGame
         //public void SetDesiredOrientationAngle(int desiredOrientationAngle)
         //{
         //}
+
+        public void AddPlayer(Player player)
+        {
+            if (!Players.Contains(player))
+                Players.Add(player);
+        }
+
+        internal void SendUpdate()
+        {
+            if (Players.Count > 0)
+            {
+                var update = new UpdateToClient();
+                GameHub.SendUpdate(Game.Id, Id, update);
+            }
+        }
     }
 }

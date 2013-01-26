@@ -8,7 +8,7 @@ namespace WebGame
     public class EntityUpdate
     {
         public int Id;
-        public int Type;
+        public string Type;
         public float[] Position;
         public float Rotation;
         public int Health;
