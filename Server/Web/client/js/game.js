@@ -1,3 +1,5 @@
+
+
 var n = NPos3d,
 	s = new n.Scene({
 
@@ -8,7 +10,7 @@ var n = NPos3d,
 	    entityTypes: {}
 	},
 	playerEntity;
-var gameId = 705865;
+var gameId = 705872;
 var timeSinceLastFrame = 0;
 var timeOfLastFrame = new Date().getTime();
 var timeSinceLastUpdate = 0;
@@ -237,18 +239,27 @@ var setGameStateFromServer = function (data) {
             entitiesUpdatedThisFrame[entityIdString] = true;
         }
 
-        //REMOVE entities we DID NOT receive data for this frame
-        for (entityIdString in client.entityMap) {
-            if (entitiesUpdatedThisFrame[entityIdString] === undefined) {
-                entityMap[entityIdString].destroy();
-                entityMap[entityIdString] = undefined;
-                console.log('removing entity:' + entityIdString);
+		//REMOVE entities we DID NOT receive data for this frame
+		for (entityIdString in client.entityMap) {
+			if (entitiesUpdatedThisFrame[entityIdString] === undefined) {
+				client.entityMap[entityIdString].destroy();
+				client.entityMap[entityIdString] = undefined;
+				console.log('removing entity:' + entityIdString);
+			}
+		}
+
+        // play sounds
+        if (audioLoaded)
+        {
+            for (var sound in data.Sounds)
+            {
+                SFX[sound].play();
             }
         }
     }
 };
 
-if (isLocal === undefined) {
+if (typeof isLocal === 'undefined') {
     isLocal = true;
 }
 var serverPath = isLocal ? 'http://legendstudio.com/' : '/';

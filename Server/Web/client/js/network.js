@@ -41,12 +41,12 @@ gameHub.client.addMessage = function (sourceId, sourceName, message) {
 
 
 //------START UI event binding
-var sendMessage = function (messageName, messageValue) {
+var sendMessage = function (messageName, messageValue, callback) {
     if (isLocal) {
-        $.post(serverPath + currentGame + messageName, messageValue);
+        $.post(serverPath + currentGame + messageName, messageValue, callback);
     }
     else {
-        $.post(messageName, messageValue);
+        $.post(messageName, messageValue, callback);
     }
 };
 var sendMessageClickHandler = function (event) {
@@ -62,14 +62,15 @@ var customEventHandlerMap = {
     },
     SelectStationHandler: function(event){
         var station = event.currentTarget.id.split('-')[1];
-        $.post("SelectStation", "station=" + station, function (data) {
+        sendMessage("SelectStation", "station=" + station, function (data) {
             if (data.length > 0) {
                 // fail case
                 AppendChatMessage(0, "Computer", data);
             } else {
                 // success case
                 // set the divs to be hidden except for the selected one.
-
+				$('.stationUI').removeClass('active');
+				$('#' + station).addClass('active');
                 // keep copy of station value
                 client.station = station;
             }
