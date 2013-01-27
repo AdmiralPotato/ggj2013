@@ -75,6 +75,11 @@ namespace WebGame
         [ProtoMember(9)]
         public double Energy { get; private set; }
 
+        public void UseRawEnergy(double amountToUse)
+        {
+            Energy -= amountToUse;
+        }
+
         public void LoseEnergyFrom(double intendedForce, TimeSpan elapsedTime)
         {
             Energy -= intendedForce * energyCostPerForcePerSecond * elapsedTime.TotalSeconds;
@@ -145,6 +150,24 @@ namespace WebGame
                 return false;
             }
             return true;
+        }
+
+        public string GetRandomWorkingPart()
+        {
+            var systemsThatCanBeDamaged = this.parts.Where((pair) => pair.Value > 0).ToArray();
+            var systemIndexToDamage = Utility.Random.Next(systemsThatCanBeDamaged.Length);
+            var systemToDamage = systemsThatCanBeDamaged[systemIndexToDamage];
+            return systemToDamage.Key;
+        }
+
+        public void DamagePart(int damage, string part)
+        {
+            parts[part] = Math.Max(parts[part] - damage, 0);
+
+            if (this.parts.Values.Sum() == 0)
+            {
+                this.Destroy();
+            }
         }
 
         public void Damage(int damage)

@@ -139,6 +139,8 @@ namespace WebGame
 
         [ProtoMember(22)]
         public int PhaserBanks { get; set; }
+
+        public Dictionary<int, DateTime> LastBeamBanksUsed = new Dictionary<int,DateTime>();
  
         public override string Type { get { return "Ship"; } }
         public MissionStatus missionState = null;
@@ -410,7 +412,8 @@ namespace WebGame
                         update.Sounds.AddRange(entity.Sounds);
                     update.Entities.Add(new EntityUpdate() { Id = entity.Id, Type = entity.Type, Rotation = (float)entity.Orientation, Position = entity.Position });
                 }
-                update.missionUpdate = missionState.getMissionStatusUpdate();
+                if (missionState != null)
+                    update.missionUpdate = missionState.getMissionStatusUpdate();
                 GameHub.SendUpdate(Game.Id, Id, update);
                 System.Diagnostics.Debug.WriteLine("Update Sent. Mission status:" + update.missionUpdate);
             }
@@ -478,5 +481,82 @@ namespace WebGame
                 this.RepairCrewTargets[repairCrewIndex] = part;
             }
         }
-   }
+
+        public bool IsEntityCloserThan(Entity target, float distance)
+        {
+            return (Position - target.Position).LengthSquared() < distance * distance;
+        }
+
+        public double BeamCoolDownTime(int bank)
+        {
+            if (LastBeamBanksUsed.ContainsKey(bank))
+            {
+                return (DateTime.UtcNow - LastBeamBanksUsed[bank]).TotalSeconds;
+            }
+            else
+                return Single.MaxValue;
+        }
+
+        internal void FireBeam(int bank, Entity target, BeamType type)
+        {
+            if (!BeamWeapons.Contains(type))
+                return;
+
+            switch (type)
+            {
+                case BeamType.StandardPhaser:
+                    if (IsEntityCloserThan(target, 150) && Energy > 5 && BeamCoolDownTime(bank) > 2)
+                    {
+                        target.Damage(100);
+                        LastBeamBanksUsed[bank] = DateTime.UtcNow;
+                        UseRawEnergy(5);
+                        PlaySound("FireStandardPhaser");
+                    }
+                    break;
+                case BeamType.HullPiercing:
+                    if (IsEntityCloserThan(target, 50) && Energy > 25 && BeamCoolDownTime(bank) > 4)
+                    {
+                        target.Damage(300);
+                        LastBeamBanksUsed[bank] = DateTime.UtcNow;
+                        UseRawEnergy(25);
+                        PlaySound("FireHullPiercing");
+                    }
+                    break;
+                case BeamType.SuppresionPulse:
+                    if (IsEntityCloserThan(target, 150) && Energy > 75 && BeamCoolDownTime(bank) > 10)
+                    {
+                        target.DamagePart(100, target.GetRandomWorkingPart());
+                        LastBeamBanksUsed[bank] = DateTime.UtcNow;
+                        UseRawEnergy(25);
+                        PlaySound("FireSuppresionPulse");
+                    }
+                    break;
+                case BeamType.PlasmaVent:
+                    if (Energy > 100 && BeamCoolDownTime(bank) > 60)
+                    {
+                        foreach (var entity in StarSystem.Entites.ToArray()) // ToArray here to avoid threading issues. Lame I know.
+                        {
+                            if (IsEntityCloserThan(entity, 50))
+                                target.Damage(250);
+                        }
+
+                        LastBeamBanksUsed[bank] = DateTime.UtcNow;
+                        UseRawEnergy(100);
+                        PlaySound("FirePlasmaVent");
+                    }
+                    break;
+                case BeamType.TractorBeam:
+                    if (IsEntityCloserThan(target, 200) && Energy > 75 && BeamCoolDownTime(bank) > 5)
+                    {
+                        //target..Velocity
+                        //(Position - target.Position).
+
+                        LastBeamBanksUsed[bank] = DateTime.UtcNow;
+                        UseRawEnergy(25);
+                        PlaySound("FireTractorBeam");
+                    }
+                    break;
+            }
+        }
+    }
 }

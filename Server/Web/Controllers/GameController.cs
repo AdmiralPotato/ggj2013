@@ -351,6 +351,7 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
                 }
 
                 player.Station = station;
+                GameHub.Say(game, player.Ship, player.Name + " took station " + station);
             }
 
             return null;
@@ -451,6 +452,19 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
                 var target = player.Ship.StarSystem.GetEntity(targetId);
                 if (target != null)
                     player.Ship.LaunchProjectile(tube, target);
+            }
+
+            return null;
+        }
+        public ActionResult FireBeam(int id, int bank, int targetId, BeamType type)
+        {
+            Initalize(id);
+
+            if (player.Ship != null && player.Station == Station.Weapons)
+            {
+                var target = player.Ship.StarSystem.GetEntity(targetId);
+                if (target != null)
+                    player.Ship.FireBeam(bank, target, type);
             }
 
             return null;
