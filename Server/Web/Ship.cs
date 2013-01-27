@@ -495,7 +495,6 @@ namespace WebGame
             }
             else
                 return Single.MaxValue;
-
         }
 
         internal void FireBeam(int bank, Entity target, BeamType type)
@@ -510,7 +509,7 @@ namespace WebGame
                     {
                         target.Damage(100);
                         LastBeamBanksUsed[bank] = DateTime.UtcNow;
-//                        Energy -= 5;
+                        UseRawEnergy(5);
                     }
                     break;
             }
