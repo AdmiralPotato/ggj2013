@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Microsoft.Xna.Framework;
 using ProtoBuf;
 
 namespace WebGame
@@ -34,6 +35,11 @@ namespace WebGame
             foreach (var ship in Ships)
             {
                 ship.SendUpdate();
+            }
+
+            if (Utility.Random.Next(480) <= 2)
+            {
+                AddEntity(new Enemy() { Position = new Vector3(Utility.Random.Next(1000) - 500, Utility.Random.Next(1000) - 500, 0) });
             }
 
             foreach (var added in addedEntities)
