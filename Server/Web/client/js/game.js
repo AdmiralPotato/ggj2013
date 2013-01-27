@@ -1,3 +1,5 @@
+
+
 var n = NPos3d,
 	s = new n.Scene({
 
@@ -250,6 +252,11 @@ var setGameStateFromServer = function (data) {
 				client.entityMap[entityIdString] = undefined;
 				console.log('removing entity:' + entityIdString);
 			}
+		}
+
+		// play sounds
+		for( var sound in data.Sounds ) {
+			SFX[sound].play();
 		}
     }
 };

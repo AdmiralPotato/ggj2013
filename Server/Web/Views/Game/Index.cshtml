@@ -15,6 +15,34 @@
     </style>
 </head>
 <body>
+    <!-- move this wherever -->
+    <script>
+        audioLoaded = false;
+        var sfxList = [
+		{
+		    name:'ShieldsUp',
+		    src:'sounds/shieldsup.wav',
+		    channels:10,
+		},{
+		    name:'ShieldsDown',
+		    src:'sounds/powerdown.wav',
+		    channels:10,
+		},{
+		    name:'gameOver',
+		    src:'invalid/error/sfx/game_over_music.wav',
+		    channels:1,
+		}
+        ];
+
+        function onLoadCallback()
+        {
+            //if( audioList.fail != true )
+            audioLoaded = true;
+        }
+
+        var audioList = new preloadAudioList(sfxList, null, document.getElementById("errorDiv"), onLoadCallback);
+    </script>
+    <div id="errorDiv"></div>
     <div id="ui">
 
         <input type="button" class="customEvent" id="SelectStation-None" value="Observer" />

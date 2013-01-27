@@ -153,12 +153,14 @@
     <Compile Include="XNA\Vector3.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="client\audio.html" />
     <Content Include="client\buttons.html" />
     <Content Include="client\css\buttons.css" />
     <Content Include="client\css\styles.css" />
     <Content Include="client\css\widgets.css" />
     <Content Include="client\index.html" />
     <Content Include="client\index2.html" />
+    <Content Include="client\js\audio.js" />
     <Content Include="client\js\game.js" />
     <Content Include="client\js\network.js" />
     <Content Include="client\js\shapes-wireframe.js" />

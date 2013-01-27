@@ -263,7 +263,7 @@ namespace WebGame
         {
             if (this.ProjectileTubes[tubeNumber].ProjectileStatus == ProjectileStatus.Loaded && this.StarSystem == target.StarSystem)
             {
-                var projectile = new Projectile(this.Velocity);
+                var projectile = new Projectile(this.Position, this.Velocity);
                 projectile.Target = target;
                 this.StarSystem.AddEntity(projectile);
                 PlaySound("MissileLaunch");
@@ -621,6 +621,24 @@ namespace WebGame
                         PlaySound("FireTractorBeam");
                     }
                     break;
+            }
+        }
+
+        protected override void HandleDamage(ref int damage, double orientation = 0)
+        {
+            if (ShieldsEngaged)
+            {
+                var shield = this.DetermineShieldFrom(orientation);
+                if (damage > shield.Strength)
+                {
+                    damage -= (int)shield.Strength;
+                    shield.Strength = 0;
+                }
+                else
+                {
+                    shield.Strength -= damage;
+                    damage = 0;
+                }
             }
         }
 

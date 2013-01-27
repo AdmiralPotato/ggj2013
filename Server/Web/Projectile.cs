@@ -29,7 +29,7 @@ namespace WebGame
         {
         }
 
-        public Projectile(Vector3 velocity): base(1, velocity: velocity)
+        public Projectile(Vector3 position, Vector3 velocity): base(1, position, velocity)
         {
         }
 
