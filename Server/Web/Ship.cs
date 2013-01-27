@@ -121,7 +121,7 @@ namespace WebGame
         public override string Type { get { return "Ship"; } }
         
 
-        public MissionStatus missionState;
+        public MissionStatus missionState = null;
 
 
 
@@ -133,7 +133,15 @@ namespace WebGame
         public Ship(double mass)
             : base(mass)
         {
-            Players = new List<Player>();
+            //if (Type.Equals("Ship") )  // aka not enemy
+            //{
+                Players = new List<Player>();
+            //}
+        }
+
+        internal void SetupMissions()
+        {
+            // this.StarSystem must be set at this point
             missionState = new MissionStatus(this);
         }
 
@@ -227,7 +235,8 @@ namespace WebGame
 
             base.Update(elapsed);
             
-            UpdateMission();
+            if( missionState != null )
+                UpdateMission();
         }
 
         private void TurnShipToDesiredOrientation(TimeSpan elapsed)

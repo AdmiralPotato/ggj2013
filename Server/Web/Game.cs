@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
@@ -465,6 +465,7 @@ namespace WebGame
                 var defaultShip = new Ship() { DefaultShipNumber = defaultShipNumber, DesiredOrientation = 1 };
                 DefaultShips[defaultShipNumber] = defaultShip;
                 StarSystems[0].AddEntity(defaultShip);
+                defaultShip.SetupMissions();  // must come after being added to starSystem
             }
 
             return DefaultShips[defaultShipNumber];
