@@ -12,6 +12,18 @@ var n = NPos3d,
 	playerEntity;
 client.station = "None";
 
+//
+var windowHashParser = function() {
+	var args = window.location.hash.replace('?','').split('&'),
+		i, len = args.length, pair;
+	for(i = 0; i < len; i += 1){
+		pair = args[i].split('=');
+		client[pair[0]] = pair[1];
+	}
+	console.log('hashchange event fired', client);
+};
+windowHashParser(); //once when this
+$(window).on('hashchange', windowHashParser);
 var gameId = window.location.hash;
 if (gameId === '') {
     // try to load the game id from a url like this: http://localhost:62700/Game-705888/
@@ -72,7 +84,7 @@ var canvasClickAndTouchHandler = function (event) {
     } else {
         mouseDown = true;
     }
-    console.log('mouseDown:', mouseDown);
+    //console.log('mouseDown:', mouseDown);
 };
 $(document).on('mousedown mouseup touchstart touchend touchstop', canvasClickAndTouchHandler);
 var normalizeAngle = function (angle) {
