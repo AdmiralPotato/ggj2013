@@ -52,33 +52,6 @@ var parseAllGeometry = function(_geoPath, _callback) {
 	}
 };
 
-var keys = {};
-var keyHandlers = {
-	"32down": function(){
-		paused = !paused;
-	}
-};
-var onKeyDown=function(e){
-	e=(e||window.event);
-	var kc = (e.keyCode||e.which);
-	if(null == keys[kc]){
-		keys[kc] = true;
-		if(keyHandlers[kc+"down"]){
-			keyHandlers[kc+"down"]();
-		}
-	}
-};
-var onKeyUp=function(e){
-	e=(e||window.event);
-	var kc = (e.keyCode||e.which);
-	if(true == keys[kc]){
-		delete keys[kc];
-		if(keyHandlers[kc+"up"]){
-			keyHandlers[kc+"up"]();
-		}
-	}
-};
-
 var player;
 
 var whatToDoWhenAllTheGeometriesAreParsedOkayYupSeriously = function(){
@@ -176,7 +149,6 @@ parseAllGeometry(
 var tau = Math.PI*2;
 var deg = tau/360;
 
-var paused = false;
 var last = Date.now()/1000;
 var timer = 0.0;
 //var updateObjects = [];
@@ -186,7 +158,7 @@ var update = function(){
 	var now = Date.now()/1000; // get current time
 	var dt = ((now-last) > .2) ? .2 : now-last; // calculate time between frames
 	last = now; // save new time
-	if(paused == false){ // main 'update' loop
+	if(client.paused == false){ // main 'update' loop
 		timer += dt;
 
 		//player.rotation.setY(player.rotation.y+(dt*.1));
