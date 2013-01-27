@@ -8,7 +8,7 @@ var n = NPos3d,
 	    entityTypes: {}
 	},
 	playerEntity;
-var gameId = 705865;
+var gameId = 705872;
 var timeSinceLastFrame = 0;
 var timeOfLastFrame = new Date().getTime();
 var timeSinceLastUpdate = 0;
@@ -99,6 +99,7 @@ client.entityTypes.Ship.prototype = {
     type: 'Ship',
     color: '#ff0',
     shape: wireframes.spear,
+	renderAlways: true,
     update: function () {
         var t = this;
         deltaInterpolate(t);
@@ -126,6 +127,7 @@ client.entityTypes.Starbase.prototype = {
     type: 'Starbase',
     color: '#00f',
     shape: wireframes.starBase,
+	renderAlways: true,
     update: function () {
         var t = this;
         deltaInterpolate(t);
@@ -152,6 +154,7 @@ client.entityTypes.Enemy.prototype = {
     type: 'Enemy',
     color: '#f00',
     shape: wireframes.fishShip,
+	renderAlways: true,
     update: function () {
         var t = this;
         deltaInterpolate(t);
@@ -178,6 +181,7 @@ client.entityTypes.Projectile.prototype = {
     type: 'Projectile',
     color: '#f00',
     shape: wireframes.simpleShip,
+	renderAlways: true,
     update: function () {
         var t = this;
         deltaInterpolate(t);
@@ -194,6 +198,7 @@ var setEntityAsPlayer = function (entity) {
         shape: new n.Geom.Circle({
             radius: 3
         }),
+		renderAlways: true,
         pos: [15, 0, 0],
         color: '#9f0'
     });
@@ -201,6 +206,7 @@ var setEntityAsPlayer = function (entity) {
         shape: new n.Geom.Circle({
             radius: 15
         }),
+		renderAlways: true,
         color: '#ccc'
     });
     entity.color = '#0f0';
@@ -237,24 +243,23 @@ var setGameStateFromServer = function (data) {
             entitiesUpdatedThisFrame[entityIdString] = true;
         }
 
-        //REMOVE entities we DID NOT receive data for this frame
-        for (entityIdString in client.entityMap) {
-            if (entitiesUpdatedThisFrame[entityIdString] === undefined) {
-                entityMap[entityIdString].destroy();
-                entityMap[entityIdString] = undefined;
-                console.log('removing entity:' + entityIdString);
-            }
-        }
+		//REMOVE entities we DID NOT receive data for this frame
+		for (entityIdString in client.entityMap) {
+			if (entitiesUpdatedThisFrame[entityIdString] === undefined) {
+				client.entityMap[entityIdString].destroy();
+				client.entityMap[entityIdString] = undefined;
+				console.log('removing entity:' + entityIdString);
+			}
+		}
     }
 };
 
-if (isLocal === undefined) {
+if (typeof isLocal === 'undefined') {
     isLocal = true;
 }
 var serverPath = isLocal ? 'http://legendstudio.com/' : '/';
 var currentGame = isLocal ? 'Game-' + gameId + '/' : '';
 var loadScript = function (relativePath) {
-
     document.write('<script type="text/javascript" src="' + serverPath + relativePath + '"></script>');
 };
 loadScript('Scripts/jquery.signalR-1.0.0-rc2.js');

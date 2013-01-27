@@ -9,13 +9,13 @@
 
 	<div id="stationSelect">
 		<h2>Station Select</h2>
-		<input type="button" class="sendMessage" id="SelectStation-None" value="Observer" />
-		<input type="button" class="sendMessage" id="SelectStation-Main" value="Main" />
-		<input type="button" class="sendMessage" id="SelectStation-Helm" value="Helm" />
-		<input type="button" class="sendMessage" id="SelectStation-Weapons" value="Weapons" />
-		<input type="button" class="sendMessage" id="SelectStation-Engineering" value="Engineering" />
-		<input type="button" class="sendMessage" id="SelectStation-Communication" value="Communication" />
-		<input type="button" class="sendMessage" id="SelectStation-GameMaster" value="Game Master" />
+		<input type="button" class="customEvent" id="SelectStation-None" value="Observer" />
+		<input type="button" class="customEvent" id="SelectStation-Main" value="Main" />
+		<input type="button" class="customEvent" id="SelectStation-Helm" value="Helm" />
+		<input type="button" class="customEvent" id="SelectStation-Weapons" value="Weapons" />
+		<input type="button" class="customEvent" id="SelectStation-Engineering" value="Engineering" />
+		<input type="button" class="customEvent" id="SelectStation-Communication" value="Communication" />
+		<input type="button" class="customEvent" id="SelectStation-GameMaster" value="Game Master" />
 	</div>
 
 	<div id="shipSelectHolder">
@@ -43,7 +43,7 @@
 		<input type="button" class="sendMessage" id="SetMainScreen-view=Status" value="Status"  />
 	</div>
 
-	<div id="Helm">
+	<div class="stationUI" id="Helm">
 		<h3>Helm</h3>
 		<input type="submit" onclick='$.post("SetMainScreen", "view=Front");' value="Front" />
 		<input type="submit" onclick='$.post("SetMainScreen", "view=Left");' value="Left" />
@@ -63,7 +63,7 @@
 		<input type="submit" onclick='$.post("SetDesiredHeading", "amount=" + $("#desiredHeading").val());' value="Set Heading" />
 	</div>
 
-	<div id="Weapons">
+	<div class="stationUI" id="Weapons">
 		<h3>Weapons</h3>
 		<input type="submit" onclick='$.post("SetMainScreen", "view=Front");' value="Front" />
 		<input type="submit" onclick='$.post("SetMainScreen", "view=Left");' value="Left" />
@@ -110,7 +110,7 @@
 		<input type="submit" onclick='$.post("FireBeam", "bank=0&targetId=" + $("#desiredTarget").val() + "&type=" + $("#beam").val());' value="Fire" />
 	</div>
 
-	<div id="Engineering">
+	<div class="stationUI" id="Engineering">
 		<h3>Engineering</h3>
 		<select id="engPart">
 			<option value="Thrusters">Thrusters</option>
@@ -136,7 +136,7 @@
 		<input type="submit" onclick='$.post("SetRepairTarget", "part=" + $("#engRepairPart").val());' value="Set Repair" />
 	</div>
 
-	<div id="Communication">
+	<div class="stationUI" id="Communication">
 		<h3>Communication</h3>
 		<input type="text" id="comTarget" value="0" />
 		<select id="command">
@@ -150,7 +150,7 @@
 		<input type="submit" onclick='$.post("SendCommand", "targetId=" + $("#comTarget").val() + "&command=" + $("#command").val());' value="Send Command" />
 	</div>
 
-	<div id="GameMaster">
+	<div class="stationUI" id="GameMaster">
 		<h3>Game Master</h3>
 		<input type="submit" onclick='$.post("Start");' value="Reset" />
 		<input type="submit" onclick='$.post("BuildBase");' value="Build Base" />

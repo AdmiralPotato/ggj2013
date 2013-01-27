@@ -46,3 +46,10 @@ input{
 label{
 	padding: 0 8px;
 }
+
+.stationUI{
+	display: none;
+}
+.stationUI.active{
+	display: none;
+}
