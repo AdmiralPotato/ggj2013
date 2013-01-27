@@ -16,13 +16,14 @@
 </head>
 <body>
     <div id="ui">
-        <input type="submit" onclick='$.post("SelectStation", "station=None");' value="Observer" />
-        <input type="submit" onclick='$.post("SelectStation", "station=Main");' value="Main" />
-        <input type="submit" onclick='$.post("SelectStation", "station=Helm");' value="Helm" />
-        <input type="submit" onclick='$.post("SelectStation", "station=Weapons");' value="Weapons" />
-        <input type="submit" onclick='$.post("SelectStation", "station=Engineering");' value="Engineering" />
-        <input type="submit" onclick='$.post("SelectStation", "station=Communication");' value="Communication" />
-        <input type="submit" onclick='$.post("SelectStation", "station=GameMaster");' value="Game Master" />
+
+        <input type="button" class="customEvent" id="SelectStation-None" value="Observer" />
+        <input type="button" class="customEvent" id="SelectStation-Main" value="Main" />
+        <input type="button" class="customEvent" id="SelectStation-Helm" value="Helm" />
+        <input type="button" class="customEvent" id="SelectStation-Weapons" value="Weapons" />
+        <input type="button" class="customEvent" id="SelectStation-Engineering" value="Engineering" />
+        <input type="button" class="customEvent" id="SelectStation-Communication" value="Communication" />
+        <input type="button" class="customEvent" id="SelectStation-GameMaster" value="Game Master" />
 
         <div id="None">
             <select id="shipSelect">
@@ -174,7 +175,12 @@
     <script type="text/javascript" src="/client/js/game.js"></script>
     <script type="text/javascript" src="/client/js/network.js"></script>
 
-@*    <script type="text/javascript">
+    <script type="text/javascript">
+        client.station = "@ViewBag.Player.Station";
+    </script>
+
+
+    @*    <script type="text/javascript">
 
         //$.connection.hub.logging = true;
 
@@ -203,6 +209,12 @@
             gameHub.server.disconnecting(@Model.Id, 0);
         });
     </script>*@
+
+    <audio id="notify">
+        <source src="/Sounds/chime.ogg" type="audio/ogg" />
+        <source src="/Sounds/chime.mp3" type="audio/mp3" />
+    </audio>
+
 
 </body>
 </html>

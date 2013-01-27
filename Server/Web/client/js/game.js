@@ -45,8 +45,10 @@ var animationController = {
             s.camera.pos[1] = playerEntity.pos[1];
             if (mouseDown) {
                 playerEntity.rot[2] = normalizeAngle(Math.atan2(s.mpos.y, s.mpos.x));
-                console.log(playerEntity.rot[2]);
-                sendMessage("SetDesiredHeading", "amount=" + playerEntity.rot[2]);
+                //                console.log(playerEntity.rot[2]);
+                if (client.station === "Helm") {
+                    sendMessage("SetDesiredHeading", "amount=" + playerEntity.rot[2]);
+                }
             }
         }
     }
