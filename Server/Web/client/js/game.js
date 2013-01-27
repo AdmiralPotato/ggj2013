@@ -72,7 +72,7 @@ var canvasClickAndTouchHandler = function (event) {
     } else {
         mouseDown = true;
     }
-    console.log('mouseDown:', mouseDown);
+    //console.log('mouseDown:', mouseDown);
 };
 $(document).on('mousedown mouseup touchstart touchend touchstop', canvasClickAndTouchHandler);
 var normalizeAngle = function (angle) {
