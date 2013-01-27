@@ -5,14 +5,8 @@
 <html>
 <head>
     <title>Game #705799 - GGJ2013</title>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
-    <script src="/Scripts/jquery.signalR-1.0.0-rc2.js"></script>
-    <script src="/signalr/hubs" type="text/javascript"></script>
-    <script src="/Global.js" type="text/javascript"></script>
-
     <link rel="stylesheet" href="/Style.css" />
     <link rel="stylesheet" href="/client/css/styles.css" />
-
     <style>
         html
         {
@@ -22,13 +16,14 @@
 </head>
 <body>
     <div id="ui">
-        <input type="submit" onclick='$.post("SelectStation", "station=None");' value="Observer" />
-        <input type="submit" onclick='$.post("SelectStation", "station=Main");' value="Main" />
-        <input type="submit" onclick='$.post("SelectStation", "station=Helm");' value="Helm" />
-        <input type="submit" onclick='$.post("SelectStation", "station=Weapons");' value="Weapons" />
-        <input type="submit" onclick='$.post("SelectStation", "station=Engineering");' value="Engineering" />
-        <input type="submit" onclick='$.post("SelectStation", "station=Communication");' value="Communication" />
-        <input type="submit" onclick='$.post("SelectStation", "station=GameMaster");' value="Game Master" />
+
+        <input type="button" class="customEvent" id="SelectStation-None" value="Observer" />
+        <input type="button" class="customEvent" id="SelectStation-Main" value="Main" />
+        <input type="button" class="customEvent" id="SelectStation-Helm" value="Helm" />
+        <input type="button" class="customEvent" id="SelectStation-Weapons" value="Weapons" />
+        <input type="button" class="customEvent" id="SelectStation-Engineering" value="Engineering" />
+        <input type="button" class="customEvent" id="SelectStation-Communication" value="Communication" />
+        <input type="button" class="customEvent" id="SelectStation-GameMaster" value="Game Master" />
 
         <div id="None">
             <select id="shipSelect">
@@ -166,20 +161,35 @@
         <textarea id="missionStatus"></textarea>
     </div>
 
-    <script src="https://raw.github.com/AdmiralPotato/npos3d/master/src/core.js"></script>
-    <script src="https://raw.github.com/AdmiralPotato/npos3d/master/src/font.js"></script>
-    <script src="/client/js/shapes-wireframe.js"></script>
-    <script src="/client/js/game.js"></script>
+    <script type="text/javascript">
+        gameId = @Model.Id;
+        isLocal = false;
+    </script>
+
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script type="text/javascript" src="/client/js/npos3d/core.js"></script>
+    <script type="text/javascript" src="/client/js/npos3d/geom.circle.js"></script>
+    <script type="text/javascript" src="/client/js/npos3d/geom.sphere.js"></script>
+    <script type="text/javascript" src="/client/js/npos3d/font.js"></script>
+    <script type="text/javascript" src="/client/js/shapes-wireframe.js"></script>
+    <script type="text/javascript" src="/client/js/game.js"></script>
+    <script type="text/javascript" src="/client/js/network.js"></script>
 
     <script type="text/javascript">
+        client.station = "@ViewBag.Player.Station";
+    </script>
+
+
+    @*    <script type="text/javascript">
+
         //$.connection.hub.logging = true;
 
         var gameHub = $.connection.gameHub;
         gameHub.client.handleUpdate = function (update) {
             console.log(JSON.stringify(update));
-            console.log("update.missionUpdate:"+update.missionUpdate);
-            if( update.missionUpdate != null )
-                missionStatus.value = update.missionUpdate;
+            //console.log("update.missionUpdate:"+update.missionUpdate);
+            //if( update.missionUpdate != null )
+            //    missionStatus.value = update.missionUpdate;
             setGameStateFromServer(update);
         };
 
@@ -198,6 +208,13 @@
         $(window).unload(function () {
             gameHub.server.disconnecting(@Model.Id, 0);
         });
-    </script>
+    </script>*@
+
+    <audio id="notify">
+        <source src="/Sounds/chime.ogg" type="audio/ogg" />
+        <source src="/Sounds/chime.mp3" type="audio/mp3" />
+    </audio>
+
+
 </body>
 </html>

@@ -199,6 +199,7 @@ namespace WebGame
             // send player messages
             //SendForumMessage("Game #" + GameName + " Started");
 
+            DefaultShips.Clear();
             StarSystems.Clear();
 
             var starSystem = new StarSystem();

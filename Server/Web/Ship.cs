@@ -466,7 +466,7 @@ namespace WebGame
         {
             if (Players.Count > 0)
             {
-                var update = new UpdateToClient() { ShipId = Id, Energy = (int)this.Energy, FrontShield = (int)Shields[0].Strength, RearShield = (int)Shields[2].Strength, LeftShield = (int)Shields[3].Strength, RightShield = (int)Shields[1].Strength, ShieldsEngaged = this.ShieldsEngaged };
+                var update = new UpdateToClient() { GameId = Game.Id, ShipId = Id, Energy = (int)this.Energy, FrontShield = (int)Shields[0].Strength, RearShield = (int)Shields[2].Strength, LeftShield = (int)Shields[3].Strength, RightShield = (int)Shields[1].Strength, ShieldsEngaged = this.ShieldsEngaged };
                 foreach (var entity in StarSystem.Entites)
                 {
                     if (entity.Sounds.Count > 0)
