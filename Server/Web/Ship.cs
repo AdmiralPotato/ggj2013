@@ -395,7 +395,7 @@ namespace WebGame
         {
             if (missionState != null)
             {
-                missionState.checkSuccess();
+                missionState.updateMissionStatus();
             }
         }
 
@@ -583,5 +583,7 @@ namespace WebGame
                     break;
             }
         }
+
+        public string Name { get; set; }
     }
 }
