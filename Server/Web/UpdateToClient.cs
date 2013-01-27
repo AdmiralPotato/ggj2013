@@ -7,6 +7,7 @@ namespace WebGame
 {
     public class UpdateToClient
     {
+        public int GameId;
         public int ShipId;
         public int Energy;
         public int FrontShield;

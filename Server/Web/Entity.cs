@@ -12,7 +12,7 @@ namespace WebGame
     [ProtoContract]
     public abstract class Entity
     {
-        public Entity(double mass)
+        public Entity(double mass, Vector3? position = null, Vector3? velocity = null)
         {
             if (mass <= 0)
             {
@@ -20,6 +20,15 @@ namespace WebGame
             }
             this.Mass = mass;
             this.Energy = this.InitialEnergy;
+            if (position.HasValue)
+            {
+                this.Position = position.Value;
+            }
+            if (velocity.HasValue)
+            {
+                this.Velocity = velocity.Value;
+            }
+
             SetupParts();
         }
 
@@ -47,7 +56,7 @@ namespace WebGame
         public abstract string Type { get; }
 
 //        [ProtoMember(2)]
-        public Vector3 Position;// { get; protected set; }
+        public Vector3 Position { get; protected set; }
         [ProtoMember(3)]
         public double Orientation { get; protected set; }
 
@@ -55,7 +64,7 @@ namespace WebGame
         /// Meters Per Second
         /// </summary>
         //[ProtoMember(4)]
-        public Vector3 Velocity;// { get; protected set; }
+        public Vector3 Velocity { get; protected set; }
         /// <summary>
         /// Tons
         /// </summary>
@@ -135,12 +144,23 @@ namespace WebGame
             if (CheckEnergy())
             {
                 this.Velocity += acceleration * (elapsed.Ticks / (float)TimeSpan.FromSeconds(1).Ticks);
-                if (this.Velocity.Magnitude() < 0.1) // small enough not to care.
-                {
-                    this.Velocity = Vector3.Zero;
-                }
+                //if (this.Velocity.Magnitude() < 0.01) // small enough not to care.
+                //{
+                //    //this.Velocity = Vector3.Zero;
+                //}
             }
         }
+
+        public void ApplyEnergyForce(double energy, double orientation)
+        {
+            const double efficiency = 0.1;
+            var force = energy / energyCostPerForcePerSecond * efficiency; // No time in this equation, because we will apply this force over one second
+            var accelerationMagnitude = force / this.Mass;
+            var flatAcceleration = new Vector3((float)accelerationMagnitude, 0, 0);
+            var acceleration = Vector3.Transform(flatAcceleration, Matrix.CreateRotationZ((float)orientation));
+            this.Velocity += acceleration; // no time in this equation because it is applied as if it were one second
+        }
+
 
         private bool CheckEnergy()
         {

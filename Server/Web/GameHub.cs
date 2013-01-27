@@ -75,9 +75,9 @@ namespace WebGame
 
                 if (useGroups)
                 {
+                    this.Clients.Caller.GroupWorking = true;
                     //Caller.ShipId = shipId;
                     //Caller.GroupName = GetShipGroupName(gameId, shipId);
-                    groupsWorking = true;
                     return Groups.Add(Context.ConnectionId, GetShipGroupName(gameId, shipId));
                 }
             }
@@ -122,11 +122,11 @@ namespace WebGame
 
             //if (groupsWorking)
             //{
-            //    var group = context.Clients.Group(groupName);
-            //    group.handleUpdate(update);
+                var group = context.Clients.Group(groupName);
+                group.handleUpdate(update);
             //}
             //else
-                context.Clients.All.handleUpdate(update);
+            //    context.Clients.All.handleUpdate(update);
         }
 
         public static void Refresh(string group)

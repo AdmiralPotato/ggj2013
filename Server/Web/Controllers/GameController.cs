@@ -529,7 +529,7 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
             Initalize(id);
 
             if (player.Ship != null && player.Station == Station.GameMaster)
-                player.Ship.StarSystem.AddEntity(new Starbase() { Position = player.Ship.Position });
+                player.Ship.StarSystem.AddEntity(new Starbase(player.Ship.Position));
 
             return null;
         }
@@ -540,8 +540,7 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
 
             if (player.Ship != null && player.Station == Station.GameMaster)
             {
-                var newShip = Ship.Create(ShipType.Capital);
-                newShip.Position = player.Ship.Position;
+                var newShip = Ship.Create(ShipType.Capital, player.Ship.Position);
                 player.Ship.StarSystem.AddEntity(newShip);
             }
 
