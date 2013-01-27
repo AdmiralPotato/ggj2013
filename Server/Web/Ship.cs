@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using ProtoBuf;
+using System.Collections.ObjectModel;
 
 namespace WebGame
 {
@@ -16,8 +17,13 @@ namespace WebGame
         {
         }
 
-        public Ship(double mass)
-            : base(mass)
+        public Ship(Vector3 position) : this(1000, position: position)
+        {
+
+        }
+
+        public Ship(double mass, Vector3? position = null)
+            : base(mass, position: position)
         {
             //if (Type.Equals("Ship") )  // aka not enemy
             //{
@@ -65,14 +71,14 @@ namespace WebGame
         [ProtoMember(5)]
         public MainView MainView { get; set; }
 
-        /// <summary>
-        /// How long ago the projectile was loaded
-        /// </summary>
-        [ProtoMember(6)]
-        public TimeSpan ProjectileLoadTime { get; private set; }
-
-        [ProtoMember(7)]
-        public ProjectileStatus ProjectileStatus { get; set; }
+        private List<Tube> _projectileTubes = new List<Tube>();
+        private ReadOnlyCollection<Tube> ProjectileTubes
+        {
+            get
+            {
+                return new ReadOnlyCollection<Tube>(_projectileTubes);
+            }
+        }
 
         [ProtoMember(9)]
         public int FrontShield { get; set; }
@@ -134,8 +140,26 @@ namespace WebGame
         [ProtoMember(20)]
         public int MaxShields { get; set; }
 
+        private int _tubes = 0;
         [ProtoMember(21)]
-        public int Tubes { get; set; }
+        public int Tubes
+        {
+            get { return _tubes; }
+            set
+            {
+                _tubes = value;
+                // make sure there's enough tubes
+                while (this.ProjectileTubes.Count < this.Tubes)
+                {
+                    this._projectileTubes.Add(new Tube());
+                }
+                // make sure there aren't too many 
+                while (this.ProjectileTubes.Count > this.Tubes)
+                {
+                    this._projectileTubes.RemoveAt(this._projectileTubes.Count - 1); // remove the last one
+                }
+            }
+        }
 
         [ProtoMember(22)]
         public int PhaserBanks { get; set; }
@@ -153,13 +177,13 @@ namespace WebGame
 
         protected override double InitialEnergy { get { return 1000; } }
 
-        public static Ship Create(ShipType type)
+        public static Ship Create(ShipType type, Vector3? position = null)
         {
             Ship result;
             switch (type)
             {
                 case ShipType.Spearhead:
-                    result = new Ship(2000) { MaxShields = 500, Tubes = 2, PhaserBanks = 1, RepairCrews = 3 };
+                    result = new Ship(2000, position) { MaxShields = 500, Tubes = 2, PhaserBanks = 1, RepairCrews = 3 };
                     result.BeamWeapons.AddRange((BeamType[])Enum.GetValues(typeof(BeamType)));
                     result.BeamWeapons.Remove(BeamType.ShadowTether);
                     result.Projectiles[ProjectileType.Torpedo] = 10;
@@ -169,19 +193,19 @@ namespace WebGame
                     result.Projectiles[ProjectileType.Skattershot] = 1;
                     break;
                 case ShipType.Skirmisher:
-                    result = new Ship(2000) { MaxShields = 500, Tubes = 2, PhaserBanks = 2, RepairCrews = 3 };
+                    result = new Ship(2000, position) { MaxShields = 500, Tubes = 2, PhaserBanks = 2, RepairCrews = 3 };
                     result.BeamWeapons.AddRange((BeamType[])Enum.GetValues(typeof(BeamType)));
                     result.BeamWeapons.Remove(BeamType.ShadowTether);
                     result.Projectiles[ProjectileType.Torpedo] = 10;
                     break;
                 case ShipType.Beserker:
-                    result = new Ship(5000) { MaxShields = 0, Tubes = 0, PhaserBanks = 1, MaximumForce = 12500, RepairCrews = 3 };
+                    result = new Ship(5000, position) { MaxShields = 0, Tubes = 0, PhaserBanks = 1, MaximumForce = 12500, RepairCrews = 3 };
                     result.BeamWeapons.Add(BeamType.HullPiercing);
                     result.BeamWeapons.Add(BeamType.SelfDestruct);
                     result.BeamWeapons.Add(BeamType.PlasmaVent);
                     break;
                 case ShipType.Gunboat:
-                    result = new Ship(1500) { MaxShields = 600, Tubes = 4, PhaserBanks = 1, RepairCrews = 3 };
+                    result = new Ship(1500, position) { MaxShields = 600, Tubes = 4, PhaserBanks = 1, RepairCrews = 3 };
                     result.BeamWeapons.Add(BeamType.SuppresionPulse);
                     result.BeamWeapons.Add(BeamType.ShadowTether);
                     result.Projectiles[ProjectileType.Torpedo] = 10;
@@ -189,7 +213,7 @@ namespace WebGame
                     result.Projectiles[ProjectileType.Hardshell] = 1;
                     break;
                 case ShipType.Capital:
-                    result = new Ship(3000) { MaxShields = 1000, Tubes = 5, RepairCrews = 3 };
+                    result = new Ship(3000, position) { MaxShields = 1000, Tubes = 5, RepairCrews = 3 };
                     result.BeamWeapons.Add(BeamType.StandardPhaser);
                     result.BeamWeapons.Add(BeamType.ShieldDamper);
                     result.BeamWeapons.Add(BeamType.ShadowTether);
@@ -205,10 +229,10 @@ namespace WebGame
 
         public bool LoadProjectile(int tubeNumber, ProjectileType type)
         {
-            if (this.ProjectileStatus == ProjectileStatus.Unloaded)
+            if (this.ProjectileTubes[tubeNumber].ProjectileStatus == ProjectileStatus.Unloaded)
             {
-                this.ProjectileLoadTime = TimeSpan.Zero;
-                this.ProjectileStatus = ProjectileStatus.Loading;
+                this.ProjectileTubes[tubeNumber].ProjectileLoadTime = TimeSpan.Zero;
+                this.ProjectileTubes[tubeNumber].ProjectileStatus = ProjectileStatus.Loading;
                 PlaySound("MissileLoad");
                 return true;
             }
@@ -217,9 +241,9 @@ namespace WebGame
 
         public Projectile LaunchProjectile(int tubeNumber, Entity target)
         {
-            if (this.ProjectileStatus == ProjectileStatus.Loaded && this.StarSystem == target.StarSystem)
+            if (this.ProjectileTubes[tubeNumber].ProjectileStatus == ProjectileStatus.Loaded && this.StarSystem == target.StarSystem)
             {
-                var projectile = new Projectile();
+                var projectile = new Projectile(this.Velocity);
                 projectile.Target = target;
                 this.StarSystem.AddEntity(projectile);
                 PlaySound("MissileLaunch");
@@ -286,11 +310,13 @@ namespace WebGame
                     // align with velocity
                     var velocityDirection = Math.Atan2(this.Velocity.Y, this.Velocity.X).NormalizeOrientation();
                     var velocityOrientationAngle = this.Orientation - velocityDirection;
+
                     this._desiredOrientation = velocityDirection; // we need to directly access the underscore members so that we don't call the set method, which will unset the target speed 
-                    if (Math.Abs(velocityOrientationAngle) > Math.PI / 2)
+                    if (Math.Abs(velocityOrientationAngle) > Math.PI / 2) // if it would be less turning for us to turn into the velocity, do that instead
                     {
                         this._desiredOrientation = (velocityDirection + Math.PI).NormalizeOrientation(); // we need to directly access the underscore members so that we don't call the set method, which will unset the target speed 
                     }
+
                     // apply a slowing force
                     this._impulsePercentage = -100 * Math.Cos(velocityOrientationAngle); // we need to directly access the underscore members so that we don't call the set method, which will unset the target speed 
                     // but make sure it won't push us past the desired velocity
@@ -298,7 +324,7 @@ namespace WebGame
                     var targetDeceleration = speed - this.TargetSpeedMetersPerSecond.Value;
                     if (targetDeceleration < Math.Abs(decelerationAmount))
                     {
-                        this._impulsePercentage = targetDeceleration / (this.EffectiveMaximumForce / this.Mass) * 100 * Math.Sign(decelerationAmount); // we need to directly access the underscore members so that we don't call the set method, which will unset the target speed 
+                        this._impulsePercentage = targetDeceleration / (this.EffectiveMaximumForce / this.Mass) / elapsed.TotalSeconds * 100 * Math.Sign(decelerationAmount); // we need to directly access the underscore members so that we don't call the set method, which will unset the target speed 
                     }
                 }
             }
@@ -306,13 +332,15 @@ namespace WebGame
 
         private void UpdateProjectileLoading(TimeSpan elapsed)
         {
-
-            if (this.ProjectileStatus == ProjectileStatus.Loading)
+            foreach (var tube in this.ProjectileTubes)
             {
-                this.ProjectileLoadTime += elapsed;
-                if (this.ProjectileLoadTime >= EffectiveTimeToLoadProjectile)
+                if (tube.ProjectileStatus == ProjectileStatus.Loading)
                 {
-                    this.ProjectileStatus = ProjectileStatus.Loaded;
+                    tube.ProjectileLoadTime += elapsed;
+                    if (tube.ProjectileLoadTime >= EffectiveTimeToLoadProjectile)
+                    {
+                        tube.ProjectileStatus = ProjectileStatus.Loaded;
+                    }
                 }
             }
         }
@@ -330,7 +358,7 @@ namespace WebGame
 
         private void UpdateOrientation(TimeSpan elapsed)
         {
-            var desiredDiffAngle = TurnAngleNeededForDesire();
+            var desiredDiffAngle = TurnAngleNeededForDesiredOrientation();
             var currentAllowedDiffAngle = elapsed.TotalSeconds * this.EffectiveTurnRate;
             var absoluteDesiredDiffAngle = Math.Abs(desiredDiffAngle);
             if (currentAllowedDiffAngle >= absoluteDesiredDiffAngle)
@@ -343,7 +371,7 @@ namespace WebGame
             }
         }
 
-        private double TurnAngleNeededForDesire()
+        private double TurnAngleNeededForDesiredOrientation()
         {
             // difference
             var remaining = this.DesiredOrientation - this.Orientation;
@@ -378,7 +406,7 @@ namespace WebGame
         {
             if (missionState != null)
             {
-                missionState.checkSuccess();
+                missionState.updateMissionStatus();
             }
         }
 
@@ -429,7 +457,7 @@ namespace WebGame
                 yield return "Shield Regenerators";
                 yield return "Energy Collectors"; // not implemented
                 yield return "Energy Storage";
-                yield return "Energy Weapon Bank"; // not implemented
+                yield return "Beam Weapon Bank"; // not implemented
             }
         }
 
@@ -497,6 +525,11 @@ namespace WebGame
                 return Single.MaxValue;
         }
 
+        private void BeamDamage(Entity target, double amount)
+        {
+            target.Damage((int)Effective(amount, "Beam Weapon Bank"));
+        }
+
         internal void FireBeam(int bank, Entity target, BeamType type)
         {
             if (!BeamWeapons.Contains(type))
@@ -549,7 +582,10 @@ namespace WebGame
                     if (IsEntityCloserThan(target, 200) && Energy > 75 && BeamCoolDownTime(bank) > 5)
                     {
                         //target..Velocity
-                        //(Position - target.Position).
+                        var displacement = this.Position - target.Position;
+                        var orientation = Math.Atan2(displacement.Y, displacement.X).NormalizeOrientation();
+
+                        target.ApplyEnergyForce(75, orientation);
 
                         LastBeamBanksUsed[bank] = DateTime.UtcNow;
                         UseRawEnergy(25);
@@ -558,5 +594,7 @@ namespace WebGame
                     break;
             }
         }
+
+        public string Name { get; set; }
     }
 }

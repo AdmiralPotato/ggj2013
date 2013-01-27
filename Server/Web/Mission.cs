@@ -27,6 +27,8 @@ namespace WebGame
 
         //public void Update(TimeSpan elapsed);  // may make these entities or something later so that we can have timed missions
 
-        public abstract bool IsComplete();
+        internal abstract bool IsComplete();
+
+        internal abstract void MissionSetup();
     }
 }

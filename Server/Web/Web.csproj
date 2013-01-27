@@ -136,6 +136,7 @@
     <Compile Include="MissionGoToLocation.cs" />
     <Compile Include="MissionStatus.cs" />
     <Compile Include="Projectile.cs" />
+    <Compile Include="Tube.cs" />
     <Compile Include="XNA\MathHelper.cs" />
     <Compile Include="XNA\Matrix.cs" />
     <Compile Include="Models\AccountModels.cs" />
