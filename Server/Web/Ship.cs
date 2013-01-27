@@ -39,7 +39,7 @@ namespace WebGame
             }
             set
             {
-                _desiredOrientation = value;
+                _desiredOrientation = value.NormalizeOrientation();
                 TargetSpeedMetersPerSecond = null; // setting orientation means "forget about what I said about 'all stop' or whatever other speed I said to try to get to"
             }
         }
@@ -60,8 +60,6 @@ namespace WebGame
         [ProtoMember(7)]
         public ProjectileStatus ProjectileStatus { get; set; }
 
-        [ProtoMember(8)]
-        public int Energy { get; set; }
         [ProtoMember(9)]
         public int FrontShield { get; set; }
         [ProtoMember(10)]
@@ -92,6 +90,14 @@ namespace WebGame
 
         [ProtoMember(15)]
         public double MaximumForce = 10000;
+        protected int EffectiveMaximumEnergy
+        {
+            get
+            {
+                return (int)this.Effective(MaximumForce, "Energy Storage");
+            }
+        }
+
         /// <summary>
         /// Meters Per Second Per Ton
         /// </summary>
@@ -117,6 +123,8 @@ namespace WebGame
             Players = new List<Player>();
             missionState = new MissionStatus(this);
         }
+
+        protected override double InitialEnergy { get { return 1000; } }
 
         public static Ship Create(ShipType type)
         {
@@ -168,14 +176,16 @@ namespace WebGame
             return result;
         }
 
-        public void LoadProjectile()
+        public bool LoadProjectile()
         {
             if (this.ProjectileStatus == ProjectileStatus.Unloaded)
             {
                 this.ProjectileLoadTime = TimeSpan.Zero;
                 this.ProjectileStatus = ProjectileStatus.Loading;
+                return true;
                 PlaySound("MissileLoad");
             }
+            return false;
         }
 
         public Projectile LaunchProjectile(Entity target)
@@ -275,7 +285,14 @@ namespace WebGame
             return remaining;
         }
 
-        public override double Force
+        public override double ApplyForce(TimeSpan elapsedTime)
+        {
+            var intendedForce = this.ImpulsePercentage / 100 * MaximumForce;
+            this.LoseEnergyFrom(intendedForce, elapsedTime); // the idea here is that if their engines aren't working at full capacity, they'll still lose energy as if they were. They're punching it, and losing all that energy, but only the Effective force is output.
+            return Force;
+        }
+
+        private double Force
         {
             get
             {
@@ -318,7 +335,7 @@ namespace WebGame
         {
             if (Players.Count > 0)
             {
-                var update = new UpdateToClient() { ShipId = Id, Energy = this.Energy, FrontShield = this.FrontShield, RearShield = this.RearShield, LeftShield = this.LeftShield, RightShield = this.RightShield, ShieldsEngaged = this.ShieldsEngaged };
+                var update = new UpdateToClient() { ShipId = Id, Energy = (int)this.Energy, FrontShield = this.FrontShield, RearShield = this.RearShield, LeftShield = this.LeftShield, RightShield = this.RightShield, ShieldsEngaged = this.ShieldsEngaged };
                 foreach (var entity in StarSystem.Entites)
                 {
                     if (entity.Sounds.Count > 0)
@@ -338,6 +355,9 @@ namespace WebGame
                 yield return "Thrusters";
                 yield return "Engines";
                 yield return "Projectile Tube";
+                yield return "Shield Regenerators";
+                yield return "Energy Collectors";
+                yield return "Energy Storage";
             }
         }
 

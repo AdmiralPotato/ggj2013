@@ -8,7 +8,6 @@ namespace WebGame
 {
     public class Projectile : Entity
     {
-        public override double Force { get { return 100; } }
         public override double Radius { get { return 1; } }
 
         const int destructionPower = partsHp;
@@ -17,9 +16,12 @@ namespace WebGame
 
         public override string Type { get { return "Projectile"; } }
 
+        protected override double InitialEnergy { get { return 1; } }
+
         public Projectile()
             : this(1)
         {
+            
         }
 
         public Projectile(double mass)
@@ -44,6 +46,13 @@ namespace WebGame
                     break;
             }
             return result;
+        }
+
+        public override double ApplyForce(TimeSpan elapsedTime)
+        {
+            var force = 100;
+            this.LoseEnergyFrom(force, elapsedTime);
+            return force;
         }
 
         public override void Update(TimeSpan elapsed)
