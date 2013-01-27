@@ -159,7 +159,6 @@
     <Content Include="client\css\styles.css" />
     <Content Include="client\css\widgets.css" />
     <Content Include="client\index.html" />
-    <Content Include="client\index2.html" />
     <Content Include="client\js\audio.js" />
     <Content Include="client\js\game.js" />
     <Content Include="client\js\mainview.js" />
@@ -373,13 +372,11 @@
     <Content Include="Sounds\playin_card_3.ogg" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Game.html" />
     <Content Include="client\models\obj2three.py" />
     <Content Include="client\three_test\Assets\obj2three.py" />
     <None Include="Properties\PublishProfiles\Profile1.pubxml" />
     <Content Include="Views\Game\_PlayerList.cshtml" />
     <Content Include="Views\Game\Lobby.cshtml" />
-    <Content Include="Views\Game\_ViewStart.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
