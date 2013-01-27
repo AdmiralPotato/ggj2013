@@ -339,7 +339,7 @@ namespace WebGame
         {
             if (missionState != null)
             {
-                missionState.checkSuccess();
+                missionState.updateMissionStatus();
             }
         }
 
@@ -411,5 +411,7 @@ namespace WebGame
         public int TorpedoTubes { get; set; }
 
         public int PhaserBanks { get; set; }
+
+        public string Name { get; set; }
     }
 }

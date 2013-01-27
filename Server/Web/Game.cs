@@ -466,6 +466,7 @@ namespace WebGame
                 var defaultShip = Ship.Create(ShipType.Spearhead);
                 defaultShip.DefaultShipNumber = defaultShipNumber;
                 defaultShip.DesiredOrientation = 1;
+                defaultShip.Name = name;
                 DefaultShips[defaultShipNumber] = defaultShip;
                 StarSystems[0].AddEntity(defaultShip);
                 defaultShip.SetupMissions();  // must come after being added to starSystem
