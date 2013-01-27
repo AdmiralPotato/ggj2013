@@ -27,14 +27,12 @@ namespace WebGame
             Uri referrer;
             if (Uri.TryCreate(Context.Headers["Referer"], UriKind.RelativeOrAbsolute, out referrer))
             {
-                if (referrer.Segments.Length > 1 && referrer.Segments[1].StartsWith("Game-"))
+                var referrerQuery = HttpUtility.ParseQueryString(referrer.Query);
+                int gameId;
+                if (Int32.TryParse(referrerQuery["Game"], out gameId))
                 {
-                    int gameId;
-                    if (Int32.TryParse(referrer.Segments[1].TrimEnd('/').Substring("Game-".Length), out gameId))
-                    {
-                        var defaultShip = GameServer.GetGame(gameId).GetDefaultShip(1);
-                        SetShip(gameId, defaultShip.Id, true);
-                    }
+                    var defaultShip = GameServer.GetGame(gameId).GetDefaultShip(1);
+                    SetShip(gameId, defaultShip.Id, true);
                 }
             }
 
