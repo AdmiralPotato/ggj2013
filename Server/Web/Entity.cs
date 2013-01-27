@@ -9,6 +9,7 @@ namespace WebGame
 {
     [ProtoInclude(10, typeof(Ship))]
     [ProtoInclude(11, typeof(Starbase))]
+    [ProtoInclude(12, typeof(Projectile))]
     [ProtoContract]
     public abstract class Entity
     {

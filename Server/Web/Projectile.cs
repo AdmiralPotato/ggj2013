@@ -67,7 +67,7 @@ namespace WebGame
 
         public override void Update(TimeSpan elapsed)
         {
-            if (this.StarSystem != Target.StarSystem)
+            if (Target == null || this.StarSystem != Target.StarSystem)
             {
                 this.Destroy();
             }

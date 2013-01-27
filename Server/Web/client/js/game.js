@@ -1,5 +1,3 @@
-
-
 var n = NPos3d,
 	s = new n.Scene({
 
@@ -7,10 +5,46 @@ var n = NPos3d,
 	client = {
 	    entityMap: {},
 	    ui: [],
-	    entityTypes: {}
+	    entityTypes: {},
+		paused: false,
+		loggingEnabled: false
 	},
 	playerEntity;
-var gameId = 705890;
+var gameId = window.location.hash;
+if (gameId === '') {
+//    window.location.P
+}
+var keyStateMap = {};
+var keyHandlerMap = {
+	//Space Bar
+	"32down": function () {
+		client.paused = !client.paused;
+	},
+	//F8
+	"119down": function () {
+		client.loggingEnabled = !client.loggingEnabled;
+		console.log('client.loggingEnabled set to', client.loggingEnabled);
+	}
+};
+var keyEventHandler = function (event) {
+	//console.log(event);
+	var whichKey = (event.keyCode || event.which),
+		type = event.type === 'keydown' ? 'down' : 'up';
+
+	//keyStateMap is used for realtime, every RENDER FRAME keyboard state checks
+	if (type === 'up') {
+		keyStateMap[whichKey] = true;
+	} else {
+		keyStateMap[whichKey] = false;
+	}
+
+	//keyHandlerMap is used for keyboard events
+	if (keyHandlerMap[whichKey + type]) {
+		keyHandlerMap[whichKey + type]();
+	}
+};
+$(window).on('keydown keyup', keyEventHandler);
+var audioLoaded = false;
 var timeSinceLastFrame = 0;
 var timeOfLastFrame = new Date().getTime();
 var timeSinceLastUpdate = 0;
@@ -212,7 +246,7 @@ var setEntityAsPlayer = function (entity) {
 };
 
 var setGameStateFromServer = function (data) {
-    if (!isLocal || data.GameId === gameId) {
+    if (data.GameId === gameId) {
         var entityDataIndex,
 			numEntities = data.Entities.length,
 			entityData,
@@ -242,11 +276,11 @@ var setGameStateFromServer = function (data) {
 
 		//REMOVE entities we DID NOT receive data for this frame
 		for (entityIdString in client.entityMap) {
-			console.log('entitiesUpdatedThisFrame[entityIdString]',entitiesUpdatedThisFrame[entityIdString],client.entityMap);
+			//console.log('entitiesUpdatedThisFrame[entityIdString]',entitiesUpdatedThisFrame[entityIdString],client.entityMap);
 			if (entitiesUpdatedThisFrame[entityIdString] === undefined) {
 				client.entityMap[entityIdString].destroy();
 				delete client.entityMap[entityIdString];
-				console.log('removing entity:' + entityIdString);
+				//console.log('removing entity:' + entityIdString);
 			}
 		}
 

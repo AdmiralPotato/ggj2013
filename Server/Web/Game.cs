@@ -140,6 +140,16 @@ namespace WebGame
             return null;
         }
 
+        public Player GetPlayer(string sessionId)
+        {
+            foreach (var player in Players)
+            {
+                if (player.SessionId == sessionId)
+                    return player;
+            }
+            return null;
+        }
+
         public Player Join(int accountId, string name, int rating)
         {
             var result = new Player() { AccountId = accountId, Name = name, Rating = rating };

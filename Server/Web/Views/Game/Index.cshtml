@@ -1,7 +1,4 @@
-﻿@{
-    Layout = null;
-}
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <title>Game #705799 - GGJ2013</title>
@@ -15,9 +12,7 @@
     </style>
 </head>
 <body>
-    <div id="errorDiv"></div>
     <div id="ui">
-
         <input type="button" class="customEvent" id="SelectStation-None" value="Observer" />
         <input type="button" class="customEvent" id="SelectStation-Main" value="Main" />
         <input type="button" class="customEvent" id="SelectStation-Helm" value="Helm" />
@@ -26,7 +21,7 @@
         <input type="button" class="customEvent" id="SelectStation-Communication" value="Communication" />
         <input type="button" class="customEvent" id="SelectStation-GameMaster" value="Game Master" />
 
-        <div id="None">
+        <div class="stationUI" id="None">
             <select id="shipSelect">
                 <option value="1">Heart of the Deep</option>
                 <option value="2">Ship 2</option>
@@ -39,7 +34,7 @@
             <input type="submit" onclick='$.post("SelectShip", "defaultShipNumber=" + $("#shipSelect").val() + "&name=" + $("#shipName").val());' value="Select Ship" />
         </div>
 
-        <div id="Helm">
+        <div class="stationUI active" id="Helm">
             <h3>Helm</h3>
             <input type="submit" onclick='$.post("SetMainScreen", "view=Front");' value="Front" />
             <input type="submit" onclick='$.post("SetMainScreen", "view=Left");' value="Left" />
@@ -59,7 +54,7 @@
             <input type="submit" onclick='$.post("SetDesiredHeading", "amount=" + $("#desiredHeading").val());' value="Set Heading" />
         </div>
 
-        <div id="Weapons">
+        <div class="stationUI" id="Weapons">
             <h3>Weapons</h3>
             <input type="submit" onclick='$.post("SetMainScreen", "view=Front");' value="Front" />
             <input type="submit" onclick='$.post("SetMainScreen", "view=Left");' value="Left" />
@@ -106,7 +101,7 @@
             <input type="submit" onclick='$.post("FireBeam", "bank=0&targetId=" + $("#desiredTarget").val() + "&type=" + $("#beam").val());' value="Fire" />
         </div>
 
-        <div id="Engineering">
+        <div class="stationUI" id="Engineering">
             <h3>Engineering</h3>
             <select id="engPart">
                 <option value="Thrusters">Thrusters</option>
@@ -132,7 +127,7 @@
             <input type="submit" onclick='$.post("SetRepairTarget", "part=" + $("#engRepairPart").val());' value="Set Repair" />
         </div>
 
-        <div id="Communication">
+        <div class="stationUI" id="Communication">
             <h3>Communication</h3>
             <input type="text" id="comTarget" value="0" />
             <select id="command">
@@ -146,7 +141,7 @@
             <input type="submit" onclick='$.post("SendCommand", "targetId=" + $("#comTarget").val() + "&command=" + $("#command").val());' value="Send Command" />
         </div>
 
-        <div id="GameMaster">
+        <div class="stationUI" id="GameMaster">
             <h3>Game Master</h3>
             <input type="submit" onclick='$.post("Start");' value="Reset" />
             <input type="submit" onclick='$.post("BuildBase");' value="Build Base" />
@@ -160,10 +155,12 @@
         <br />
         <br />
         <textarea id="missionStatus"></textarea>
+
+        <div id="errorDiv"></div>
     </div>
 
     <script type="text/javascript">
-        gameId = @Model.Id;
+        gameId = window.location.hash;
         isLocal = false;
     </script>
 
@@ -176,11 +173,6 @@
     <script type="text/javascript" src="/client/js/game.js"></script>
     <script type="text/javascript" src="/client/js/audio.js"></script>
     <script type="text/javascript" src="/client/js/network.js"></script>
-
-    <script type="text/javascript">
-        client.station = "@ViewBag.Player.Station";
-    </script>
-
     
     <!-- move this wherever -->
     <script>
@@ -210,41 +202,9 @@
         var audioList = new preloadAudioList(sfxList, null, document.getElementById("errorDiv"), onLoadCallback);
     </script>
 
-    @*    <script type="text/javascript">
-
-        //$.connection.hub.logging = true;
-
-        var gameHub = $.connection.gameHub;
-        gameHub.client.handleUpdate = function (update) {
-            console.log(JSON.stringify(update));
-            //console.log("update.missionUpdate:"+update.missionUpdate);
-            //if( update.missionUpdate != null )
-            //    missionStatus.value = update.missionUpdate;
-            setGameStateFromServer(update);
-        };
-
-        gameHub.client.addMessage = function (sourceId, sourceName, message) {
-            AppendChatMessage(sourceId, sourceName, message);
-        };
-
-        //$.connection.hub.start()
-        //    .done(function () { alert("Now connected!"); })
-        //    .fail(function () { alert("Could not Connect!"); });
-
-        $.connection.hub.start()
-            .done(function () { gameHub.server.setShip(@Model.Id, 0); })
-            .fail(function () { alert("Could not Connect!"); });
-
-        $(window).unload(function () {
-            gameHub.server.disconnecting(@Model.Id, 0);
-        });
-    </script>*@
-
     <audio id="notify">
         <source src="/Sounds/chime.ogg" type="audio/ogg" />
         <source src="/Sounds/chime.mp3" type="audio/mp3" />
     </audio>
-
-
 </body>
 </html>
