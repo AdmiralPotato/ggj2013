@@ -3,17 +3,20 @@
 	//Fires thrustometerValueSelected event
 	var createSlider = function($element, options){
 		var sliderAdjustValue = function(event){
+			//Sets the rangeVal variable.
 			var yValueClicked = event.pageY - event.currentTarget.offsetTop;
 			var rangeZeroPercentage = 1 - Math.abs(min/(max+Math.abs(min)));
 			var uiHeight = $element.height();
 			var uiZero = uiHeight * rangeZeroPercentage;
 			var threshold = 10;
 			var fillColor, fillHeight;
+			var rangeVal = max - (yValueClicked/uiHeight)*(max-min)
 			if (yValueClicked > uiZero - threshold && yValueClicked < uiZero + threshold)
 			{
 				fillColor = "#CCC";
 				fillHeight = uiHeight * .03;
 				fill.css('top', uiZero - fillHeight/2);
+				rangeVal = 0;
 			}
 			else if( yValueClicked > uiZero){
 				fillColor = "#F00";
@@ -31,9 +34,9 @@
 			fill.css('background-color', fillColor);
 			fill.css('height', fillHeight);
 
-			// Set this value wherever you want.
+			// Set rangeValue wherever you want.
 			// This is the equivalent of a slider's range value.  This is what you send back to the server!!!
-			var rangeVal = max - (yValueClicked/uiHeight)*(max-min)
+			
 		};
 		var sliderMouseUpHandler = function(event){
 			//Remove the sliderAdjustValue event listener
