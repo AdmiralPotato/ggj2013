@@ -109,6 +109,9 @@
         var gameHub = $.connection.gameHub;
         gameHub.client.handleUpdate = function (update) {
             console.log(JSON.stringify(update));
+            console.log("update.missionUpdate:"+update.missionUpdate);
+            if( update.missionUpdate != null )
+                missionStatus.value = update.missionUpdate;
             setGameStateFromServer(update);
         };
 

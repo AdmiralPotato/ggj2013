@@ -279,7 +279,7 @@ namespace WebGame
                 }
                 update.missionUpdate = missionState.getMissionStatusUpdate();
                 GameHub.SendUpdate(Game.Id, Id, update);
-                System.Diagnostics.Debug.WriteLine("Update Sent.");
+                System.Diagnostics.Debug.WriteLine("Update Sent. Mission status:"+update.missionUpdate);
             }
         }
 
