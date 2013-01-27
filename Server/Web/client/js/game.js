@@ -7,12 +7,12 @@ var n = NPos3d,
 	    ui: [],
 	    entityTypes: {},
 		paused: false,
-		loggingEnabled: false
+		loggingEnabled: false,
+		isUsingRemoteServer: false
 	},
 	playerEntity;
 client.station = "None";
 
-//
 var windowSearchParser = function() {
 	var args = window.location.search.replace('?','').split('&'),
 		i, len = args.length, pair;
@@ -20,9 +20,8 @@ var windowSearchParser = function() {
 		pair = args[i].split('=');
 		client[pair[0]] = pair[1];
 	}
-	console.log('hashchange event fired', client);
 };
-windowSearchParser(); //once when this
+windowSearchParser(); //once when this page loads
 
 var gameId = client.Game;
 
@@ -313,9 +312,6 @@ var setGameStateFromServer = function (data) {
     }
 };
 
-if (typeof client.isUsingRemoteServer === 'undefined') {
-    client.isUsingRemoteServer = false;
-}
 var serverPath = client.isUsingRemoteServer ? 'http://legendstudio.com/' : '/';
 var currentGame = 'Game-' + gameId + '/';
 var loadScript = function (relativePath) {
