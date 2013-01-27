@@ -292,11 +292,13 @@ namespace WebGame
                     // align with velocity
                     var velocityDirection = Math.Atan2(this.Velocity.Y, this.Velocity.X).NormalizeOrientation();
                     var velocityOrientationAngle = this.Orientation - velocityDirection;
+
                     this._desiredOrientation = velocityDirection; // we need to directly access the underscore members so that we don't call the set method, which will unset the target speed 
-                    if (Math.Abs(velocityOrientationAngle) > Math.PI / 2)
+                    if (Math.Abs(velocityOrientationAngle) > Math.PI / 2) // if it would be less turning for us to turn into the velocity, do that instead
                     {
                         this._desiredOrientation = (velocityDirection + Math.PI).NormalizeOrientation(); // we need to directly access the underscore members so that we don't call the set method, which will unset the target speed 
                     }
+
                     // apply a slowing force
                     this._impulsePercentage = -100 * Math.Cos(velocityOrientationAngle); // we need to directly access the underscore members so that we don't call the set method, which will unset the target speed 
                     // but make sure it won't push us past the desired velocity
@@ -304,7 +306,7 @@ namespace WebGame
                     var targetDeceleration = speed - this.TargetSpeedMetersPerSecond.Value;
                     if (targetDeceleration < Math.Abs(decelerationAmount))
                     {
-                        this._impulsePercentage = targetDeceleration / (this.EffectiveMaximumForce / this.Mass) * 100 * Math.Sign(decelerationAmount); // we need to directly access the underscore members so that we don't call the set method, which will unset the target speed 
+                        this._impulsePercentage = targetDeceleration / (this.EffectiveMaximumForce / this.Mass) / elapsed.TotalSeconds * 100 * Math.Sign(decelerationAmount); // we need to directly access the underscore members so that we don't call the set method, which will unset the target speed 
                     }
                 }
             }
