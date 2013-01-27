@@ -30,11 +30,9 @@ namespace WebGame
             if (LoggedIn)
             {
                 player = game.GetPlayer(Account.Id);
-                if (player != null)
-                    player = game.Join(Account.Id, Account.Name, Account.Rating);
-
                 ViewBag.Player = player;
-                player.SessionId = Request.Cookies["ASP.Net_SessionId"].Value;
+                if (player != null)
+                    player.SessionId = Request.Cookies["ASP.Net_SessionId"].Value;
             }
         }
 
