@@ -6,7 +6,8 @@ var n = NPos3d,
 		entityList: {},
 		ui: [],
 		entityTypes: {}
-	};
+	},
+	playerEntity;
 var timeSinceLastFrame = 0;
 var timeOfLastFrame = new Date().getTime();
 var timeSinceLastUpdate = 0;
@@ -18,7 +19,10 @@ var animationController = {
 		timeSinceLastFrame =  currentTime - timeOfLastFrame;
 		timeOfLastFrame = currentTime;
 		deltaSinceUpdate =  (currentTime - timeOfLastUpdate) / 250;
-		//console.log(deltaSinceUpdate);
+		if(playerEntity !== undefined){
+			s.camera.pos[0] = playerEntity.pos[0];
+			s.camera.pos[1] = playerEntity.pos[1];
+		}
 	}
 };
 s.add(animationController);
@@ -151,6 +155,7 @@ var setGameStateFromServer = function(data) {
 			console.log(entityData.Id === data.ShipId, entity.Id, data.ShipId);
 			if(entityData.Id === data.ShipId){
 				entity.color = '#0f0';
+				playerEntity = entity;
 			}
 		}
 		entity.updateFromData(entityData);
