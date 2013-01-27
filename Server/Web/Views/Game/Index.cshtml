@@ -46,6 +46,9 @@
         <input type="submit" onclick='$.post("SelectStation", "station=" + $("#desiredStation").val());' value="Select Station" />
 
         <h3>Helm</h3>
+        <input type="submit" onclick='$.post("SetDesiredSpeed", "amount=50");' value="Slow" />
+        <input type="submit" onclick='$.post("SetDesiredSpeed", "amount=100");' value="Medium" />
+        <input type="submit" onclick='$.post("SetDesiredSpeed", "amount=300");' value="Fast" />
         <input type="submit" onclick='$.post("SetImpulse", "amount=100");' value="Go" />
         <input type="submit" onclick='$.post("SetDesiredSpeed", "amount=0");' value="Stop" />
         <br />

@@ -25,10 +25,10 @@ namespace WebGame
 
         private void SetupParts()
         {
-            Parts = new Dictionary<string, int>();
+            parts = new Dictionary<string, int>();
             foreach (var part in PartList)
             {
-                Parts.Add(part, partsHp);
+                parts.Add(part, partsHp);
             }
         }
 
@@ -70,9 +70,7 @@ namespace WebGame
         [ProtoMember(7)]
         public bool IsDestroyed { get; private set; }
 
-        [ProtoMember(8)]
-        private Dictionary<string, int> Parts { get; set; }
-
+        Dictionary<string, int> parts;
         [ProtoMember(9)]
         public double Energy { get; private set; }
 
@@ -150,16 +148,16 @@ namespace WebGame
 
         public void Damage(int damage)
         {
-            while (damage > 0 && this.Parts.Values.Sum() > 0)
+            while (damage > 0 && this.parts.Values.Sum() > 0)
             {
-                var systemsThatCanBeDamaged = this.Parts.Where((pair) => pair.Value > 0).ToArray();
+                var systemsThatCanBeDamaged = this.parts.Where((pair) => pair.Value > 0).ToArray();
                 var systemIndexToDamage = Utility.Random.Next(systemsThatCanBeDamaged.Length);
                 var systemToDamage = systemsThatCanBeDamaged[systemIndexToDamage];
-                this.Parts[systemToDamage.Key] = systemToDamage.Value - 1;
+                this.parts[systemToDamage.Key] = systemToDamage.Value - 1;
                 damage--;
             }
 
-            if (this.Parts.Values.Sum() == 0)
+            if (this.parts.Values.Sum() == 0)
             {
                 this.Destroy();
             }
@@ -167,12 +165,12 @@ namespace WebGame
 
         public double Effective(double maximum, string partName)
         {
-            return maximum * this.Parts[partName] / partsHp;
+            return maximum * this.parts[partName] / partsHp;
         }
 
         public TimeSpan Effective(TimeSpan minimum, string partName)
         {
-            return TimeSpan.FromTicks((long)(minimum.Ticks / (this.Parts[partName] / (double)partsHp)));
+            return TimeSpan.FromTicks((long)(minimum.Ticks / (this.parts[partName] / (double)partsHp)));
         }
 
         protected void Destroy()
