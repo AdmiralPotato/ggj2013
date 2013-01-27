@@ -72,6 +72,9 @@ namespace WebGame
         [ProtoMember(13)]
         public bool ShieldsEngaged { get; set; }
 
+        [ProtoMember(14)]
+        public int DefaultShipNumber { get; set; }
+
         private static TimeSpan timeToLoadProjectile = TimeSpan.FromSeconds(5);
 
         public TimeSpan EffectiveTimeToLoadProjectile
@@ -109,6 +112,9 @@ namespace WebGame
         }
 
         public override string Type { get { return "Ship"; } }
+        
+
+        public MissionStatus missionState;
 
 
 
@@ -121,6 +127,7 @@ namespace WebGame
             : base(mass)
         {
             Players = new List<Player>();
+            missionState = new MissionStatus(this);
         }
 
         public void LoadProjectile()
@@ -202,6 +209,8 @@ namespace WebGame
             TurnShipToDesiredOrientation(elapsed);
 
             base.Update(elapsed);
+            
+            UpdateMission();
         }
 
         private void TurnShipToDesiredOrientation(TimeSpan elapsed)
@@ -243,16 +252,28 @@ namespace WebGame
             }
         }
 
+        private void UpdateMission()
+        {
+            missionState.checkSuccess();
+        }
+
         public void AddPlayer(Player player)
         {
             if (!Players.Contains(player))
+            {
                 Players.Add(player);
+                player.Ship = this;
+            }
         }
 
         public void RemovePlayer(Player player)
         {
             if (Players.Contains(player))
+            {
                 Players.Remove(player);
+                if (player.Ship == this)
+                    player.Ship = null;
+            }
         }
 
         internal void SendUpdate()
@@ -266,8 +287,9 @@ namespace WebGame
                         update.Sounds.AddRange(entity.Sounds);
                     update.Entities.Add(new EntityUpdate() { Id = entity.Id, Type = entity.Type, Rotation = (float)entity.Orientation, Position = entity.Position });
                 }
+                update.missionUpdate = missionState.getMissionStatusUpdate();
                 GameHub.SendUpdate(Game.Id, Id, update);
-                System.Diagnostics.Debug.WriteLine("Update Sent.");
+                System.Diagnostics.Debug.WriteLine("Update Sent. Mission status:"+update.missionUpdate);
             }
         }
 

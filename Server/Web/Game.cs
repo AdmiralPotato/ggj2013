@@ -51,7 +51,7 @@ namespace WebGame
         [ProtoMember(23, IsRequired = false)]
         public List<StarSystem> StarSystems = new List<StarSystem>();
 
-        public Ship DefaultShip;
+        public Dictionary<int, Ship> DefaultShips = new Dictionary<int,Ship>();
 
         public int NextEntityId { get; set; }
 
@@ -158,7 +158,7 @@ namespace WebGame
                 break;
             }
 
-            SendForumMessage(player.Name + " joined the game.");
+            SendForumMessage(player.Name + " joined the game.", player);
 
             if (Players.Count >= MaxPlayers)
                 Start();
@@ -168,18 +168,18 @@ namespace WebGame
         {
             Players.Remove(player);
 
-            SendForumMessage(player.Name + " left the game.");
+            SendForumMessage(player.Name + " left the game.", player);
         }
 
-        public void SendForumMessage(string text, int sourceId = 1, string sourceName = "Computer")
+        public void SendForumMessage(string text, Player source, string sourceName = "Computer")
         {
             using (var db = new DBConnection())
             {
-                GameServer.SendMessage(db, -Id, sourceId, sourceName, text);
+                GameServer.SendMessage(db, -Id, source.AccountId, sourceName, text);
             }
 
-            var message = new Message() { Sent = DateTime.UtcNow, Text = text, SourceId = sourceId, SourceName = sourceName };
-            GameHub.Say(Id, message.Print(false));
+            var message = new Message() { Sent = DateTime.UtcNow, Text = text, SourceId = source.AccountId, SourceName = sourceName };
+            GameHub.Say(this, source.Ship, message.Print(false));
         }
 
         public void Start()
@@ -197,17 +197,12 @@ namespace WebGame
             StartTime = DateTime.UtcNow;
 
             // send player messages
-            SendForumMessage("Game #" + GameName + " Started");
+            //SendForumMessage("Game #" + GameName + " Started");
 
             StarSystems.Clear();
 
             var starSystem = new StarSystem();
             Add(starSystem);
-            DefaultShip = new Ship(1000);
-            DefaultShip.DesiredOrientation = 1;
-            starSystem.AddEntity(DefaultShip);
-
-//            Run();
 
             GameServer.SaveGame(this);
 
@@ -246,7 +241,7 @@ namespace WebGame
 
         public void ForceEnd()        
         {
-            SendForumMessage("Since the turn has not run in over 14 days or there have been over 70 turns the server has forced an end to this game.");
+            //SendForumMessage("Since the turn has not run in over 14 days or there have been over 70 turns the server has forced an end to this game.");
 
             foreach (var player in (from p in Players where !p.IsEliminated select p))
             {
@@ -334,8 +329,8 @@ namespace WebGame
                         var ship = entity as Ship;
                         if (ship != null)
                         {
-                            if (result.DefaultShip == null)
-                                result.DefaultShip = ship;
+                            if (ship.DefaultShipNumber != 0)
+                                result.DefaultShips[ship.DefaultShipNumber] = ship;
                             starSystem.Ships.Add(ship);
                         }
                     }
@@ -416,13 +411,12 @@ namespace WebGame
             var player = (from p in Players where p.SessionId == sessionId select p).FirstOrDefault();
             if (player != null)
             {
-                if (DefaultShip != null)
-                    DefaultShip.AddPlayer(player);
+                GetDefaultShip(1).AddPlayer(player);
 
                 if (!IsRunning)
                     Run();
 
-                GameHub.Say(Id, player.Name + " connected.");
+                GameHub.Say(this, player.Ship, player.Name + " connected.");
             }
 
             return player;
@@ -438,13 +432,16 @@ namespace WebGame
         {
             if (player != null)
             {
-                if (DefaultShip != null)
-                    DefaultShip.RemovePlayer(player);
+                if (player.Ship != null)
+                {
+                    GameHub.Say(this, player.Ship, player.Name + " disconnected.");
+                    player.Ship.RemovePlayer(player);
+                }
 
                 if (GetActivePlayerCount() <= 0)
                     StopRunning();
 
-                GameHub.Say(this, player.Name + " disconnected.");
+                GameServer.SaveGame(this);
             }
         }
 
@@ -459,6 +456,18 @@ namespace WebGame
                 }
             }
             return result;
+        }
+
+        internal Ship GetDefaultShip(int defaultShipNumber, string name = "Heart of the Deep")
+        {
+            if (!DefaultShips.ContainsKey(defaultShipNumber))
+            {
+                var defaultShip = new Ship() { DefaultShipNumber = defaultShipNumber, DesiredOrientation = 1 };
+                DefaultShips[defaultShipNumber] = defaultShip;
+                StarSystems[0].AddEntity(defaultShip);
+            }
+
+            return DefaultShips[defaultShipNumber];
         }
     }
 }
