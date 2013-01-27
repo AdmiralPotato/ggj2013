@@ -11,6 +11,20 @@ namespace WebGame
     [ProtoContract]
     public class Ship : Entity
     {
+        public Ship()
+            : this(1000)
+        {
+        }
+
+        public Ship(double mass)
+            : base(mass)
+        {
+            //if (Type.Equals("Ship") )  // aka not enemy
+            //{
+            Players = new List<Player>();
+            //}
+        }
+
         public List<Player> Players;
         //public Entity Target;
 
@@ -77,7 +91,7 @@ namespace WebGame
         /// <summary>
         /// The string is the name of the system they are repairing
         /// </summary>
-        public List<string> RepairCrews { get; set; }
+        public readonly List<string> RepairCrewTargets = new List<string>();
 
         private static TimeSpan timeToLoadProjectile = TimeSpan.FromSeconds(5);
         public TimeSpan EffectiveTimeToLoadProjectile { get { return this.Effective(timeToLoadProjectile, "Projectile Tube"); }}
@@ -114,22 +128,20 @@ namespace WebGame
         [ProtoMember(18)]
         public Dictionary<ProjectileType, int> Projectiles = new Dictionary<ProjectileType, int>();
 
+        [ProtoMember(19)]
+        public int RepairCrews { get; set; }
+
+        [ProtoMember(20)]
+        public int MaxShields { get; set; }
+
+        [ProtoMember(21)]
+        public int Tubes { get; set; }
+
+        [ProtoMember(22)]
+        public int PhaserBanks { get; set; }
+ 
         public override string Type { get { return "Ship"; } }
         public MissionStatus missionState = null;
-
-        public Ship()
-            : this(1000)
-        {
-        }
-
-        public Ship(double mass)
-            : base(mass)
-        {
-            //if (Type.Equals("Ship") )  // aka not enemy
-            //{
-                Players = new List<Player>();
-            //}
-        }
 
         internal void SetupMissions()
         {
@@ -145,7 +157,7 @@ namespace WebGame
             switch (type)
             {
                 case ShipType.Spearhead:
-                    result = new Ship(2000) { MaxShields = 500, TorpedoTubes = 2, PhaserBanks = 1 };
+                    result = new Ship(2000) { MaxShields = 500, Tubes = 2, PhaserBanks = 1, RepairCrews = 3 };
                     result.BeamWeapons.AddRange((BeamType[])Enum.GetValues(typeof(BeamType)));
                     result.BeamWeapons.Remove(BeamType.ShadowTether);
                     result.Projectiles[ProjectileType.Torpedo] = 10;
@@ -155,19 +167,19 @@ namespace WebGame
                     result.Projectiles[ProjectileType.Skattershot] = 1;
                     break;
                 case ShipType.Skirmisher:
-                    result = new Ship(2000) { MaxShields = 500, TorpedoTubes = 2, PhaserBanks = 2 };
+                    result = new Ship(2000) { MaxShields = 500, Tubes = 2, PhaserBanks = 2, RepairCrews = 3 };
                     result.BeamWeapons.AddRange((BeamType[])Enum.GetValues(typeof(BeamType)));
                     result.BeamWeapons.Remove(BeamType.ShadowTether);
                     result.Projectiles[ProjectileType.Torpedo] = 10;
                     break;
                 case ShipType.Beserker:
-                    result = new Ship(5000) { MaxShields = 0, TorpedoTubes = 0, PhaserBanks = 1 , MaximumForce = 12500 };
+                    result = new Ship(5000) { MaxShields = 0, Tubes = 0, PhaserBanks = 1, MaximumForce = 12500, RepairCrews = 3 };
                     result.BeamWeapons.Add(BeamType.HullPiercing);
                     result.BeamWeapons.Add(BeamType.SelfDestruct);
                     result.BeamWeapons.Add(BeamType.PlasmaVent);
                     break;
                 case ShipType.Gunboat:
-                    result = new Ship(1500) { MaxShields = 600, TorpedoTubes = 4, PhaserBanks = 1 };
+                    result = new Ship(1500) { MaxShields = 600, Tubes = 4, PhaserBanks = 1, RepairCrews = 3 };
                     result.BeamWeapons.Add(BeamType.SuppresionPulse);
                     result.BeamWeapons.Add(BeamType.ShadowTether);
                     result.Projectiles[ProjectileType.Torpedo] = 10;
@@ -175,7 +187,7 @@ namespace WebGame
                     result.Projectiles[ProjectileType.Hardshell] = 1;
                     break;
                 case ShipType.Capital:
-                    result = new Ship(3000) { MaxShields = 1000, TorpedoTubes = 5 };
+                    result = new Ship(3000) { MaxShields = 1000, Tubes = 5, RepairCrews = 3 };
                     result.BeamWeapons.Add(BeamType.StandardPhaser);
                     result.BeamWeapons.Add(BeamType.ShieldDamper);
                     result.BeamWeapons.Add(BeamType.ShadowTether);
@@ -216,21 +228,42 @@ namespace WebGame
 
         public override void Update(TimeSpan elapsed)
         {
-            if (ShieldsEngaged)
-            {
-                FrontShield++;
-                if (FrontShield > 100)
-                    FrontShield = 100;
-            }
+            UpdateShields(elapsed);
+            UpdateProjectileLoading(elapsed);
+            UpdateTargetVelocity(elapsed);
+            UpdateOrientation(elapsed);
+            UpdateRepair(elapsed);
 
-            if (this.ProjectileStatus == ProjectileStatus.Loading)
+            UpdateMission();
+
+            base.Update(elapsed);
+
+        }
+
+        /// <summary>
+        /// hp / second
+        /// </summary>
+        private const double repairRate = 1;
+
+        private void UpdateRepair(TimeSpan elapsed)
+        {
+            for (int i = 0; i < this.RepairCrewTargets.Count; i++)
             {
-                this.ProjectileLoadTime += elapsed;
-                if (this.ProjectileLoadTime >= EffectiveTimeToLoadProjectile)
+                var target = this.RepairCrewTargets[i];
+                if (target != null)
                 {
-                    this.ProjectileStatus = ProjectileStatus.Loaded;
+                    this.parts[target] += repairRate * elapsed.TotalSeconds;
+                    if (this.parts[target] >= partsHp)
+                    {
+                        this.parts[target] = partsHp;
+                        this.RepairCrewTargets[i] = null;
+                    }
                 }
             }
+        }
+
+        private void UpdateTargetVelocity(TimeSpan elapsed)
+        {
             if (this.TargetSpeedMetersPerSecond.HasValue)
             {
                 var speed = this.Velocity.Magnitude();
@@ -259,7 +292,7 @@ namespace WebGame
                     // apply a slowing force
                     this._impulsePercentage = -100 * Math.Cos(velocityOrientationAngle); // we need to directly access the underscore members so that we don't call the set method, which will unset the target speed 
                     // but make sure it won't push us past the desired velocity
-                    var decelerationAmount = this.Force / this.Mass;
+                    var decelerationAmount = this.Force / this.Mass * elapsed.TotalSeconds;
                     var targetDeceleration = speed - this.TargetSpeedMetersPerSecond.Value;
                     if (targetDeceleration < Math.Abs(decelerationAmount))
                     {
@@ -267,15 +300,33 @@ namespace WebGame
                     }
                 }
             }
-            TurnShipToDesiredOrientation(elapsed);
-
-            base.Update(elapsed);
-
-            if( missionState != null )
-                UpdateMission();
         }
 
-        private void TurnShipToDesiredOrientation(TimeSpan elapsed)
+        private void UpdateProjectileLoading(TimeSpan elapsed)
+        {
+
+            if (this.ProjectileStatus == ProjectileStatus.Loading)
+            {
+                this.ProjectileLoadTime += elapsed;
+                if (this.ProjectileLoadTime >= EffectiveTimeToLoadProjectile)
+                {
+                    this.ProjectileStatus = ProjectileStatus.Loaded;
+                }
+            }
+        }
+
+        private void UpdateShields(TimeSpan elapsed)
+        {
+            // todo: make time dependant
+            if (ShieldsEngaged)
+            {
+                FrontShield++;
+                if (FrontShield > 100)
+                    FrontShield = 100;
+            }
+        }
+
+        private void UpdateOrientation(TimeSpan elapsed)
         {
             var desiredDiffAngle = TurnAngleNeededForDesire();
             var currentAllowedDiffAngle = elapsed.TotalSeconds * this.EffectiveTurnRate;
@@ -323,7 +374,10 @@ namespace WebGame
 
         private void UpdateMission()
         {
-            missionState.checkSuccess();
+            if (missionState != null)
+            {
+                missionState.checkSuccess();
+            }
         }
 
         public void AddPlayer(Player player)
@@ -369,10 +423,11 @@ namespace WebGame
             {
                 yield return "Thrusters";
                 yield return "Engines";
-                yield return "Projectile Tube";
+                yield return "Projectile Tube"; // expand to number of tubes
                 yield return "Shield Regenerators";
-                yield return "Energy Collectors";
+                yield return "Energy Collectors"; // not implemented
                 yield return "Energy Storage";
+                yield return "Energy Weapon Bank"; // not implemented
             }
         }
 
@@ -384,14 +439,45 @@ namespace WebGame
         {
         }
 
-        public void SetRepairTarget(string part)
+        public void SetRepairTarget(string part, int repairCrewIndex = -1)
         {
+            if (repairCrewIndex > this.RepairCrews)
+            {
+                // Fit repair crew to correct size
+                while (this.RepairCrewTargets.Count < this.RepairCrews)
+                {
+                    this.RepairCrewTargets.Add(null);
+                }
+                while (this.RepairCrewTargets.Count > this.RepairCrews)
+                {
+                    // I can't imagine how this would happen though.
+                    this.RepairCrewTargets.RemoveAt(this.RepairCrews);
+                }
+
+                if (repairCrewIndex == -1) // Let Main Computer decide;
+                {
+                    var bestHp = -1;
+                    repairCrewIndex = 0; // choose something other than -1 if for some reason all of them are at negative Hp;
+                    for (int i = 0; i < this.RepairCrewTargets.Count; i++)
+                    {
+                        var targetPart = this.RepairCrewTargets[i];
+                        if (targetPart == null)
+                        {
+                            // found a lazy repair crew? Use them immediately
+                            repairCrewIndex = i;
+                            break;
+                        }
+                        var repairingHp = this.parts[targetPart];
+                        if (repairingHp > bestHp)
+                        {
+                            repairingHp = bestHp;
+                            repairCrewIndex = i;
+                        }
+                    }
+                }
+
+                this.RepairCrewTargets[repairCrewIndex] = part;
+            }
         }
-
-        public int MaxShields { get; set; }
-
-        public int TorpedoTubes { get; set; }
-
-        public int PhaserBanks { get; set; }
-    }
+   }
 }
