@@ -141,6 +141,7 @@ client.entityTypes.Ship = function (args) {
     args = args || {};
     n.blessWith3DBase(t, args);
     t.scale = [10, 10, 10];
+	t.threeMesh = threeMakeShip();
     s.add(t);
     return t;
 };
@@ -168,6 +169,7 @@ client.entityTypes.Starbase = function (args) {
     args = args || {};
     n.blessWith3DBase(t, args);
     t.scale = [10, 10, 10];
+	t.threeMesh = threeMakeStarbase();
     s.add(t);
     return t;
 };
@@ -194,6 +196,7 @@ client.entityTypes.Enemy = function (args) {
     args = args || {};
     n.blessWith3DBase(t, args);
     t.scale = [10, 10, 10];
+	t.threeMesh = threeMakeEnemy();
     s.add(t);
     return t;
 };
@@ -315,7 +318,6 @@ var setGameStateFromServer = function (data) {
 var serverPath = client.isUsingRemoteServer ? 'http://legendstudio.com/' : '/';
 var currentGame = 'Game-' + gameId + '/';
 var loadScript = function (relativePath) {
-
     document.write('<script type="text/javascript" src="' + serverPath + relativePath + '"></script>');
 };
 loadScript('Scripts/jquery.signalR-1.0.0-rc2.js');

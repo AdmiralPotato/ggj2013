@@ -78,7 +78,7 @@ var whatToDoWhenAllTheGeometriesAreParsedOkayYupSeriously = function(){
 	update(); // start loop
 };
 
-var threeMakeEnemy(){
+var threeMakeEnemy = function(){
 	var mesh = new THREE.Mesh(geometryObjects.fishShip, geometryObjects.fishShip.matLib[0]);
 	mesh.position.set(50,0,0);
 	mesh.lookAt(player.position);
@@ -88,14 +88,14 @@ var threeMakeEnemy(){
 	return mesh;
 }
 
-var threeMakeShip(){
+var threeMakeShip = function(){
 	var urls = [
-		'../models/starfield.png',
-		'../models/starfield.png',
-		'../models/starfield.png',
-		'../models/starfield.png',
-		'../models/starfield.png',
-		'../models/starfield.png'
+		'models/starfield.png',
+		'models/starfield.png',
+		'models/starfield.png',
+		'models/starfield.png',
+		'models/starfield.png',
+		'models/starfield.png'
     ];
 
     var cubemap = THREE.ImageUtils.loadTextureCube(urls);
@@ -118,7 +118,7 @@ var threeMakeShip(){
 	scene.add(newMesh);
 
 	newMesh = new THREE.Mesh(geometryObjects.spear, geometryObjects.spear.matLib[0]);
-	
+
 	scene.add(newMesh);
 
 	var directionalLightA = new THREE.DirectionalLight(0xffffff,2);
@@ -138,7 +138,7 @@ var threeMakeShip(){
 
 	return newMesh;
 }
-var threeMakeStarbase(){
+var threeMakeStarbase = function(){
 
 	var mesh = new THREE.Mesh(geometryObjects.starbase, geometryObjects.starbase.matLib[0]);
 	mesh.position.set(0,0,150);
@@ -162,7 +162,7 @@ var makeLaser = function(){
 	laser.scale.x = distance*0.5;
 	laser.position = player.position;
 
-	var newRot = Math.atan2(target.position.x - player.position.x, 
+	var newRot = Math.atan2(target.position.x - player.position.x,
 		target.position.z - player.position.z);
 
 	laser .rotation.setY(newRot-(90*deg));
@@ -176,7 +176,7 @@ var updateLaser = function(){
 	laser.scale.x = distance*0.5;
 	laser.position = player.position;
 
-	var newRot = Math.atan2(target.position.x - player.position.x, 
+	var newRot = Math.atan2(target.position.x - player.position.x,
 		target.position.z - player.position.z);
 
 	laser.rotation.setY(newRot-(90*deg));
@@ -187,7 +187,7 @@ parseAllGeometry(
 		'laser': "models/Laser.json",
 		'fishShip': "models/FishShip.json",
 		'spear': "models/Spear.json",
-		'starbase': "models/Starbase.json",
+		'starbase': "models/Starbase.json"
 	},
 	whatToDoWhenAllTheGeometriesAreParsedOkayYupSeriously
 );
@@ -238,10 +238,10 @@ var update = function(){
 		}*/
 	//}
 	render();
-	
+
 };
 
-var render = function(){	
+var render = function(){
 	if(window.innerWidth != width || window.innerHeight != height){
 		width = window.innerWidth;
 		height = window.innerHeight;
@@ -266,7 +266,7 @@ var particleCount = 750,
     	color: 0xFFFFFF,
     	size: 10,
 		map: THREE.ImageUtils.loadTexture(
-      	"particle.png"
+      	"three_test/particle.png"
     ),
     blending: THREE.AdditiveBlending,
     transparent: true
