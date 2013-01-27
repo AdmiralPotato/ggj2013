@@ -1,30 +1,13 @@
-// Converted from: /Users/admiral/Sites/js_experiments/webgl_demos/threejs_tests/eyeguy.obj
-//  vertices: 546
-//  faces: 540
-//  normals: 538
-//  colors: 0
-//  uvs: 171
-//  materials: 1
-//  edges: 0
-//
-//  Generated with OBJ -> Three.js converter
-//  http://github.com/alteredq/three.js/blob/master/utils/exporters/convert_obj_three.py
-
-
-var eyeguy = {
-
+{
     "version" : 2,
     
     "scale" : 1.000000,
 
     "materials": [	{
-	"DbgColor" : 15658734,
-	"DbgIndex" : 0,
-	"DbgName" : "tex_for_render_eyeguy_tex.jpg",
 	"colorAmbient" : [0.0, 0.0, 0.0],
-	"colorDiffuse" : [0.64000000000000001, 0.64000000000000001, 0.64000000000000001],
+	"colorDiffuse" : [0.64, 0.64, 0.64],
 	"colorSpecular" : [0.5, 0.5, 0.5],
-	"illumination" : 0,
+	"specular" : [1.0, 1.0, 1.0],
 	"mapDiffuse" : "eyeguy_tex.png",
 	"opticalDensity" : 1.0,
 	"specularCoef" : 96.078431,
@@ -47,4 +30,4 @@ var eyeguy = {
 
     "edges" : []
 
-};
+}
