@@ -10,7 +10,7 @@ var n = NPos3d,
 	    entityTypes: {}
 	},
 	playerEntity;
-var gameId = 705872;
+var gameId = 705884;
 var timeSinceLastFrame = 0;
 var timeOfLastFrame = new Date().getTime();
 var timeSinceLastUpdate = 0;
@@ -57,13 +57,17 @@ var animationController = {
 };
 s.add(animationController);
 
-var deltaInit = function (o) {
-    o.posLast = [0, 0, 0];
-    o.posNext = [0, 0, 0];
-    o.posDiff = [0, 0, 0];
-    o.rotLast = 0;
-    o.rotNext = 0;
-    o.rotDiff = 0;
+var deltaInit = function (o, entityData) {
+	o.pos[0] = entityData.Position.X;
+	o.pos[1] = entityData.Position.Y;
+	o.pos[2] = entityData.Position.Z;
+    o.posLast = o.pos.slice();
+    o.posNext = o.pos.slice();
+    o.posDiff = o.pos.slice();
+	o.rot[2] = entityData.Rotation;
+    o.rotLast = o.rot[2];
+    o.rotNext = o.rot[2];
+    o.rotDiff = o.rot[2];
 };
 var deltaUpdate = function (o, entityData) {
     o.posLast[0] = o.posNext[0];
@@ -92,7 +96,6 @@ client.entityTypes.Ship = function (args) {
     args = args || {};
     n.blessWith3DBase(t, args);
     t.scale = [10, 10, 10];
-    deltaInit(t);
     s.add(t);
     return t;
 };
@@ -119,7 +122,6 @@ client.entityTypes.Starbase = function (args) {
     args = args || {};
     n.blessWith3DBase(t, args);
     t.scale = [10, 10, 10];
-    deltaInit(t);
     s.add(t);
     return t;
 };
@@ -145,7 +147,6 @@ client.entityTypes.Enemy = function (args) {
     args = args || {};
     n.blessWith3DBase(t, args);
     t.scale = [10, 10, 10];
-    deltaInit(t);
     s.add(t);
     return t;
 };
@@ -171,7 +172,6 @@ client.entityTypes.Projectile = function (args) {
     args = args || {};
     n.blessWith3DBase(t, args);
     t.scale = [0.25, 0.25, 0.25];
-    deltaInit(t);
     s.add(t);
     return t;
 };
@@ -230,6 +230,7 @@ var setGameStateFromServer = function (data) {
             entity = client.entityMap[entityIdString];
             if (entity === undefined) {
                 entity = client.entityMap[entityIdString] = new client.entityTypes[entityData.Type]();
+				deltaInit(entity, entityData);
                 console.log(entityData.Id === data.ShipId, entity.Id, data.ShipId);
                 if (entityData.Id === data.ShipId) {
                     setEntityAsPlayer(entity);
@@ -241,9 +242,10 @@ var setGameStateFromServer = function (data) {
 
 		//REMOVE entities we DID NOT receive data for this frame
 		for (entityIdString in client.entityMap) {
+			console.log('entitiesUpdatedThisFrame[entityIdString]',entitiesUpdatedThisFrame[entityIdString],client.entityMap);
 			if (entitiesUpdatedThisFrame[entityIdString] === undefined) {
 				client.entityMap[entityIdString].destroy();
-				client.entityMap[entityIdString] = undefined;
+				delete client.entityMap[entityIdString];
 				console.log('removing entity:' + entityIdString);
 			}
 		}

@@ -15,7 +15,7 @@ gameHub.client.handleUpdate = function (update) {
 
 if (isLocal) {
     $.connection.hub.start({ jsonp: true, transport: 'longPolling', xdomain: true})
-        .done(function () { /*alert("Now connected!");*/ })
+        .done(function () { gameHub.server.setShip(gameId, 0); })
         .fail(function () { alert("Could not Connect!"); });
 } else {
     $.connection.hub.start()
