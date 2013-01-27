@@ -25,13 +25,20 @@ function SFXChannels(source, channels){
 		t.children[i] = a;
 	}
 	t.play = function(delay){
-		//console.log(t.currentSound);
-		t.children[t.currentSound].currentTime = 0;
-		t.children[t.currentSound].play();
-		if(t.currentSound < t.maxChannels - 1){
-			t.currentSound++;
-		}else{
-			t.currentSound=0;
+		try
+		{
+			//console.log(t.currentSound);
+			t.children[t.currentSound].currentTime = 0;
+			t.children[t.currentSound].play();
+			if(t.currentSound < t.maxChannels - 1){
+				t.currentSound++;
+			}else{
+				t.currentSound=0;
+			}
+		}
+		catch(e)
+		{
+			console.log("caught exception playing sound! e:"+e);
 		}
 	}
 	return t;

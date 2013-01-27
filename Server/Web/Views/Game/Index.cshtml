@@ -186,6 +186,9 @@
         function onLoadCallback() {
             //if( audioList.fail != true )
             audioLoaded = true;
+            console.log("SFX:" + SFX);
+            console.log("SFX['ShieldsDown']:" + SFX['ShieldsDown']);
+            SFX['ShieldsDown'].play();
         }
 
         var audioList = new preloadAudioList(sfxList, null, document.getElementById("errorDiv"), onLoadCallback);
