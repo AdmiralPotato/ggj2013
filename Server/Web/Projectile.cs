@@ -8,26 +8,43 @@ namespace WebGame
 {
     public class Projectile : Entity
     {
+        public override double Force { get { return 100; } }
+        public override double Radius { get { return 1; } }
+
+        const int destructionPower = partsHp;
+
+        public Entity Target { get; set; }
+
+        public override string Type { get { return "Projectile"; } }
+
         public Projectile()
             : this(1)
         {
         }
 
-        public override double Force
+        public Projectile(double mass)
+            : base(mass)
         {
-            get
+        }
+
+        public static Projectile Create(ProjectileType type)
+        {
+            var result = new Projectile();
+            switch (type)
             {
-                return 100;
+                case ProjectileType.Torpedo:
+                    break;
+                case ProjectileType.Skattershot:
+                    break;
+                case ProjectileType.Hardshell:
+                    break;
+                case ProjectileType.Nuke:
+                    break;
+                case ProjectileType.Knockshot:
+                    break;
             }
+            return result;
         }
-        public override double Radius
-        {
-            get { return 1; }
-        }
-
-        private const int destructionPower = partsHp;
-
-        public Entity Target { get; set; }
 
         public override void Update(TimeSpan elapsed)
         {
@@ -71,13 +88,6 @@ namespace WebGame
             PlaySound("MissileDetonate");
             this.Destroy();
         }
-
-        public Projectile(double mass)
-            : base(mass)
-        {
-        }
-        public override string Type { get { return "Projectile"; } }
-
 
         public int EffectiveDamage
         {
