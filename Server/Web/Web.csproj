@@ -106,6 +106,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Command.cs" />
+    <Compile Include="Enemy.cs" />
     <Compile Include="ProjectileStatus.cs" />
     <Compile Include="MainScreenView.cs" />
     <Compile Include="Station.cs" />

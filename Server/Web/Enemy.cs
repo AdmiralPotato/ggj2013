@@ -1,0 +1,43 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace WebGame
+{
+    public class Enemy : Ship
+    {
+        public override string Type
+        {
+            get
+            {
+                return "Enemy";
+            }
+        }
+
+        private const TimeSpan reFireTime = TimeSpan.FromSeconds(15);
+
+        private TimeSpan timeSinceLastFire = TimeSpan.Zero;
+
+        public override void Update(TimeSpan elapsed)
+        {
+            if (timeSinceLastFire > reFireTime)
+            {
+                foreach (var ship in this.StarSystem.Ships)
+                {
+                    if (!(ship is Enemy))
+                    {
+                        this.LaunchProjectile(ship);
+                        this.LoadProjectile();
+                    }
+                }
+                timeSinceLastFire = TimeSpan.Zero;
+            }
+            else
+            {
+                timeSinceLastFire += elapsed;
+            }
+            base.Update(elapsed);
+        }
+    }
+}
