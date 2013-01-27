@@ -15,10 +15,21 @@ var height = window.innerHeight;
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(50, width/height, 0.1, 1000);
 scene.add(camera);
+
 var rend = new THREE.WebGLRenderer( {antialias: true} );
 rend.autoClear = false;
 rend.setSize(width, height);
 document.body.appendChild(rend.domElement);
+
+function stopRender(){
+	document.body.removeChild(rend.domElement);
+}
+
+function startRender(){
+	document.body.appendChild(rend.domElement);
+}
+
+console.log(rend);
 
 
 var geometryObjects = {};
@@ -149,14 +160,17 @@ var deg = tau/360;
 
 var last = Date.now()/1000;
 var timer = 0.0;
-//var updateObjects = [];
 
+var client = client || {paused:false};
+var timesRun = 0;
 var update = function(){
+	
+
 	requestAnimFrame(update);
 	var now = Date.now()/1000; // get current time
 	var dt = ((now-last) > .2) ? .2 : now-last; // calculate time between frames
 	last = now; // save new time
-	if(client.paused == false){ // main 'update' loop
+	//if(client.paused == false){ // main 'update' loop
 		timer += dt;
 
 		//player.rotation.setY(player.rotation.y+(dt*.1));
@@ -172,7 +186,7 @@ var update = function(){
 		while(i--){
 			updateObjects[i].update();
 		}*/
-	}
+	//}
 	render();
 };
 
