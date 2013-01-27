@@ -3,9 +3,10 @@ var n = NPos3d,
 
 	}),
 	client = {
-		entityList: {},
+		entityMap: {},
 		ui: [],
-		entityTypes: {}
+		entityTypes: {},
+		gameId: 705865
 	},
 	playerEntity;
 var timeSinceLastFrame = 0;
@@ -13,6 +14,26 @@ var timeOfLastFrame = new Date().getTime();
 var timeSinceLastUpdate = 0;
 var timeOfLastUpdate = timeOfLastFrame;
 var deltaSinceUpdate = 0;
+var mouseDown = false;
+var canvasClickAndTouchHandler = function (event) {
+	event.preventDefault();
+	if(event.type === 'mouseup' || event.type === 'touchend') {
+		mouseDown = false;
+	} else {
+		mouseDown = true;
+	}
+	console.log('mouseDown:', mouseDown);
+};
+$(document).on('mousedown mouseup touchstart touchend touchstop', canvasClickAndTouchHandler);
+var normalizeAngle = function(angle){
+	while (angle >= tau){
+		angle -= tau;
+	}
+	while (angle < 0){
+		angle += tau;
+	}
+	return angle;
+};
 var animationController = {
 	update: function() {
 		var currentTime = new Date().getTime();
@@ -22,6 +43,11 @@ var animationController = {
 		if(playerEntity !== undefined){
 			s.camera.pos[0] = playerEntity.pos[0];
 			s.camera.pos[1] = playerEntity.pos[1];
+			if(mouseDown) {
+				playerEntity.rot[2] = normalizeAngle(Math.atan2(s.mpos.y, s.mpos.x));
+				console.log(playerEntity.rot[2]);
+				sendMessage("SetDesiredHeading", "amount=" + playerEntity.rot[2]);
+			}
 		}
 	}
 };
@@ -110,7 +136,7 @@ client.entityTypes.Starbase.prototype = {
 };
 
 client.entityTypes.Enemy = function(args){
-	var t = this, type = 'StarBase';
+	var t = this, type = 'Enemy';
 	if(t.type !== type){throw type + ' constructor must be invoked using the `new` keyword.';}
 	args = args || {};
 	n.blessWith3DBase(t,args);
@@ -121,7 +147,7 @@ client.entityTypes.Enemy = function(args){
 };
 
 client.entityTypes.Enemy.prototype = {
-	type: 'StarBase',
+	type: 'Enemy',
 	color: '#f00',
 	shape: wireframes.fishShip,
 	update: function() {
@@ -135,29 +161,97 @@ client.entityTypes.Enemy.prototype = {
 	}
 };
 
+client.entityTypes.Projectile = function(args){
+	var t = this, type = 'Projectile';
+	if(t.type !== type){throw type + ' constructor must be invoked using the `new` keyword.';}
+	args = args || {};
+	n.blessWith3DBase(t,args);
+	t.scale = [0.25,0.25,0.25];
+	deltaInit(t);
+	s.add(t);
+	return t;
+};
 
-var setGameStateFromServer = function(data) {
-	var entityDataIndex,
-		numEntities = data.Entities.length,
-		entityData,
-		entity,
-		entityIdString,
-		currentTime = new Date().getTime();
-	timeSinceLastUpdate =  currentTime - timeOfLastUpdate;
-	timeOfLastUpdate = currentTime;
-	//console.log('game state update!');
-	for(entityDataIndex = 0; entityDataIndex < numEntities; entityDataIndex += 1) {
-	    entityData = data.Entities[entityDataIndex];
-		entityIdString = 'entity-' + entityData.Id;
-		entity = client.entityList[entityIdString];
-		if(entity === undefined){
-			entity = client.entityList[entityIdString] = new client.entityTypes[entityData.Type]();
-			console.log(entityData.Id === data.ShipId, entity.Id, data.ShipId);
-			if(entityData.Id === data.ShipId){
-				entity.color = '#0f0';
-				playerEntity = entity;
-			}
-		}
-		entity.updateFromData(entityData);
+client.entityTypes.Projectile.prototype = {
+	type: 'Projectile',
+	color: '#f00',
+	shape: wireframes.simpleShip,
+	update: function() {
+		var t = this;
+		deltaInterpolate(t);
+		t.render();
+	},
+	updateFromData: function(entityData){
+		var t = this;
+		deltaUpdate(t, entityData);
 	}
 };
+
+var setEntityAsPlayer = function (entity) {
+	var playerHeadingWidget = new n.Ob3D({
+		shape: new n.Geom.Circle({
+			radius: 3
+		}),
+		pos: [15,0,0],
+		color: '#9f0'
+	});
+	var playerHeadingRadius = new n.Ob3D({
+		shape: new n.Geom.Circle({
+			radius: 15
+		}),
+		color: '#ccc'
+	});
+	entity.color = '#0f0';
+	playerEntity = entity;
+	entity.add(playerHeadingRadius);
+	entity.add(playerHeadingWidget);
+};
+
+var setGameStateFromServer = function(data) {
+	if(data.GameId === client.gameId){
+		var entityDataIndex,
+			numEntities = data.Entities.length,
+			entityData,
+			entity,
+			entityIdString,
+			currentTime = new Date().getTime(),
+			entitiesUpdatedThisFrame = {};
+		timeSinceLastUpdate =  currentTime - timeOfLastUpdate;
+		timeOfLastUpdate = currentTime;
+		//console.log('game state update!');
+		//Update entities we received data for this frame
+		for(entityDataIndex = 0; entityDataIndex < numEntities; entityDataIndex += 1) {
+			entityData = data.Entities[entityDataIndex];
+			entityIdString = 'entity-' + entityData.Id;
+			entity = client.entityMap[entityIdString];
+			if(entity === undefined){
+				entity = client.entityMap[entityIdString] = new client.entityTypes[entityData.Type]();
+				console.log(entityData.Id === data.ShipId, entity.Id, data.ShipId);
+				if(entityData.Id === data.ShipId){
+					setEntityAsPlayer(entity);
+				}
+			}
+			entity.updateFromData(entityData);
+			entitiesUpdatedThisFrame[entityIdString] = true;
+		}
+
+		//REMOVE entities we DID NOT receive data for this frame
+		for(entityIdString in client.entityMap){
+			if(entitiesUpdatedThisFrame[entityIdString] === undefined){
+				entityMap[entityIdString].destroy();
+				entityMap[entityIdString] = undefined;
+				console.log('removing entity:' + entityIdString);
+			}
+		}
+	}
+};
+
+var isLocal = window.location.port === '';
+var serverPath =  isLocal ? 'http://legendstudio.com/' : '';
+var currentGame =  isLocal ? 'Game-' + client.gameId + '/' : '';
+var loadScript = function(relativePath) {
+	document.write('<script type="text/javascript" src="' + serverPath + relativePath + '"></script>' );
+};
+loadScript('Scripts/jquery.signalR-1.0.0-rc2.js');
+loadScript('signalr/hubs');
+loadScript('Global.js');
