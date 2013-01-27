@@ -25,7 +25,7 @@ namespace WebGame
 
         private void SetupParts()
         {
-            parts = new Dictionary<string, int>();
+            parts = new Dictionary<string, double>();
             foreach (var part in PartList)
             {
                 parts.Add(part, partsHp);
@@ -70,7 +70,7 @@ namespace WebGame
         [ProtoMember(7)]
         public bool IsDestroyed { get; private set; }
 
-        protected Dictionary<string, int> parts;
+        protected Dictionary<string, double> parts;
 
         [ProtoMember(9)]
         public double Energy { get; private set; }
@@ -129,7 +129,7 @@ namespace WebGame
             // before applying force, we need to check energy:
             if (CheckEnergy())
             {
-                this.Velocity += acceleration;
+                this.Velocity += acceleration * (elapsed.Ticks / (float)TimeSpan.FromSeconds(1).Ticks);
                 if (this.Velocity.Magnitude() < 0.1) // small enough not to care.
                 {
                     this.Velocity = Vector3.Zero;
