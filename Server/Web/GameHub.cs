@@ -32,14 +32,8 @@ namespace WebGame
                     int gameId;
                     if (Int32.TryParse(referrer.Segments[1].TrimEnd('/').Substring("Game-".Length), out gameId))
                     {
-                        var defaultShip = GameServer.GetGame(gameId).DefaultShip;
-                        if (defaultShip != null)
-                        {
-                            //Groups.Add(Context.ConnectionId, GetShipGroupName(gameId, defaultShip.Id));
-                            //groupsWorking = true;
-
-                            SetShip(gameId, defaultShip.Id, true);
-                        }
+                        var defaultShip = GameServer.GetGame(gameId).GetDefaultShip(1);
+                        SetShip(gameId, defaultShip.Id, true);
                     }
                 }
             }
@@ -109,16 +103,11 @@ namespace WebGame
             throw new NotImplementedException();
         }
 
-        internal static void Say(int gameId, string message)
+        internal static void Say(Game game, Ship ship, string message)
         {
-            Say(GameServer.GetGame(gameId), message);
-        }
-
-        internal static void Say(Game game, string message)
-        {
-            if (game != null && game.DefaultShip != null)
+            if (game != null && ship != null)
             {
-                var groupName = GetShipGroupName(game.Id, game.DefaultShip.Id);
+                var groupName = GetShipGroupName(game.Id, ship.Id);
 
                 var context = GlobalHost.ConnectionManager.GetHubContext<GameHub>();
                 context.Clients.Group(groupName).addMessage(0, "System", message);
