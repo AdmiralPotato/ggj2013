@@ -11,6 +11,11 @@ namespace WebGame
     {
         public static Random Random = new Random();
 
+        public static bool randomBool()
+        {
+            return Random.Next(1) == 1;
+        }
+
         /// <summary>
         /// Returns the specified time measured in the number of seconds.
         /// </summary>

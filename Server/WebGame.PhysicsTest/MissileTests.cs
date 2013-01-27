@@ -259,9 +259,7 @@ namespace WebGame.PhysicsTest
             oldVelocity = missile.Velocity;
             game.Update(TimeSpan.FromSeconds(0.25));
             Assert.AreEqual(oldVelocity.Magnitude(), missile.Velocity.Magnitude(), "The missile didn't run out of energy after over 20 seconds");
-
         }
-
     }
 }
 

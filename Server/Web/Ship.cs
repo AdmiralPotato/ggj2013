@@ -74,6 +74,11 @@ namespace WebGame
         [ProtoMember(14)]
         public int DefaultShipNumber { get; set; }
 
+        /// <summary>
+        /// The string is the name of the system they are repairing
+        /// </summary>
+        public List<string> RepairCrews { get; set; }
+
         private static TimeSpan timeToLoadProjectile = TimeSpan.FromSeconds(5);
         public TimeSpan EffectiveTimeToLoadProjectile { get { return this.Effective(timeToLoadProjectile, "Projectile Tube"); }}
 
@@ -110,7 +115,7 @@ namespace WebGame
         public Dictionary<ProjectileType, int> Projectiles = new Dictionary<ProjectileType, int>();
 
         public override string Type { get { return "Ship"; } }
-        public MissionStatus missionState;
+        public MissionStatus missionState = null;
 
         public Ship()
             : this(1000)
@@ -120,7 +125,15 @@ namespace WebGame
         public Ship(double mass)
             : base(mass)
         {
-            Players = new List<Player>();
+            //if (Type.Equals("Ship") )  // aka not enemy
+            //{
+                Players = new List<Player>();
+            //}
+        }
+
+        internal void SetupMissions()
+        {
+            // this.StarSystem must be set at this point
             missionState = new MissionStatus(this);
         }
 
@@ -258,7 +271,8 @@ namespace WebGame
 
             base.Update(elapsed);
 
-            UpdateMission();
+            if( missionState != null )
+                UpdateMission();
         }
 
         private void TurnShipToDesiredOrientation(TimeSpan elapsed)
@@ -369,7 +383,7 @@ namespace WebGame
         {
         }
 
-        internal void SetRepairTarget(string part)
+        public void SetRepairTarget(string part)
         {
         }
 

@@ -70,7 +70,8 @@ namespace WebGame
         [ProtoMember(7)]
         public bool IsDestroyed { get; private set; }
 
-        Dictionary<string, int> parts;
+        protected Dictionary<string, int> parts;
+
         [ProtoMember(9)]
         public double Energy { get; private set; }
 
