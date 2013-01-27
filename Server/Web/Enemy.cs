@@ -15,7 +15,7 @@ namespace WebGame
             }
         }
 
-        private TimeSpan reFireTime = TimeSpan.FromSeconds(15);
+        private static TimeSpan reFireTime = TimeSpan.FromSeconds(15);
 
         private TimeSpan timeSinceLastFire = TimeSpan.Zero;
 
