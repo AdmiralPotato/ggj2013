@@ -165,12 +165,21 @@
     <Content Include="client\js\signalR.js" />
     <Content Include="client\js\Three.js" />
     <Content Include="client\js\ui.js" />
+    <Content Include="client\models\FishShip.json" />
     <Content Include="client\models\FishShipColorMap.png" />
     <Content Include="client\models\FishShipNormalMap.png" />
+    <Content Include="client\models\Missile.mtl" />
+    <Content Include="client\models\Missile.obj" />
+    <Content Include="client\models\Spear.json" />
     <Content Include="client\models\SpearColorMap.png" />
     <Content Include="client\models\SpearNormalMap.png" />
+    <Content Include="client\models\Starbase.json" />
     <Content Include="client\models\StarbaseColorMap.png" />
     <Content Include="client\models\StarbaseNormalMap.png" />
+    <Content Include="client\models\StarFieldAlphaCylinder.mtl" />
+    <Content Include="client\models\StarFieldAlphaCylinder.obj" />
+    <Content Include="client\models\StarFieldCylinder.mtl" />
+    <Content Include="client\models\StarFieldCylinder.obj" />
     <Content Include="client\sounds\buttonpress.mp3" />
     <Content Include="client\sounds\buttonpress.ogg" />
     <Content Include="client\sounds\buttonpress.wav" />
@@ -205,12 +214,15 @@
     <Content Include="client\three_test\Assets\FishShipColorMap.png" />
     <Content Include="client\three_test\Assets\FishShipNormalMap.png" />
     <Content Include="client\three_test\Assets\FishWireFrame.obj" />
+    <Content Include="client\three_test\Assets\shapes.blend" />
     <Content Include="client\three_test\Assets\Spear.obj" />
     <Content Include="client\three_test\Assets\SpearColorMap.png" />
     <Content Include="client\three_test\Assets\SpearNormalMap.png" />
+    <Content Include="client\three_test\Assets\SpearWireframe.obj" />
     <Content Include="client\three_test\Assets\starbase.obj" />
     <Content Include="client\three_test\Assets\StarbaseColorMap.png" />
     <Content Include="client\three_test\Assets\StarBaseNormalMap.png" />
+    <Content Include="client\three_test\Assets\StarbaseWireframe.obj" />
     <Content Include="client\three_test\eyeguy.js" />
     <Content Include="client\three_test\eyeguy_tex.png" />
     <Content Include="client\three_test\particle.png" />
@@ -349,18 +361,6 @@
     <Content Include="Sounds\playin_card_3.ogg" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="client\models\FishShip.json" />
-    <Content Include="client\models\Missile.mtl" />
-    <Content Include="client\models\Missile.obj" />
-    <Content Include="client\models\Spear.json" />
-    <Content Include="client\models\Starbase.json" />
-    <Content Include="client\models\StarFieldAlphaCylinder.mtl" />
-    <Content Include="client\models\StarFieldAlphaCylinder.obj" />
-    <Content Include="client\models\StarFieldCylinder.mtl" />
-    <Content Include="client\models\StarFieldCylinder.obj" />
-    <Content Include="client\three_test\Assets\shapes.blend" />
-    <Content Include="client\three_test\Assets\SpearWireframe.obj" />
-    <Content Include="client\three_test\Assets\StarbaseWireframe.obj" />
     <None Include="Properties\PublishProfiles\Profile1.pubxml" />
     <Content Include="Views\Game\_PlayerList.cshtml" />
     <Content Include="Views\Game\Lobby.cshtml" />

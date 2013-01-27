@@ -229,26 +229,26 @@ namespace WebGame
 
         public bool LoadProjectile(int tubeNumber, ProjectileType type)
         {
-            //if (this.ProjectileTubes[tubeNumber].ProjectileStatus == ProjectileStatus.Unloaded)
-            //{
-            //    this.ProjectileTubes[tubeNumber].ProjectileLoadTime = TimeSpan.Zero;
-            //    this.ProjectileTubes[tubeNumber].ProjectileStatus = ProjectileStatus.Loading;
-            //    PlaySound("MissileLoad");
-            //    return true;
-            //}
+            if (this.ProjectileTubes[tubeNumber].ProjectileStatus == ProjectileStatus.Unloaded)
+            {
+                this.ProjectileTubes[tubeNumber].ProjectileLoadTime = TimeSpan.Zero;
+                this.ProjectileTubes[tubeNumber].ProjectileStatus = ProjectileStatus.Loading;
+                PlaySound("MissileLoad");
+                return true;
+            }
             return false;
         }
 
         public Projectile LaunchProjectile(int tubeNumber, Entity target)
         {
-            //if (this.ProjectileTubes[tubeNumber].ProjectileStatus == ProjectileStatus.Loaded && this.StarSystem == target.StarSystem)
-            //{
-            //    var projectile = new Projectile(this.Velocity);
-            //    projectile.Target = target;
-            //    this.StarSystem.AddEntity(projectile);
-            //    PlaySound("MissileLaunch");
-            //    return projectile;
-            //}
+            if (this.ProjectileTubes[tubeNumber].ProjectileStatus == ProjectileStatus.Loaded && this.StarSystem == target.StarSystem)
+            {
+                var projectile = new Projectile(this.Velocity);
+                projectile.Target = target;
+                this.StarSystem.AddEntity(projectile);
+                PlaySound("MissileLaunch");
+                return projectile;
+            }
             return null;
         }
 
