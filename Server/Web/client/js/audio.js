@@ -38,7 +38,7 @@ function SFXChannels(source, channels){
 }
 
 var SFX = {};
-function preloadAudioList(sfxList, statusDiv, callback){
+function preloadAudioList(sfxList, statusDiv, errorDiv, callback){
 	//No Jims allowed!
 	if(this === window){throw('You cannot simply invoke this fuction, as it is meant to be called as a constructor with the `new` keyword!');}
 	// simply for shortening and parental access in the member methods
@@ -53,7 +53,7 @@ function preloadAudioList(sfxList, statusDiv, callback){
 		audio.loaded = false;
 		//audio.onload = function(e){this.loaded = true;t.checkProgress(e);}
 		//I should probably do something more meaningful onerror.
-		audio.onerror = function(e){this.loaded = true;t.checkProgress(e);errorDiv.innerHTML+='<br>error loading: '+this.src;};
+		audio.onerror = function(e){this.loaded = true;t.fail = true;t.checkProgress(e);if( errorDiv != null ) errorDiv.innerHTML+='<br>error loading: '+this.src;};
 		audio.src = src;
 		audio.muted = true;
 		audio.play(); //forces the audio to start loading from the server!
@@ -63,17 +63,20 @@ function preloadAudioList(sfxList, statusDiv, callback){
 		audio.muted = false;
 		t.children[i] = audio;
 	}
-	t.display = document.createElement('div');
-	t.display.style.backgroundColor = '#333';
-	t.display.style.width = '100%';
-	t.display.style.height = '16px';
-	statusDiv.appendChild(t.display);
-	t.progress = document.createElement('div');
-	t.progress.style.backgroundColor = '#f00';
-	t.progress.style.width = '0%';
-	t.progress.style.height = '16px';
-	t.progress.style.textAlign = 'center';
-	t.display.appendChild(t.progress);
+	if( statusDiv != null )
+	{
+		t.display = document.createElement('div');
+		t.display.style.backgroundColor = '#333';
+		t.display.style.width = '100%';
+		t.display.style.height = '16px';
+		statusDiv.appendChild(t.display);
+		t.progress = document.createElement('div');
+		t.progress.style.backgroundColor = '#f00';
+		t.progress.style.width = '0%';
+		t.progress.style.height = '16px';
+		t.progress.style.textAlign = 'center';
+		t.display.appendChild(t.progress);
+	}
 	t.checkProgress = function(){
 		var notLoadedCount = t.children.length;
 		for(var i = 0; i < t.children.length; i++){
@@ -87,9 +90,12 @@ function preloadAudioList(sfxList, statusDiv, callback){
 				}
 			}
 		}
-		var percent = Math.floor(((t.children.length - notLoadedCount) * 100) / t.children.length);
-		t.progress.style.width = percent+'%';
-		t.progress.innerHTML = percent+'%';
+		if( statusDiv != null )
+		{
+			var percent = Math.floor(((t.children.length - notLoadedCount) * 100) / t.children.length);
+			t.progress.style.width = percent+'%';
+			t.progress.innerHTML = percent+'%';
+		}
 		if(notLoadedCount === 0){
 			clearInterval(t.areWeThereYet);
 			t.loaded = true;
