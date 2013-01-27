@@ -104,34 +104,54 @@
 	}
 
 	var meshObjects = {};
+	var player;
 
 	var whatToDoWhenAllTheGeometriesAreParsedOkayYupSeriously = function(){
 		document.addEventListener("keydown", onKeyDown, false);
 		document.addEventListener("keyup", onKeyUp, false);
 
 
-		var newMesh = new THREE.Mesh(geometryObjects.fishShip, geometryObjects.fishShip.matLib[0]);
-		meshObjects['fish'] = newMesh;
+		var newMesh = new THREE.Mesh(geometryObjects.fishShipA, geometryObjects.fishShipA.matLib[0]);
+		meshObjects['fishA'] = newMesh;
+		newMesh.position.z = -20;
+		newMesh.position.x = -20;
+		scene.add(newMesh);
+
+		var newMesh = new THREE.Mesh(geometryObjects.fishShipB, geometryObjects.fishShipB.matLib[0]);
+		meshObjects['fishB'] = newMesh;
+		newMesh.position.z = 20;
+		newMesh.position.x = -20;
+		scene.add(newMesh);
+
+		var newMesh = new THREE.Mesh(geometryObjects.fishShipC, geometryObjects.fishShipC.matLib[0]);
+		meshObjects['fishC'] = newMesh;
+		newMesh.position.x = 20;
 		scene.add(newMesh);
 
 		newMesh = new THREE.Mesh(geometryObjects.spear, geometryObjects.spear.matLib[0]);
-		newMesh.position.z = -20;
-		meshObjects['spear'] = newMesh;
+		player = newMesh;
 		scene.add(newMesh);
 
-		newMesh = new THREE.Mesh(geometryObjects.starbase, geometryObjects.starbase.matLib[0]);
-		newMesh.position.x = -50;
-		meshObjects['starbase'] = newMesh;
+		newMesh = new THREE.Mesh(geometryObjects.starbaseA, geometryObjects.starbaseA.matLib[0]);
+		newMesh.position.x = -70;
+		newMesh.position.z = 10;
+		meshObjects['starbaseA'] = newMesh;
+		scene.add(newMesh);
+
+		newMesh = new THREE.Mesh(geometryObjects.starbaseB, geometryObjects.starbaseB.matLib[0]);
+		newMesh.position.x = 70;
+		newMesh.position.z = -30;
+		meshObjects['starbaseB'] = newMesh;
 		scene.add(newMesh);
 
 
 		var directionalLightA = new THREE.DirectionalLight(0xffffff,2);
 		directionalLightA.position.set( 0, -1, 0 );
-		meshObjects['fish'].add(directionalLightA);
+		player.add(directionalLightA);
 
 		var directionalLightB = new THREE.DirectionalLight(0xffffff,1.5);
 		directionalLightB.position.set( 0, 1, 0 );
-		meshObjects['fish'].add(directionalLightB);
+		player.add(directionalLightB);
 
 		var directionalLightPointedFromCamera = new THREE.DirectionalLight(0xffffff, 0.5);
 		directionalLightPointedFromCamera.position.set( -1, 0, 0 );
@@ -140,14 +160,17 @@
 	};
 
 	var fireLaser = function(){
-
+		//var rnd = Math.random()*
 	}
 
 	parseAllGeometry(
 		{
-			'fishShip': "../models/FishShip.json",
+			'fishShipA': "../models/FishShip.json",
+			'fishShipB': "../models/FishShip.json",
+			'fishShipC': "../models/FishShip.json",
 			'spear': "../models/Spear.json",
-			'starbase': "../models/Starbase.json"
+			'starbaseA': "../models/Starbase.json",
+			'starbaseB': "../models/Starbase.json",
 		},
 		whatToDoWhenAllTheGeometriesAreParsedOkayYupSeriously
 	);
@@ -168,9 +191,9 @@
 		Add Update Stuff BELOW Here
 		****/
 			// use dt for frame rate independent speed
-			meshObjects['fish'].rotation.setY(meshObjects['fish'] .rotation.y+(dt*.1));
-			camera.position = distanceElevationHeading(30, 15 * deg, meshObjects['fish'] .rotation.y);
-			camera.lookAt(meshObjects['fish'] .position);
+			player.rotation.setY(player.rotation.y+(dt*.1));
+			camera.position = distanceElevationHeading(30, 15 * deg, player.rotation.y);
+			camera.lookAt(player.position);
 			
 			/*var pCount = particleCount;
   			while(pCount--) {
