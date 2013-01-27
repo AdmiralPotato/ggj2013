@@ -11,16 +11,16 @@
 </head>
 <body>
     <div id="ui">
-        <input type="submit" onclick='$.post("http://legendstudio.com/Game-705810/Start");' value="Reset" />
+        <input type="submit" onclick='$.post("http://legendstudio.com/Game-705814/Start");' value="Reset" />
         <br />
-        <input type="submit" onclick='$.post("http://legendstudio.com/Game-705810/SetImpulse", "amount=100");' value="Go" />
-        <input type="submit" onclick='$.post("http://legendstudio.com/Game-705810/SetDesiredSpeed", "amount=0");' value="Stop" />
+        <input type="submit" onclick='$.post("http://legendstudio.com/Game-705814/SetImpulse", "amount=100");' value="Go" />
+        <input type="submit" onclick='$.post("http://legendstudio.com/Game-705814/SetDesiredSpeed", "amount=0");' value="Stop" />
         <br />
         <input type="text" id="desiredHeading" value="0" />
-        <input type="submit" onclick='$.post("http://legendstudio.com/Game-705810/SetDesiredHeading", "amount=" + $("#desiredHeading").val());' value="Set Heading" />
+        <input type="submit" onclick='$.post("http://legendstudio.com/Game-705814/SetDesiredHeading", "amount=" + $("#desiredHeading").val());' value="Set Heading" />
         <br />
-        <input type="submit" onclick='$.post("http://legendstudio.com/Game-705810/BuildBase");' value="Build Base" />
-        <input type="submit" onclick='$.post("http://legendstudio.com/Game-705810/BuildShip");' value="Build Ship" />
+        <input type="submit" onclick='$.post("http://legendstudio.com/Game-705814/BuildBase");' value="Build Base" />
+        <input type="submit" onclick='$.post("http://legendstudio.com/Game-705814/BuildShip");' value="Build Ship" />
         <div id="modal">
         </div>
     </div>
@@ -32,7 +32,7 @@
 
     <script type="text/javascript">
         jQuery.support.cors = true;
-        //		$.connection.hub.logging = true;		
+        //		$.connection.hub.logging = true;
         $.connection.hub.url = 'http://legendstudio.com/signalr';
 
         var gameHub = $.connection.gameHub;

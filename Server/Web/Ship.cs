@@ -44,38 +44,123 @@ namespace WebGame
         }
         private double _desiredOrientation;
 
-        private const double turnRateAnglePerSecond = Math.PI / 4; // this will likely get changed to something from engineering
+        [ProtoMember(4)]
+        public bool Alert { get; set; }
+
+        [ProtoMember(5)]
+        public MainView MainView { get; set; }
+
+        /// <summary>
+        /// How long ago the projectile was loaded
+        /// </summary>
+        [ProtoMember(6)]
+        public TimeSpan ProjectileLoadTime { get; private set; }
+
+        [ProtoMember(7)]
+        public ProjectileStatus ProjectileStatus { get; set; }
+
+        [ProtoMember(8)]
+        public  int Energy { get; set; }
+        [ProtoMember(9)]
+        public  int FrontShield { get; set; }
+        [ProtoMember(10)]
+        public  int RearShield { get; set; }
+        [ProtoMember(11)]
+        public  int LeftShield { get; set; }
+        [ProtoMember(12)]
+        public  int RightShield { get; set; }
+        [ProtoMember(13)]
+        public bool ShieldsEngaged { get; set; }
+
+        private static TimeSpan timeToLoadProjectile = TimeSpan.FromSeconds(5);
+
+        public TimeSpan EffectiveTimeToLoadProjectile
+        {
+            get
+            {
+                return this.Effective(timeToLoadProjectile, "Projectile Tube");
+            }
+        }
+
+        /// <summary>
+        /// Angle Per Second
+        /// </summary>
+        private const double turnRate = Math.PI / 4;
+        /// <summary>
+        /// AnglePerSecond
+        /// </summary>
+        public double EffectiveTurnRate
+        {
+            get
+            {
+                return this.Effective(turnRate, "Thrusters");
+            }
+        }
         /// <summary>
         /// Meters Per Second Per Ton
         /// </summary>
-        private const double maximumAvailableForce = 10000;
+        private const double maximumForce = 10000;
+        public double EffectiveMaximumForce
+        {
+            get
+            {
+                return this.Effective(maximumForce, "Engines");
+            }
+        }
 
         public override string Type { get { return "Ship"; } }
+
+
 
         public Ship()
             : this(1000)
         {
         }
 
-        public Ship(double mass) : base(mass)
+        public Ship(double mass)
+            : base(mass)
         {
             Players = new List<Player>();
         }
 
-        public Projectile Launch(Entity target)
+        public void LoadProjectile()
         {
-            if (this.StarSystem != target.StarSystem)
+            if (this.ProjectileStatus == ProjectileStatus.Unloaded)
             {
-                throw new ArgumentException("The target is not in the current star system");
+                this.ProjectileLoadTime = TimeSpan.Zero;
+                this.ProjectileStatus = ProjectileStatus.Loading;
             }
-            var projectile = new Projectile();
-            projectile.Target = target;
-            this.StarSystem.AddEntity(projectile);
-            return projectile;
+        }
+
+        public Projectile LaunchProjectile(Entity target)
+        {
+            if (this.ProjectileStatus == ProjectileStatus.Loaded && this.StarSystem == target.StarSystem)
+            {
+                var projectile = new Projectile();
+                projectile.Target = target;
+                this.StarSystem.AddEntity(projectile);
+                return projectile;
+            }
+            return null;
         }
 
         public override void Update(TimeSpan elapsed)
         {
+            if (ShieldsEngaged)
+            {
+                FrontShield++;
+                if (FrontShield > 100)
+                    FrontShield = 100;
+            }
+
+            if (this.ProjectileStatus == ProjectileStatus.Loading)
+            {
+                this.ProjectileLoadTime += elapsed;
+                if (this.ProjectileLoadTime >= EffectiveTimeToLoadProjectile)
+                {
+                    this.ProjectileStatus = ProjectileStatus.Loaded;
+                }
+            }
             if (this.TargetSpeedMetersPerSecond.HasValue)
             {
                 var speed = this.Velocity.Magnitude();
@@ -108,7 +193,7 @@ namespace WebGame
                     var targetDeceleration = speed - this.TargetSpeedMetersPerSecond.Value;
                     if (targetDeceleration < Math.Abs(decelerationAmount))
                     {
-                        this._impulsePercentage = targetDeceleration / (maximumAvailableForce / this.Mass) * 100 * Math.Sign(decelerationAmount); // we need to directly access the underscore members so that we don't call the set method, which will unset the target speed 
+                        this._impulsePercentage = targetDeceleration / (this.EffectiveMaximumForce / this.Mass) * 100 * Math.Sign(decelerationAmount); // we need to directly access the underscore members so that we don't call the set method, which will unset the target speed 
                     }
                 }
             }
@@ -120,7 +205,7 @@ namespace WebGame
         private void TurnShipToDesiredOrientation(TimeSpan elapsed)
         {
             var desiredDiffAngle = TurnAngleNeededForDesire();
-            var currentAllowedDiffAngle = elapsed.TotalSeconds * turnRateAnglePerSecond;
+            var currentAllowedDiffAngle = elapsed.TotalSeconds * this.EffectiveTurnRate;
             var absoluteDesiredDiffAngle = Math.Abs(desiredDiffAngle);
             if (currentAllowedDiffAngle >= absoluteDesiredDiffAngle)
             {
@@ -145,7 +230,14 @@ namespace WebGame
         {
             get
             {
-                return this.ImpulsePercentage / 100 * maximumAvailableForce;
+                return this.ImpulsePercentage / 100 * this.EffectiveMaximumForce;
+            }
+        }
+        public override double Radius
+        {
+            get
+            {
+                return 10;
             }
         }
 
@@ -165,7 +257,7 @@ namespace WebGame
         {
             if (Players.Count > 0)
             {
-                var update = new UpdateToClient();
+                var update = new UpdateToClient() { ShipId = Id, Energy = this.Energy, FrontShield = this.FrontShield, RearShield = this.RearShield, LeftShield = this.LeftShield, RightShield = this.RightShield, ShieldsEngaged = this.ShieldsEngaged };
                 foreach (var entity in StarSystem.Entites)
                 {
                     update.Entities.Add(new EntityUpdate() { Id = entity.Id, Type = entity.Type, Rotation = (float)entity.Orientation, Position = entity.Position });
@@ -173,6 +265,28 @@ namespace WebGame
                 GameHub.SendUpdate(Game.Id, Id, update);
                 System.Diagnostics.Debug.WriteLine("Update Sent.");
             }
+        }
+
+        protected override IEnumerable<string> PartList
+        {
+            get
+            {
+                yield return "Thrusters";
+                yield return "Engines";
+                yield return "Projectile Tube";
+            }
+        }
+
+        internal void SetPower(string part, float amount)
+        {
+        }
+
+        internal void SetCoolant(string part, int amount)
+        {
+        }
+
+        internal void SetRepairTarget(string part)
+        {
         }
     }
 }

@@ -31,7 +31,8 @@ namespace WebGame
             {
                 player = game.GetPlayer(Account.Id);
                 ViewBag.Player = player;
-                player.SessionId = Request.Cookies["ASP.Net_SessionId"].Value;
+                if (player != null)
+                    player.SessionId = Request.Cookies["ASP.Net_SessionId"].Value;
             }
         }
 
@@ -298,6 +299,8 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
             if (!LoggedIn)
                 return Redirect("/Game-" + game.Id + "/");
 
+            if (!game.IsRunning || player.Station == Station.GameMaster)
+
             game.MaxPlayers = game.CurrentPlayers;
             game.Start();
 
@@ -322,12 +325,43 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
             return null;
         }
 
-        public ActionResult SetImpulse(int id, int amount)
+        public string SelectStation(int id, Station station)
         {
             Initalize(id);
 
             if (game.DefaultShip != null)
+            {
+                foreach (var shipPlayer in game.DefaultShip.Players)
+                {
+                    if (shipPlayer.Station == station)
+                        return "Station already taken.";
+                }
+
+                player.Station = station;
+            }
+
+            return null;
+        }
+
+        public ActionResult SetMainScreen(int id, MainView view)
+        {
+            Initalize(id);
+
+            if (game.DefaultShip != null)
+                game.DefaultShip.MainView = view;
+
+            return null;
+        }
+
+        #region Helm
+        public string SetImpulse(int id, int amount)
+        {
+            Initalize(id);
+
+            if (game.DefaultShip != null && player.Station == Station.Helm)
+            {
                 game.DefaultShip.ImpulsePercentage = amount;
+            }
 
             return null;
         }
@@ -337,7 +371,7 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
         {
             Initalize(id);
 
-            if (game.DefaultShip != null)
+            if (game.DefaultShip != null && player.Station == Station.Helm)
             {
                 game.DefaultShip.DesiredOrientation = amount;
             }
@@ -349,17 +383,118 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
         {
             Initalize(id);
 
-            if (game.DefaultShip != null)
+            if (game.DefaultShip != null && player.Station == Station.Helm)
                 game.DefaultShip.TargetSpeedMetersPerSecond = amount;
 
             return null;
         }
+        #endregion
 
+        #region Weapons
+        public ActionResult ToggleAlert(int id)
+        {
+            Initalize(id);
+
+            if (game.DefaultShip != null && player.Station == Station.Weapons)
+                game.DefaultShip.Alert = !game.DefaultShip.Alert;
+
+            return null;
+        }
+
+        public ActionResult ToggleShields(int id)
+        {
+            Initalize(id);
+
+            if (game.DefaultShip != null && player.Station == Station.Weapons)
+                game.DefaultShip.ShieldsEngaged = !game.DefaultShip.ShieldsEngaged;
+            
+            return null;
+        }
+
+        public ActionResult LoadProjectile(int id)
+        {
+            Initalize(id);
+
+            if (game.DefaultShip != null && player.Station == Station.Weapons)
+            {
+                game.DefaultShip.LoadProjectile();
+            }
+
+            return null;
+        }
+        public ActionResult LaunchProjectile(int id, int targetId)
+        {
+            Initalize(id);
+
+            if (game.DefaultShip != null && player.Station == Station.Weapons)
+            {
+                var target = game.DefaultShip.StarSystem.GetEntity(targetId);
+                if (target != null)
+                    game.DefaultShip.LaunchProjectile(target);
+            }
+
+            return null;
+        }
+        #endregion
+
+        #region Engineering
+        public ActionResult SetPower(int id, string part, float amount)
+        {
+            Initalize(id);
+
+            if (game.DefaultShip != null && player.Station == Station.Engineering)
+            {
+                game.DefaultShip.SetPower(part, amount);
+            }
+
+            return null;
+        }
+        public ActionResult SetCoolantLevel(int id, string part, int amount)
+        {
+            Initalize(id);
+
+            if (game.DefaultShip != null && player.Station == Station.Engineering)
+            {
+                game.DefaultShip.SetCoolant(part, amount);
+            }
+
+            return null;
+        }
+        public ActionResult SetRepairTarget(int id, string part)
+        {
+            Initalize(id);
+
+            if (game.DefaultShip != null && player.Station == Station.Engineering)
+            {
+                game.DefaultShip.SetRepairTarget(part);
+            }
+
+            return null;
+        }
+        #endregion
+
+        #region Communication
+        public ActionResult SendCommand(int id, int targetId, Command command)
+        {
+            Initalize(id);
+
+            if (game.DefaultShip != null && player.Station == Station.Communication)
+            {
+                var target = game.DefaultShip.StarSystem.GetEntity(targetId);
+                if (target != null)
+                    target.ReceiveCommand(game.DefaultShip, command);
+            }
+
+            return null;
+        }
+        #endregion
+
+        #region GM
         public ActionResult BuildBase(int id)
         {
             Initalize(id);
 
-            if (game.DefaultShip != null)
+            if (game.DefaultShip != null && player.Station == Station.GameMaster)
                 game.DefaultShip.StarSystem.AddEntity(new Starbase() { Position = game.DefaultShip.Position });
 
             return null;
@@ -369,10 +504,11 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
         {
             Initalize(id);
 
-            if (game.DefaultShip != null)
+            if (game.DefaultShip != null && player.Station == Station.GameMaster)
                 game.DefaultShip.StarSystem.AddEntity(new Ship() { Position = game.DefaultShip.Position });
 
             return null;
         }
+        #endregion
     }
 }
