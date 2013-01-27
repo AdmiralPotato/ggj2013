@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>GGJ2013 Heart of the Deep Audio Test</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script src="js/audio.js"></script>
+<script type="text/javascript">
+	function playSound()
+	{
+		//SFX[soundSelect.selected].play();
+		showAlert("hello vazor");
+	}
+</script>
+</head>
+<body>
+	<select id="soundSelect">
+		<option value="1">One</option>
+		<option value="2">two</option>
+		<option value="3">three</option>
+	</select>
+	<input type="button" id="playButton" value="Play" onClick="playSound();" disabled>
+
+
+<script type="text/javascript">
+	document.getElementById("playButton").disabled = false;
+
+	var sfxList = [
+		{
+			name:'advance',
+			src:'sfx/cube_advance.wav',
+			channels:10,
+		},{
+			name:'gameOver',
+			src:'sfx/game_over_music.wav',
+			channels:1,
+		},{
+			name:'menuMove',
+			src:'sfx/menu_move.wav',
+			channels:10,
+		},{
+			name:'menuSelect',
+			src:'sfx/menu_select.wav',
+			channels:10,
+		},{
+			name:'newLevel',
+			src:'sfx/new_level.wav',
+			channels:1,
+		},{
+			name:'resume',
+			src:'sfx/resume.wav',
+			channels:5,
+		},
+	];
+
+
+
+	var audioList = new preloadAudioList(sfxList, audioStatusDiv, onLoadCallback);
+
+	function onLoadCallback()
+	{
+		document.getElementById("playButton").disabled = false;
+	}
+
+</script>
+</body>
+</html>
