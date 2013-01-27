@@ -396,7 +396,11 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
             Initalize(id);
 
             if (game.DefaultShip != null && player.Station == Station.Weapons)
+            {
                 game.DefaultShip.Alert = !game.DefaultShip.Alert;
+                if (game.DefaultShip.Alert)
+                    game.DefaultShip.PlaySound("Alert");
+            }
 
             return null;
         }
@@ -406,7 +410,10 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
             Initalize(id);
 
             if (game.DefaultShip != null && player.Station == Station.Weapons)
+            {
                 game.DefaultShip.ShieldsEngaged = !game.DefaultShip.ShieldsEngaged;
+                game.DefaultShip.PlaySound(game.DefaultShip.ShieldsEngaged ? "ShieldsUp" : "ShieldsDown");
+            }
             
             return null;
         }
