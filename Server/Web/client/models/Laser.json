@@ -14,24 +14,22 @@
 		"bones"         : 0
 	},
 
-	"scale" : 1.000000,
+	"scale" : 1.0,
 
 	"materials" : [	{
 		"DbgColor" : 15658734,
 		"DbgIndex" : 0,
 		"DbgName" : "Material",
-		"blending" : "NormalBlending",
-		"colorAmbient" : [1.0, 0.0, 0.0],
+		"blending" : "AdditiveBlending",
+		"colorAmbient" : [0.0, 0.0, 0.0],
 		"colorDiffuse" : [1.0, 0.0, 0.0],
 		"colorSpecular" : [0.0, 0.0, 0.0],
 		"depthTest" : true,
 		"depthWrite" : true,
 		"mapDiffuse" : "LaserColorMap.png",
-		"mapDiffuseWrap" : ["repeat", "repeat"],
 		"shading" : "Lambert",
 		"specularCoef" : 50,
-		"transparency" : 1.0,
-		"transparent" : false,
+		"transparent" : true,
 		"vertexColors" : false
 	}],
 
