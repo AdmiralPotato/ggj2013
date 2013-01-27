@@ -426,7 +426,7 @@ namespace WebGame
                 yield return "Shield Regenerators";
                 yield return "Energy Collectors"; // not implemented
                 yield return "Energy Storage";
-                yield return "Energy Weapon Bank"; // not implemented
+                yield return "Beam Weapon Bank"; // not implemented
             }
         }
 
