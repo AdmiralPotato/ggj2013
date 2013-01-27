@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using ProtoBuf;
+using Microsoft.Xna.Framework;
 
 namespace WebGame
 {
@@ -11,6 +12,11 @@ namespace WebGame
     {
         public Starbase()
             : this(100000)
+        {
+        }
+
+        public Starbase(Vector3 position)
+            : base(100000, position: position)
         {
         }
 

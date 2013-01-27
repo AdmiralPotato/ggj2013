@@ -17,8 +17,13 @@ namespace WebGame
         {
         }
 
-        public Ship(double mass)
-            : base(mass)
+        public Ship(Vector3 position) : this(1000, position: position)
+        {
+
+        }
+
+        public Ship(double mass, Vector3? position = null)
+            : base(mass, position: position)
         {
             //if (Type.Equals("Ship") )  // aka not enemy
             //{
@@ -154,13 +159,13 @@ namespace WebGame
 
         protected override double InitialEnergy { get { return 1000; } }
 
-        public static Ship Create(ShipType type)
+        public static Ship Create(ShipType type, Vector3? position = null)
         {
             Ship result;
             switch (type)
             {
                 case ShipType.Spearhead:
-                    result = new Ship(2000) { MaxShields = 500, Tubes = 2, PhaserBanks = 1, RepairCrews = 3 };
+                    result = new Ship(2000, position) { MaxShields = 500, Tubes = 2, PhaserBanks = 1, RepairCrews = 3 };
                     result.BeamWeapons.AddRange((BeamType[])Enum.GetValues(typeof(BeamType)));
                     result.BeamWeapons.Remove(BeamType.ShadowTether);
                     result.Projectiles[ProjectileType.Torpedo] = 10;
@@ -170,19 +175,19 @@ namespace WebGame
                     result.Projectiles[ProjectileType.Skattershot] = 1;
                     break;
                 case ShipType.Skirmisher:
-                    result = new Ship(2000) { MaxShields = 500, Tubes = 2, PhaserBanks = 2, RepairCrews = 3 };
+                    result = new Ship(2000, position) { MaxShields = 500, Tubes = 2, PhaserBanks = 2, RepairCrews = 3 };
                     result.BeamWeapons.AddRange((BeamType[])Enum.GetValues(typeof(BeamType)));
                     result.BeamWeapons.Remove(BeamType.ShadowTether);
                     result.Projectiles[ProjectileType.Torpedo] = 10;
                     break;
                 case ShipType.Beserker:
-                    result = new Ship(5000) { MaxShields = 0, Tubes = 0, PhaserBanks = 1, MaximumForce = 12500, RepairCrews = 3 };
+                    result = new Ship(5000, position) { MaxShields = 0, Tubes = 0, PhaserBanks = 1, MaximumForce = 12500, RepairCrews = 3 };
                     result.BeamWeapons.Add(BeamType.HullPiercing);
                     result.BeamWeapons.Add(BeamType.SelfDestruct);
                     result.BeamWeapons.Add(BeamType.PlasmaVent);
                     break;
                 case ShipType.Gunboat:
-                    result = new Ship(1500) { MaxShields = 600, Tubes = 4, PhaserBanks = 1, RepairCrews = 3 };
+                    result = new Ship(1500, position) { MaxShields = 600, Tubes = 4, PhaserBanks = 1, RepairCrews = 3 };
                     result.BeamWeapons.Add(BeamType.SuppresionPulse);
                     result.BeamWeapons.Add(BeamType.ShadowTether);
                     result.Projectiles[ProjectileType.Torpedo] = 10;
@@ -190,7 +195,7 @@ namespace WebGame
                     result.Projectiles[ProjectileType.Hardshell] = 1;
                     break;
                 case ShipType.Capital:
-                    result = new Ship(3000) { MaxShields = 1000, Tubes = 5, RepairCrews = 3 };
+                    result = new Ship(3000, position) { MaxShields = 1000, Tubes = 5, RepairCrews = 3 };
                     result.BeamWeapons.Add(BeamType.StandardPhaser);
                     result.BeamWeapons.Add(BeamType.ShieldDamper);
                     result.BeamWeapons.Add(BeamType.ShadowTether);
@@ -220,7 +225,7 @@ namespace WebGame
         {
             if (this.ProjectileTubes[tubeNumber].ProjectileStatus == ProjectileStatus.Loaded && this.StarSystem == target.StarSystem)
             {
-                var projectile = new Projectile();
+                var projectile = new Projectile(this.Velocity);
                 projectile.Target = target;
                 this.StarSystem.AddEntity(projectile);
                 PlaySound("MissileLaunch");

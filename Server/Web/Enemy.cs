@@ -3,12 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using ProtoBuf;
+using Microsoft.Xna.Framework;
 
 namespace WebGame
 {
     [ProtoContract]
     public class Enemy : Ship
     {
+        public Enemy()
+        {
+        }
+
+        public Enemy(Vector3 position) : base(position)
+        {
+
+        }
         public override string Type
         {
             get
@@ -17,7 +26,7 @@ namespace WebGame
             }
         }
 
-        private static TimeSpan reFireTime = TimeSpan.FromSeconds(5);
+        private static TimeSpan reFireTime = TimeSpan.FromSeconds(500);
 
         private TimeSpan timeSinceLastFire = TimeSpan.Zero;
 

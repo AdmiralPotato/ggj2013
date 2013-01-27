@@ -20,7 +20,7 @@ namespace WebGame
         {
             missionStep = 0;
             missions = new Mission[4];
-            Enemy firstMissionEnemy = new Enemy() { Position = new Vector3((Utility.randomBool() ? 1 : -1) * Utility.Random.Next(100) + 200, (Utility.randomBool() ? 1 : -1) * Utility.Random.Next(100) + 200, 0) };
+            Enemy firstMissionEnemy = new Enemy(new Vector3((Utility.randomBool() ? 1 : -1) * Utility.Random.Next(100) + 200, (Utility.randomBool() ? 1 : -1) * Utility.Random.Next(100) + 200, 0));
             initShip.StarSystem.AddEntity(firstMissionEnemy);
             int enemyId = firstMissionEnemy.Id;
             int m = 0;
