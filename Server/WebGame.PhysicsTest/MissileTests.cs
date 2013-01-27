@@ -21,6 +21,7 @@ namespace WebGame.PhysicsTest
             ship.Update(TimeSpan.FromSeconds(0.25));
             Assert.AreNotEqual(0, ship.Position.X, "The ship should have moved along the x axis");
             var missile = new Projectile();
+            system.AddEntity(missile);
             Assert.AreEqual(0, missile.Position.X, "the missile was not at the center");
             missile.Target = ship;
             var oldDiff = ship.Position.X - missile.Position.X;

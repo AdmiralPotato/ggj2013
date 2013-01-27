@@ -142,6 +142,17 @@ namespace WebGame
             }
         }
 
+        public void ApplyEnergyForce(double energy, double orientation)
+        {
+            const double efficiency = 0.1;
+            var force = energy / energyCostPerForcePerSecond * efficiency; // No time in this equation, because we will apply this force over one second
+            var accelerationMagnitude = force / this.Mass;
+            var flatAcceleration = new Vector3((float)accelerationMagnitude, 0, 0);
+            var acceleration = Vector3.Transform(flatAcceleration, Matrix.CreateRotationZ((float)orientation));
+            this.Velocity += acceleration; // no time in this equation because it is applied as if it were one second
+        }
+
+
         private bool CheckEnergy()
         {
             if (Energy < 0)

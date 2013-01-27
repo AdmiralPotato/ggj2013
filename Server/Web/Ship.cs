@@ -340,7 +340,7 @@ namespace WebGame
 
         private void UpdateOrientation(TimeSpan elapsed)
         {
-            var desiredDiffAngle = TurnAngleNeededForDesire();
+            var desiredDiffAngle = TurnAngleNeededForDesiredOrientation();
             var currentAllowedDiffAngle = elapsed.TotalSeconds * this.EffectiveTurnRate;
             var absoluteDesiredDiffAngle = Math.Abs(desiredDiffAngle);
             if (currentAllowedDiffAngle >= absoluteDesiredDiffAngle)
@@ -353,7 +353,7 @@ namespace WebGame
             }
         }
 
-        private double TurnAngleNeededForDesire()
+        private double TurnAngleNeededForDesiredOrientation()
         {
             // difference
             var remaining = this.DesiredOrientation - this.Orientation;
@@ -564,7 +564,10 @@ namespace WebGame
                     if (IsEntityCloserThan(target, 200) && Energy > 75 && BeamCoolDownTime(bank) > 5)
                     {
                         //target..Velocity
-                        //(Position - target.Position).
+                        var displacement = this.Position - target.Position;
+                        var orientation = Math.Atan2(displacement.Y, displacement.X).NormalizeOrientation();
+
+                        target.ApplyEnergyForce(75, orientation);
 
                         LastBeamBanksUsed[bank] = DateTime.UtcNow;
                         UseRawEnergy(25);
