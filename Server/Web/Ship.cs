@@ -73,6 +73,11 @@ namespace WebGame
         [ProtoMember(14)]
         public int DefaultShipNumber { get; set; }
 
+        /// <summary>
+        /// The string is the name of the system they are repairing
+        /// </summary>
+        public List<string> RepairCrews { get; set; }
+
         private static TimeSpan timeToLoadProjectile = TimeSpan.FromSeconds(5);
 
         public TimeSpan EffectiveTimeToLoadProjectile
@@ -338,7 +343,7 @@ namespace WebGame
         {
         }
 
-        internal void SetRepairTarget(string part)
+        public void SetRepairTarget(string part)
         {
         }
     }
