@@ -27,6 +27,7 @@ namespace WebGame.PhysicsTest
             game.Add(system);
             var ship = new Ship();
             system.AddEntity(ship);
+            ship.ShieldsEngaged = false;
             ship.ImpulsePercentage = 100;
             Assert.IsTrue(ship.Energy > 0, "Ship didn't have any energy");
             var oldVelocity = ship.Velocity;

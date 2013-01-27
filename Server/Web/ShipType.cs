@@ -21,7 +21,7 @@ namespace WebGame
         HullPiercing,
         StandardPhaser,
         SuppresionPulse,
-        ShieldDamper,
+        ShieldDampener,
         PlasmaVent,
         TractorBeam,
         RepulsorBeam,

@@ -17,7 +17,8 @@ namespace WebGame
         {
         }
 
-        public Ship(Vector3 position) : this(1000, position: position)
+        public Ship(Vector3 position)
+            : this(1000, position: position)
         {
 
         }
@@ -29,6 +30,11 @@ namespace WebGame
             //{
             Players = new List<Player>();
             //}
+            Shields = new List<Shield>();
+            for (int i = 0; i < ShieldCount; i++)
+            {
+                Shields.Add(new Shield());
+            }
         }
 
         public List<Player> Players;
@@ -80,14 +86,15 @@ namespace WebGame
             }
         }
 
-        [ProtoMember(9)]
-        public int FrontShield { get; set; }
-        [ProtoMember(10)]
-        public int RearShield { get; set; }
-        [ProtoMember(11)]
-        public int LeftShield { get; set; }
-        [ProtoMember(12)]
-        public int RightShield { get; set; }
+        // shield set stored lower
+        //[ProtoMember(9)]
+        //public int FrontShield { get; set; }
+        //[ProtoMember(10)]
+        //public int RearShield { get; set; }
+        //[ProtoMember(11)]
+        //public int LeftShield { get; set; }
+        //[ProtoMember(12)]
+        //public int RightShield { get; set; }
         [ProtoMember(13)]
         public bool ShieldsEngaged { get; set; }
 
@@ -100,7 +107,7 @@ namespace WebGame
         public readonly List<string> RepairCrewTargets = new List<string>();
 
         private static TimeSpan timeToLoadProjectile = TimeSpan.FromSeconds(5);
-        public TimeSpan EffectiveTimeToLoadProjectile { get { return this.Effective(timeToLoadProjectile, "Projectile Tube"); }}
+        public TimeSpan EffectiveTimeToLoadProjectile { get { return this.Effective(timeToLoadProjectile, "Projectile Tube"); } }
 
         /// <summary>
         /// Angle Per Second
@@ -164,8 +171,21 @@ namespace WebGame
         [ProtoMember(22)]
         public int PhaserBanks { get; set; }
 
-        public Dictionary<int, DateTime> LastBeamBanksUsed = new Dictionary<int,DateTime>();
- 
+        [ProtoMember(23)]
+        public string Name { get; set; }
+
+        [ProtoMember(24)]
+        public List<Shield> Shields { get; set; }
+
+        private const int ShieldCount = 4;
+
+        private Shield DetermineShieldFrom(double orientation)
+        {
+            return Shields[(int)((orientation + Math.PI / 4).NormalizeOrientation() / (Math.PI / 2))];
+        }
+
+        public Dictionary<int, DateTime> LastBeamBanksUsed = new Dictionary<int, DateTime>();
+
         public override string Type { get { return "Ship"; } }
         public MissionStatus missionState = null;
 
@@ -215,7 +235,7 @@ namespace WebGame
                 case ShipType.Capital:
                     result = new Ship(3000, position) { MaxShields = 1000, Tubes = 5, RepairCrews = 3 };
                     result.BeamWeapons.Add(BeamType.StandardPhaser);
-                    result.BeamWeapons.Add(BeamType.ShieldDamper);
+                    result.BeamWeapons.Add(BeamType.ShieldDampener);
                     result.BeamWeapons.Add(BeamType.ShadowTether);
                     result.Projectiles[ProjectileType.Torpedo] = 10;
                     result.Projectiles[ProjectileType.Nuke] = 1;
@@ -270,6 +290,7 @@ namespace WebGame
         /// hp / second
         /// </summary>
         private const double repairRate = 1;
+        private const double energyPerRepair = 0.01;
 
         private void UpdateRepair(TimeSpan elapsed)
         {
@@ -278,7 +299,13 @@ namespace WebGame
                 var target = this.RepairCrewTargets[i];
                 if (target != null)
                 {
-                    this.parts[target] += repairRate * elapsed.TotalSeconds;
+                    var repairAmount = repairRate * elapsed.TotalSeconds;
+                    var repairEnergy = energyPerRepair * repairAmount;
+                    if (!this.SpendRawEnergy(repairEnergy))
+                    {
+                        break;
+                    }
+                    this.parts[target] += repairAmount;
                     if (this.parts[target] >= partsHp)
                     {
                         this.parts[target] = partsHp;
@@ -347,12 +374,12 @@ namespace WebGame
 
         private void UpdateShields(TimeSpan elapsed)
         {
-            // todo: make time dependant
             if (ShieldsEngaged)
             {
-                FrontShield++;
-                if (FrontShield > 100)
-                    FrontShield = 100;
+                foreach (var shield in this.Shields)
+                {
+                    shield.Update(elapsed, this);
+                }
             }
         }
 
@@ -380,11 +407,17 @@ namespace WebGame
             return remaining;
         }
 
-        public override double ApplyForce(TimeSpan elapsedTime)
+        public override double? ApplyForce(TimeSpan elapsedTime)
         {
             var intendedForce = this.ImpulsePercentage / 100 * MaximumForce;
-            this.LoseEnergyFrom(intendedForce, elapsedTime); // the idea here is that if their engines aren't working at full capacity, they'll still lose energy as if they were. They're punching it, and losing all that energy, but only the Effective force is output.
-            return Force;
+            if (this.LoseEnergyFrom(intendedForce, elapsedTime)) // the idea here is that if their engines aren't working at full capacity, they'll still lose energy as if they were. They're punching it, and losing all that energy, but only the Effective force is output.
+            {
+                return Force;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         private double Force
@@ -433,7 +466,7 @@ namespace WebGame
         {
             if (Players.Count > 0)
             {
-                var update = new UpdateToClient() { GameId = Game.Id, ShipId = Id, Energy = (int)this.Energy, FrontShield = this.FrontShield, RearShield = this.RearShield, LeftShield = this.LeftShield, RightShield = this.RightShield, ShieldsEngaged = this.ShieldsEngaged };
+                var update = new UpdateToClient() { GameId = Game.Id, ShipId = Id, Energy = (int)this.Energy, FrontShield = (int)Shields[0].Strength, RearShield = (int)Shields[2].Strength, LeftShield = (int)Shields[3].Strength, RightShield = (int)Shields[1].Strength, ShieldsEngaged = this.ShieldsEngaged };
                 foreach (var entity in StarSystem.Entites)
                 {
                     if (entity.Sounds.Count > 0)
@@ -542,30 +575,28 @@ namespace WebGame
                     {
                         target.Damage(100);
                         LastBeamBanksUsed[bank] = DateTime.UtcNow;
-                        UseRawEnergy(5);
+                        SpendRawEnergy(5);
                         PlaySound("FireStandardPhaser");
                     }
                     break;
                 case BeamType.HullPiercing:
-                    if (IsEntityCloserThan(target, 50) && Energy > 25 && BeamCoolDownTime(bank) > 4)
+                    if (IsEntityCloserThan(target, 50) && SpendRawEnergy(25) && BeamCoolDownTime(bank) > 4)
                     {
                         target.Damage(300);
                         LastBeamBanksUsed[bank] = DateTime.UtcNow;
-                        UseRawEnergy(25);
                         PlaySound("FireHullPiercing");
                     }
                     break;
                 case BeamType.SuppresionPulse:
-                    if (IsEntityCloserThan(target, 150) && Energy > 75 && BeamCoolDownTime(bank) > 10)
+                    if (IsEntityCloserThan(target, 150) && SpendRawEnergy(75) && BeamCoolDownTime(bank) > 10)
                     {
                         target.DamagePart(100, target.GetRandomWorkingPart());
                         LastBeamBanksUsed[bank] = DateTime.UtcNow;
-                        UseRawEnergy(25);
                         PlaySound("FireSuppresionPulse");
                     }
                     break;
                 case BeamType.PlasmaVent:
-                    if (Energy > 100 && BeamCoolDownTime(bank) > 60)
+                    if (SpendRawEnergy(100) && BeamCoolDownTime(bank) > 60)
                     {
                         foreach (var entity in StarSystem.Entites.ToArray()) // ToArray here to avoid threading issues. Lame I know.
                         {
@@ -574,12 +605,11 @@ namespace WebGame
                         }
 
                         LastBeamBanksUsed[bank] = DateTime.UtcNow;
-                        UseRawEnergy(100);
                         PlaySound("FirePlasmaVent");
                     }
                     break;
                 case BeamType.TractorBeam:
-                    if (IsEntityCloserThan(target, 200) && Energy > 75 && BeamCoolDownTime(bank) > 5)
+                    if (IsEntityCloserThan(target, 200) && SpendRawEnergy(75) && BeamCoolDownTime(bank) > 5)
                     {
                         //target..Velocity
                         var displacement = this.Position - target.Position;
@@ -588,13 +618,32 @@ namespace WebGame
                         target.ApplyEnergyForce(75, orientation);
 
                         LastBeamBanksUsed[bank] = DateTime.UtcNow;
-                        UseRawEnergy(25);
                         PlaySound("FireTractorBeam");
                     }
                     break;
             }
         }
 
-        public string Name { get; set; }
+        [ProtoContract]
+        public class Shield
+        {
+            [ProtoMember(1)]
+            public double Strength { get; set; }
+
+            /// <summary>
+            /// Shield per second
+            /// </summary>
+            public const double shieldRegenerationRate = 2;
+            public const double energyPerShield = 0.1;
+
+            public void Update(TimeSpan elapsedTime, Ship currentShip)
+            {
+                var shieldRegenrationAmount = elapsedTime.TotalSeconds * shieldRegenerationRate;
+                var energyCost = energyPerShield * shieldRegenrationAmount;
+                Strength += shieldRegenrationAmount;
+                currentShip.SpendRawEnergy(energyCost);
+            }
+        }
+
     }
 }
