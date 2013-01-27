@@ -38,7 +38,7 @@ namespace WebGame
             }
             set
             {
-                _desiredOrientation = value;
+                _desiredOrientation = value.NormalizeOrientation();
                 TargetSpeedMetersPerSecond = null; // setting orientation means "forget about what I said about 'all stop' or whatever other speed I said to try to get to"
             }
         }

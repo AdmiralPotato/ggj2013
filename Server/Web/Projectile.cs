@@ -18,7 +18,7 @@ namespace WebGame
         {
             get
             {
-                return 100;
+                return 1;
             }
         }
 
