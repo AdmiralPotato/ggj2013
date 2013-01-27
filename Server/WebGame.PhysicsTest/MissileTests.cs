@@ -9,7 +9,11 @@ namespace WebGame.PhysicsTest
         [TestMethod]
         public void MissileTowardTarget()
         {
-            var ship = new Ship();
+            var game = new Game();
+            var system = new StarSystem();
+            game.Add(system);
+            var ship = new Ship() { Tubes = 3 };
+            system.AddEntity(ship);
             ship.ImpulsePercentage = 100;
             ship.Update(TimeSpan.FromSeconds(0.25));
             ship.Update(TimeSpan.FromSeconds(0.25));
@@ -33,8 +37,9 @@ namespace WebGame.PhysicsTest
             game.Add(system);
             var enemy = new Ship();
             system.AddEntity(enemy);
-            var attacker = new Ship();
+            var attacker = new Ship() { Tubes = 3 };
             system.AddEntity(attacker);
+            game.Update(TimeSpan.FromSeconds(0.25));
             attacker.LoadProjectile(0, ProjectileType.Torpedo);
             enemy.ImpulsePercentage = 100;
             game.Update(TimeSpan.FromSeconds(0.25));
@@ -75,8 +80,9 @@ namespace WebGame.PhysicsTest
             game.Add(system);
             var enemy = new Ship();
             system.AddEntity(enemy);
-            var attacker = new Ship();
+            var attacker = new Ship() { Tubes = 3 };
             system.AddEntity(attacker);
+            game.Update(TimeSpan.FromSeconds(0.25));
             attacker.LoadProjectile(0, ProjectileType.Torpedo);
             enemy.ImpulsePercentage = 100;
             game.Update(TimeSpan.FromSeconds(0.25));
@@ -126,8 +132,9 @@ namespace WebGame.PhysicsTest
             var system = new StarSystem();
             system.RandomlySpawnEnemies = false;
             game.Add(system);
-            var ship = new Ship();
+            var ship = new Ship() { Tubes = 3 };
             system.AddEntity(ship);
+            game.Update(TimeSpan.FromSeconds(0.25));
             var projectile = ship.LaunchProjectile(0, ship);
             Assert.IsNull(projectile, "The projectile shouldn't have been launched if it hadn't been loaded.");
         }
@@ -139,8 +146,9 @@ namespace WebGame.PhysicsTest
             var system = new StarSystem();
             system.RandomlySpawnEnemies = false;
             game.Add(system);
-            var ship = new Ship();
+            var ship = new Ship() { Tubes = 3 };
             system.AddEntity(ship);
+            game.Update(TimeSpan.FromSeconds(0.25));
             ship.LoadProjectile(0, ProjectileType.Torpedo);
             var projectile = ship.LaunchProjectile(0, ship);
             Assert.IsNull(projectile, "The projectile shouldn't have been launched if there hasn't been enough time to load it.");
@@ -153,8 +161,9 @@ namespace WebGame.PhysicsTest
             var system = new StarSystem();
             system.RandomlySpawnEnemies = false;
             game.Add(system);
-            var ship = new Ship();
+            var ship = new Ship() { Tubes = 3 };
             system.AddEntity(ship);
+            game.Update(TimeSpan.FromSeconds(0.25));
             var loaded = ship.LoadProjectile(0, ProjectileType.Torpedo);
             Assert.IsTrue(loaded, "Couldn't load the first projectile");
             loaded = ship.LoadProjectile(0, ProjectileType.Torpedo);

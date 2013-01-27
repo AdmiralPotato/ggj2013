@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using ProtoBuf;
+using System.Collections.ObjectModel;
 
 namespace WebGame
 {
@@ -65,14 +66,14 @@ namespace WebGame
         [ProtoMember(5)]
         public MainView MainView { get; set; }
 
-        /// <summary>
-        /// How long ago the projectile was loaded
-        /// </summary>
-        [ProtoMember(6)]
-        public TimeSpan ProjectileLoadTime { get; private set; }
-
-        [ProtoMember(7)]
-        public ProjectileStatus ProjectileStatus { get; set; }
+        private Dictionary<int, Tube> _tubes = new Dictionary<int,Tube>();
+        private IDictionary<int, Tube> ProjectileTubes
+        {
+            get
+            {
+                return new ReadOnlyDictionary<int, Tube>(_tubes);
+            }
+        }
 
         [ProtoMember(9)]
         public int FrontShield { get; set; }
@@ -205,10 +206,10 @@ namespace WebGame
 
         public bool LoadProjectile(int tubeNumber, ProjectileType type)
         {
-            if (this.ProjectileStatus == ProjectileStatus.Unloaded)
+            if (this.ProjectileTubes[tubeNumber].ProjectileStatus == ProjectileStatus.Unloaded)
             {
-                this.ProjectileLoadTime = TimeSpan.Zero;
-                this.ProjectileStatus = ProjectileStatus.Loading;
+                this.ProjectileTubes[tubeNumber].ProjectileLoadTime = TimeSpan.Zero;
+                this.ProjectileTubes[tubeNumber].ProjectileStatus = ProjectileStatus.Loading;
                 PlaySound("MissileLoad");
                 return true;
             }
@@ -217,7 +218,7 @@ namespace WebGame
 
         public Projectile LaunchProjectile(int tubeNumber, Entity target)
         {
-            if (this.ProjectileStatus == ProjectileStatus.Loaded && this.StarSystem == target.StarSystem)
+            if (this.ProjectileTubes[tubeNumber].ProjectileStatus == ProjectileStatus.Loaded && this.StarSystem == target.StarSystem)
             {
                 var projectile = new Projectile();
                 projectile.Target = target;
@@ -306,13 +307,22 @@ namespace WebGame
 
         private void UpdateProjectileLoading(TimeSpan elapsed)
         {
-
-            if (this.ProjectileStatus == ProjectileStatus.Loading)
+            // make sure there's enough tubes
+            while (this.ProjectileTubes.Count < this.Tubes)
             {
-                this.ProjectileLoadTime += elapsed;
-                if (this.ProjectileLoadTime >= EffectiveTimeToLoadProjectile)
+                this._tubes[this.ProjectileTubes.Count] = new Tube();
+            }
+
+            foreach (var pair in this.ProjectileTubes)
+            {
+                var tube = pair.Value;
+                if (tube.ProjectileStatus == ProjectileStatus.Loading)
                 {
-                    this.ProjectileStatus = ProjectileStatus.Loaded;
+                    tube.ProjectileLoadTime += elapsed;
+                    if (tube.ProjectileLoadTime >= EffectiveTimeToLoadProjectile)
+                    {
+                        tube.ProjectileStatus = ProjectileStatus.Loaded;
+                    }
                 }
             }
         }
@@ -495,6 +505,11 @@ namespace WebGame
             }
             else
                 return Single.MaxValue;
+        }
+
+        private void BeamDamage(Entity target, double amount)
+        {
+            target.Damage((int)Effective(amount, "Beam Weapon Bank"));
         }
 
         internal void FireBeam(int bank, Entity target, BeamType type)
