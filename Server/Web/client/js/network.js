@@ -73,7 +73,7 @@ var customEventHandlerMap = {
                 // keep copy of station value
                 client.station = station;
             }
-            });
+        });
     }
 };
 var customEventHandler = function(event) {
