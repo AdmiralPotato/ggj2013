@@ -72,6 +72,23 @@ var enemies=[];
 
 var whatToDoWhenAllTheGeometriesAreParsedOkayYupSeriously = function(){
 
+
+	makeLaser();
+
+	update(); // start loop
+};
+
+var threeMakeEnemy(){
+	var mesh = new THREE.Mesh(geometryObjects.fishShip, geometryObjects.fishShip.matLib[0]);
+	mesh.position.set(50,0,0);
+	mesh.lookAt(player.position);
+	mesh.rotation.setY(mesh.rotation.y-(90*deg));
+	scene.add(mesh);
+	//enemies.push(mesh);
+	return mesh;
+}
+
+var threeMakeShip(){
 	var urls = [
 		'../models/starfield.png',
 		'../models/starfield.png',
@@ -101,7 +118,7 @@ var whatToDoWhenAllTheGeometriesAreParsedOkayYupSeriously = function(){
 	scene.add(newMesh);
 
 	newMesh = new THREE.Mesh(geometryObjects.spear, geometryObjects.spear.matLib[0]);
-	player = newMesh;
+	
 	scene.add(newMesh);
 
 	var directionalLightA = new THREE.DirectionalLight(0xffffff,2);
@@ -117,58 +134,21 @@ var whatToDoWhenAllTheGeometriesAreParsedOkayYupSeriously = function(){
 
 	camera.add(directionalLightPointedFromCamera);
 
+	//player = newMesh;
 
-	var mesh = new THREE.Mesh(geometryObjects.fishShip, geometryObjects.fishShip.matLib[0]);
-	mesh.position.set(50,0,0);
-	mesh.lookAt(player.position);
-	mesh.rotation.setY(mesh.rotation.y-(90*deg));
-	scene.add(mesh);
-	enemies.push(mesh);
-
-	var mesh = new THREE.Mesh(geometryObjects.fishShip, geometryObjects.fishShip.matLib[0]);
-	mesh.position.set(-50,0,0);
-	mesh.lookAt(player.position);
-	mesh.rotation.setY(mesh.rotation.y-(90*deg));
-	scene.add(mesh);
-	enemies.push(mesh);
-
-	var mesh = new THREE.Mesh(geometryObjects.fishShip, geometryObjects.fishShip.matLib[0]);
-	mesh.position.set(100,0,-50);
-	mesh.lookAt(player.position);
-	mesh.rotation.setY(mesh.rotation.y-(90*deg));
-	scene.add(mesh);
-	enemies.push(mesh);
-
-	var mesh = new THREE.Mesh(geometryObjects.fishShip, geometryObjects.fishShip.matLib[0]);
-	mesh.position.set(-50,0,150);
-	mesh.lookAt(player.position);
-	mesh.rotation.setY(mesh.rotation.y-(90*deg));
-	scene.add(mesh);
-	enemies.push(mesh);
-
-	var mesh = new THREE.Mesh(geometryObjects.fishShip, geometryObjects.fishShip.matLib[0]);
-	mesh.position.set(75,0,150);
-	mesh.lookAt(player.position);
-	mesh.rotation.setY(mesh.rotation.y-(90*deg));
-	scene.add(mesh);
-	enemies.push(mesh);
+	return newMesh;
+}
+var threeMakeStarbase(){
 
 	var mesh = new THREE.Mesh(geometryObjects.starbase, geometryObjects.starbase.matLib[0]);
 	mesh.position.set(0,0,150);
 	mesh.lookAt(player.position);
 	mesh.rotation.setY(mesh.rotation.y-(90*deg));
 	scene.add(mesh);
+	return mesh;
+}
 
-	var mesh = new THREE.Mesh(geometryObjects.starbase, geometryObjects.starbase.matLib[0]);
-	mesh.position.set(0,0,-200);
-	mesh.lookAt(player.position);
-	mesh.rotation.setY(mesh.rotation.y-(90*deg));
-	scene.add(mesh);
 
-	makeLaser();
-
-	update(); // start loop
-};
 var laser;
 var target;
 var makeLaser = function(){
