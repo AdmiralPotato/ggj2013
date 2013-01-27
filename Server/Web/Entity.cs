@@ -152,6 +152,24 @@ namespace WebGame
             return true;
         }
 
+        public string GetRandomWorkingPart()
+        {
+            var systemsThatCanBeDamaged = this.parts.Where((pair) => pair.Value > 0).ToArray();
+            var systemIndexToDamage = Utility.Random.Next(systemsThatCanBeDamaged.Length);
+            var systemToDamage = systemsThatCanBeDamaged[systemIndexToDamage];
+            return systemToDamage.Key;
+        }
+
+        public void DamagePart(int damage, string part)
+        {
+            parts[part] = Math.Max(parts[part] - damage, 0);
+
+            if (this.parts.Values.Sum() == 0)
+            {
+                this.Destroy();
+            }
+        }
+
         public void Damage(int damage)
         {
             while (damage > 0 && this.parts.Values.Sum() > 0)

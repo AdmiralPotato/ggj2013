@@ -510,6 +510,50 @@ namespace WebGame
                         target.Damage(100);
                         LastBeamBanksUsed[bank] = DateTime.UtcNow;
                         UseRawEnergy(5);
+                        PlaySound("FireStandardPhaser");
+                    }
+                    break;
+                case BeamType.HullPiercing:
+                    if (IsEntityCloserThan(target, 50) && Energy > 25 && BeamCoolDownTime(bank) > 4)
+                    {
+                        target.Damage(300);
+                        LastBeamBanksUsed[bank] = DateTime.UtcNow;
+                        UseRawEnergy(25);
+                        PlaySound("FireHullPiercing");
+                    }
+                    break;
+                case BeamType.SuppresionPulse:
+                    if (IsEntityCloserThan(target, 150) && Energy > 75 && BeamCoolDownTime(bank) > 10)
+                    {
+                        target.DamagePart(100, target.GetRandomWorkingPart());
+                        LastBeamBanksUsed[bank] = DateTime.UtcNow;
+                        UseRawEnergy(25);
+                        PlaySound("FireSuppresionPulse");
+                    }
+                    break;
+                case BeamType.PlasmaVent:
+                    if (Energy > 100 && BeamCoolDownTime(bank) > 60)
+                    {
+                        foreach (var entity in StarSystem.Entites.ToArray()) // ToArray here to avoid threading issues. Lame I know.
+                        {
+                            if (IsEntityCloserThan(entity, 50))
+                                target.Damage(250);
+                        }
+
+                        LastBeamBanksUsed[bank] = DateTime.UtcNow;
+                        UseRawEnergy(100);
+                        PlaySound("FirePlasmaVent");
+                    }
+                    break;
+                case BeamType.TractorBeam:
+                    if (IsEntityCloserThan(target, 200) && Energy > 75 && BeamCoolDownTime(bank) > 5)
+                    {
+                        //target..Velocity
+                        //(Position - target.Position).
+
+                        LastBeamBanksUsed[bank] = DateTime.UtcNow;
+                        UseRawEnergy(25);
+                        PlaySound("FireTractorBeam");
                     }
                     break;
             }
