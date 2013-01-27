@@ -208,7 +208,7 @@ var setEntityAsPlayer = function (entity) {
 };
 
 var setGameStateFromServer = function (data) {
-    if (data.GameId === gameId) {
+    if (!isLocal || data.GameId === gameId) {
         var entityDataIndex,
 			numEntities = data.Entities.length,
 			entityData,

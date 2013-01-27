@@ -41,8 +41,13 @@ gameHub.client.addMessage = function (sourceId, sourceName, message) {
 
 
 //------START UI event binding
-var sendMessage = function(messageName, messageValue) {
-    $.post(serverPath + currentGame + messageName, messageValue);
+var sendMessage = function (messageName, messageValue) {
+    if (isLocal) {
+        $.post(serverPath + currentGame + messageName, messageValue);
+    }
+    else {
+        $.post(messageName, messageValue);
+    }
 };
 var sendMessageClickHandler = function (event) {
     var element = event.currentTarget,
