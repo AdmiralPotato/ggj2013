@@ -2,7 +2,19 @@
 <html>
 <head>
 <title>Global Game Jam 2013</title>
-<style></style>
+<style>
+	*{
+		margin: 0;
+		padding: 0;
+		border: 0;
+		outline: 0;
+	}
+	canvas{
+		position: fixed;
+		top: 0;
+		left: 0;
+	}
+</style>
 </head>
 <body>
 <script type = "text/javascript" src = "https://raw.github.com/mrdoob/three.js/master/build/three.js">
@@ -10,11 +22,11 @@
 <script>
 
 	window.requestAnimFrame = (function(){
-		return  window.requestAnimationFrame       || 
-			window.webkitRequestAnimationFrame || 
-			window.mozRequestAnimationFrame    || 
-			window.oRequestAnimationFrame      || 
-			window.msRequestAnimationFrame     || 
+		return  window.requestAnimationFrame       ||
+			window.webkitRequestAnimationFrame ||
+			window.mozRequestAnimationFrame    ||
+			window.oRequestAnimationFrame      ||
+			window.msRequestAnimationFrame     ||
 			function( callback ){
 				window.setTimeout(callback, 1000 / 60);
 			};
@@ -22,7 +34,7 @@
 
 	var width = window.innerWidth;
 	var height = window.innerHeight;
-	
+
 	var scene = new THREE.Scene();
 	var camera = new THREE.PerspectiveCamera(50, width/height, 0.1, 1000);
 	scene.add(camera);
@@ -30,18 +42,18 @@
 	rend = new THREE.WebGLRenderer( { clearColor: 0x020202, clearAlpha: 1, antialias: true } );
 	rend.setSize(width, height);
 	document.body.appendChild(rend.domElement);
-	
+
 	var geometryObjects = {};
 	var parseAllGeometry = function(_geoPath, _callback) {
 		var propertyName, modelData, modelCount = 0, modelsLoaded = 0;
-		
+
 		for(propertyName in _geoPath){
 			if(_geoPath.hasOwnProperty(propertyName)){
-				
+
 				modelCount += 1;
 				modelData = _geoPath[propertyName];
-				
-				
+
+
 				function createMesh(_propertyName){
 					var meshCreationHandler = function(_geometry, _materials) {
 						_geometry.computeTangents();
@@ -49,9 +61,9 @@
 						geometryObjects[_propertyName] = _geometry;
 
 						modelsLoaded += 1;
-					
+
 						console.log(_propertyName+":"+modelsLoaded+":"+modelCount);
-					
+
 						if(modelsLoaded === modelCount){
 							_callback();
 						}
@@ -68,21 +80,30 @@
 		fishShipMesh = new THREE.Mesh(geometryObjects.fishShip, geometryObjects.fishShip.matLib[0]);
 		scene.add(fishShipMesh);
 
-		var tmpMesh = new THREE.Mesh(geometryObjects.spear, geometryObjects.spear.matLib[0]);
-		tmpMesh.position.z = -20;
-		scene.add(tmpMesh);
+		var spearMesh = new THREE.Mesh(geometryObjects.spear, geometryObjects.spear.matLib[0]);
+		spearMesh.position.z = -20;
+		scene.add(spearMesh);
 
-		var tmpMesh = new THREE.Mesh(geometryObjects.starbase, geometryObjects.starbase.matLib[0]);
-		tmpMesh.position.x = -50;
-		scene.add(tmpMesh);
+		var starbaseMesh = new THREE.Mesh(geometryObjects.starbase, geometryObjects.starbase.matLib[0]);
+		starbaseMesh.position.x = -50;
+		scene.add(starbaseMesh);
 
+
+		var directionalLightA = new THREE.DirectionalLight(0xffffff,2);
+		directionalLightA.position.set( 0, -1, 0 );
+		fishShipMesh.add(directionalLightA);
+
+		var directionalLightB = new THREE.DirectionalLight(0xffffff,1.5);
+		directionalLightB.position.set( 0, 1, 0 );
+		fishShipMesh.add(directionalLightB);
+
+		var directionalLightPointedFromCamera = new THREE.DirectionalLight(0xffffff, 0.5);
+		directionalLightPointedFromCamera.position.set( -1, 0, 0 );
+		camera.add(directionalLightPointedFromCamera);
 		render();
 	};
-	var light = new THREE.PointLight(0xffffff,1.5);
-	light.position.y=1000;
-	scene.add(light);
-	
-	
+
+
 	parseAllGeometry(
 		{
 			'fishShip': "../models/FishShip.json",
@@ -99,29 +120,23 @@
 			width = window.innerWidth;
 			height = window.innerHeight;
 			camera.aspect = width/height;
-			camera.updateProjectionMatrix()
+			camera.updateProjectionMatrix();
 			rend.setSize(width, height);
 		}
 
 		fishShipMesh.rotation.setY(fishShipMesh.rotation.y+(deg*.125));
-		camera.position = distanceElevationHeading(30, 15, rad2Deg(fishShipMesh.rotation.y)-90);
+		camera.position = distanceElevationHeading(30, 15 * deg, fishShipMesh.rotation.y);
 
 		camera.lookAt(new THREE.Vector3(0,0,0));
 
 		rend.render(scene, camera);
-	}
+	};
 	var distanceElevationHeading = function (_distance, _elevation, _heading){
-		var radH = deg2Rad(_heading-90);
-		var radE = deg2Rad(_elevation);
+		var radH = _heading + Math.PI;
+		var radE = _elevation;
 		var a = _distance * Math.cos(radE);
-		return new THREE.Vector3(a*Math.cos(radH), _distance*Math.sin(radE), -a*Math.sin(radH));
-	}
-	var deg2Rad = function(_deg){
-		return (_deg/180)*Math.PI;
-	}
-	var rad2Deg = function(_rad){
-		return (_rad*180)/Math.PI;
-	}
+		return new THREE.Vector3(a * Math.cos(radH), _distance * Math.sin(radE), -a * Math.sin(radH));
+	};
 
 /*
 // common material parameters

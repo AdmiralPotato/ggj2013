@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
@@ -435,7 +435,8 @@ namespace WebGame
                 if (player.Ship != null)
                 {
                     GameHub.Say(this, player.Ship, player.Name + " disconnected.");
-                    player.Ship.RemovePlayer(player);
+                    if (player.Ship != null)
+                        player.Ship.RemovePlayer(player);
                 }
 
                 if (GetActivePlayerCount() <= 0)
@@ -462,9 +463,12 @@ namespace WebGame
         {
             if (!DefaultShips.ContainsKey(defaultShipNumber))
             {
-                var defaultShip = new Ship() { DefaultShipNumber = defaultShipNumber, DesiredOrientation = 1 };
+                var defaultShip = Ship.Create(ShipType.Spearhead);
+                defaultShip.DefaultShipNumber = defaultShipNumber;
+                defaultShip.DesiredOrientation = 1;
                 DefaultShips[defaultShipNumber] = defaultShip;
                 StarSystems[0].AddEntity(defaultShip);
+                defaultShip.SetupMissions();  // must come after being added to starSystem
             }
 
             return DefaultShips[defaultShipNumber];

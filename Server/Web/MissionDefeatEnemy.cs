@@ -8,18 +8,18 @@ namespace WebGame
     class MissionDefeatEnemy : Mission
     {
         int enemyId;
+        StarSystem starSystem;
 
-        public MissionDefeatEnemy(int initEnemyId, string initMissionText)
+        public MissionDefeatEnemy(StarSystem initStarSys, int initEnemyId, string initMissionText)
             : base(MissionType.MISSION_TYPE_DEFEAT_ENEMY, initMissionText)
         {
+            starSystem = initStarSys;
             enemyId = initEnemyId;
         }
         
         public override bool IsComplete()
         {
-            //if (Enemies[enemyId].isDefeated())
-            //    return true;
-            return false;
+            return (starSystem.GetEntity(enemyId) == null);
         }
     }
 }
