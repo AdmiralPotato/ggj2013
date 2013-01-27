@@ -57,6 +57,7 @@ client.entityTypes.Ship = function(args){
 	if(t.type !== type){throw type + ' constructor must be invoked using the `new` keyword.';}
 	args = args || {};
 	n.blessWith3DBase(t,args);
+	t.scale = [10,10,10];
 	deltaInit(t);
 	s.add(t);
 	return t;
@@ -64,8 +65,8 @@ client.entityTypes.Ship = function(args){
 
 client.entityTypes.Ship.prototype = {
 	type: 'Ship',
-	color: '#0f0',
-	shape: wireframes.simpleShip,
+	color: '#ff0',
+	shape: wireframes.spear,
 	update: function() {
 		var t = this;
 		deltaInterpolate(t);
@@ -79,20 +80,46 @@ client.entityTypes.Ship.prototype = {
 
 
 client.entityTypes.Starbase = function(args){
-	var t = this, type = 'StarBase';
+	var t = this, type = 'Starbase';
 	if(t.type !== type){throw type + ' constructor must be invoked using the `new` keyword.';}
 	args = args || {};
 	n.blessWith3DBase(t,args);
-	t.scale = [100,100,100];
+	t.scale = [10,10,10];
 	deltaInit(t);
 	s.add(t);
 	return t;
 };
 
 client.entityTypes.Starbase.prototype = {
-	type: 'StarBase',
-	color: '#0f0',
+	type: 'Starbase',
+	color: '#00f',
 	shape: wireframes.starBase,
+	update: function() {
+		var t = this;
+		deltaInterpolate(t);
+		t.render();
+	},
+	updateFromData: function(entityData){
+		var t = this;
+		deltaUpdate(t, entityData);
+	}
+};
+
+client.entityTypes.Enemy = function(args){
+	var t = this, type = 'StarBase';
+	if(t.type !== type){throw type + ' constructor must be invoked using the `new` keyword.';}
+	args = args || {};
+	n.blessWith3DBase(t,args);
+	t.scale = [10,10,10];
+	deltaInit(t);
+	s.add(t);
+	return t;
+};
+
+client.entityTypes.Enemy.prototype = {
+	type: 'StarBase',
+	color: '#f00',
+	shape: wireframes.fishShip,
 	update: function() {
 		var t = this;
 		deltaInterpolate(t);
@@ -121,6 +148,10 @@ var setGameStateFromServer = function(data) {
 		entity = client.entityList[entityIdString];
 		if(entity === undefined){
 			entity = client.entityList[entityIdString] = new client.entityTypes[entityData.Type]();
+			console.log(entityData.Id === data.ShipId, entity.Id, data.ShipId);
+			if(entityData.Id === data.ShipId){
+				entity.color = '#0f0';
+			}
 		}
 		entity.updateFromData(entityData);
 	}
