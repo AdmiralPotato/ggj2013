@@ -6,7 +6,7 @@ var n = NPos3d,
 		entityMap: {},
 		ui: [],
 		entityTypes: {},
-		gameId: 705865
+		gameId: 705835
 	},
 	playerEntity;
 var timeSinceLastFrame = 0;
