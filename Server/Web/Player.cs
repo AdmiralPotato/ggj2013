@@ -31,6 +31,7 @@ namespace WebGame
         public Station Station;
         public string SessionId;
         public Game Game;
+        public Ship Ship;
 
         public bool IsEliminated
         {

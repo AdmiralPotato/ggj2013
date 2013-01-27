@@ -72,6 +72,9 @@ namespace WebGame
         [ProtoMember(13)]
         public bool ShieldsEngaged { get; set; }
 
+        [ProtoMember(14)]
+        public int DefaultShipNumber { get; set; }
+
         private static TimeSpan timeToLoadProjectile = TimeSpan.FromSeconds(5);
 
         public TimeSpan EffectiveTimeToLoadProjectile
@@ -246,13 +249,20 @@ namespace WebGame
         public void AddPlayer(Player player)
         {
             if (!Players.Contains(player))
+            {
                 Players.Add(player);
+                player.Ship = this;
+            }
         }
 
         public void RemovePlayer(Player player)
         {
             if (Players.Contains(player))
+            {
                 Players.Remove(player);
+                if (player.Ship == this)
+                    player.Ship = null;
+            }
         }
 
         internal void SendUpdate()
