@@ -22,11 +22,18 @@ rend.setSize(width, height);
 document.body.appendChild(rend.domElement);
 
 function stopRender(){
-	document.body.removeChild(rend.domElement);
+	if (animRequest) {
+       window.cancelAnimationFrame(animRequest);
+       animRequest = undefined;
+    }
+    document.body.removeChild(rend.domElement);
 }
 
 function startRender(){
 	document.body.appendChild(rend.domElement);
+	if (!animRequest) {
+       update();
+    }
 }
 
 console.log(rend);
@@ -163,10 +170,10 @@ var timer = 0.0;
 
 var client = client || {paused:false};
 var timesRun = 0;
+var animRequest;
 var update = function(){
 	
-
-	requestAnimFrame(update);
+	animRequest = requestAnimFrame(update);
 	var now = Date.now()/1000; // get current time
 	var dt = ((now-last) > .2) ? .2 : now-last; // calculate time between frames
 	last = now; // save new time
