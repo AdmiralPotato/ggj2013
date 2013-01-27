@@ -36,10 +36,11 @@
 	var height = window.innerHeight;
 
 	var scene = new THREE.Scene();
-	var camera = new THREE.PerspectiveCamera(50, width/height, 0.1, 1000);
+	var camera = new THREE.PerspectiveCamera(50, width/height, 0.1, 10000);
 	scene.add(camera);
 	//var rend = new THREE.WebGLRenderer();
-	rend = new THREE.WebGLRenderer( { clearColor: 0x020202, clearAlpha: 1, antialias: true } );
+	rend = new THREE.WebGLRenderer( { /*clearColor: 0x1F94C2, clearAlpha: 1, */antialias: true } );
+	rend.autoClear = false;
 	rend.setSize(width, height);
 	document.body.appendChild(rend.domElement);
 
@@ -105,22 +106,69 @@
 	var enemies = [];
 	var weapons = [];
 	var player;
-
+	var starBox1;
+	var starBox2;
+	var starBox3;
 	var whatToDoWhenAllTheGeometriesAreParsedOkayYupSeriously = function(){
 		document.addEventListener("keydown", onKeyDown, false);
 		document.addEventListener("keyup", onKeyUp, false);
 
+		// urls of the images,
+		// one per half axis
+		var urls = [
+			'../models/starfield.png',
+			'../models/starfield.png',
+			'../models/starfield.png',
+			'../models/starfield.png',
+			'../models/starfield.png',
+			'../models/starfield.png'
+    	];
 
-		var newMesh = new THREE.Mesh(geometryObjects.fishShip, geometryObjects.fishShip.matLib[0]);
+    	// wrap it up into the
+   	 	// object that we need
+    	var cubemap = THREE.ImageUtils.loadTextureCube(urls);
+
+		// set the format, likely RGB
+		// unless you've gone crazy
+		cubemap.format = THREE.RGBFormat;
+
+		var shader = THREE.ShaderLib["cube"];
+		shader.uniforms["tCube"].value = cubemap;
+
+		var material = new THREE.ShaderMaterial( {
+ 
+          fragmentShader: shader.fragmentShader,
+          vertexShader: shader.vertexShader,
+          uniforms: shader.uniforms,
+          depthWrite: false,
+ 			side:THREE.BackSide
+        });
+
+		var newMesh = new THREE.Mesh(new THREE.CubeGeometry(500, 500, 500, 5, 5, 5),
+			material);
+
+		newMesh.flipSided = true;
+
+
+		scene.add(newMesh);
+
+
+		newMesh = new THREE.Mesh(geometryObjects.spear, geometryObjects.spear.matLib[0]);
+		player = newMesh;
+		scene.add(newMesh);
+
+		
+
+		newMesh = new THREE.Mesh(geometryObjects.fishShip, geometryObjects.fishShip.matLib[0]);
 		enemies.push(newMesh);
-		newMesh.position.z = -10;
+		newMesh.position.z = -50;
 		newMesh.position.x = -10;
 		scene.add(newMesh);
 
 		newMesh = new THREE.Mesh(geometryObjects.fishShip, geometryObjects.fishShip.matLib[0]);
 		enemies.push(newMesh);
 		newMesh.position.z = 10;
-		newMesh.position.x = -10;
+		newMesh.position.x = -90;
 		scene.add(newMesh);
 
 		newMesh = new THREE.Mesh(geometryObjects.fishShip, geometryObjects.fishShip.matLib[0]);
@@ -131,13 +179,11 @@
 
 		newMesh = new THREE.Mesh(geometryObjects.fishShip, geometryObjects.fishShip.matLib[0]);
 		enemies.push(newMesh);
-		newMesh.position.z = 10;
-		newMesh.position.x = 0;
+		newMesh.position.z = 5;
+		newMesh.position.x = 190;
 		scene.add(newMesh);
 
-		newMesh = new THREE.Mesh(geometryObjects.spear, geometryObjects.spear.matLib[0]);
-		player = newMesh;
-		scene.add(newMesh);
+		
 
 		/*newMesh = new THREE.Mesh(geometryObjects.starbase, geometryObjects.starbase.matLib[0]);
 		newMesh.position.x = -70;
@@ -150,7 +196,6 @@
 		newMesh.position.z = -30;
 		enemies.push(newMesh);
 		scene.add(newMesh);*/
-
 
 		var directionalLightA = new THREE.DirectionalLight(0xffffff,2);
 		directionalLightA.position.set( 0, -1, 0 );
@@ -169,51 +214,35 @@
 
 	function makeLaser(_source, _target){
 		_target = _target || enemies[/*Math.floor(Math.random() * enemies.length)*/3];
-		console.log("target");
-		console.log(_target);
-
-		var distance = _source.position.distanceTo(_target.position);
-		console.log("distance");
-		console.log(distance);
-		var pMaterial = new THREE.ParticleBasicMaterial({
-    		color: 0xFFFFFF,
-    		size: 20,
-			map: THREE.ImageUtils.loadTexture(
-      			"particle.png"
-    		),
-   			blending: THREE.AdditiveBlending,
-   			transparent: true});
 
 		var newLaser = new THREE.Mesh(
-			new THREE.PlaneGeometry(distance , 2, 1, 1),
-			new THREE.MeshBasicMaterial({color: 0x0000ff})
-			);
-		
+			geometryObjects.laser,
+			geometryObjects.laser.matLib[0]);
 
-		//newLaser.lookAt(_target.position);
-		//var radRot = newLaser.rotation.y;
-		//newLaser.rotation = new THREE.Vector3(0,0,0);
-		//newLaser.rotation.setX(-(90*deg));
-		//newLaser.rotation.setZ(radRot);
+		/** start laser update loop **/
+		var distance = _source.position.distanceTo(_target.position);
+		newLaser.scale.x = distance*0.5;
+		newLaser.position = _source.position;
 
-		var newRot = Math.atan2(_target.position.z - _source.position.z,
-			_target.position.x - _source.position.x) + (Math.PI*.5) ;
-		newLaser.rotation.setX(-(90*deg));
-		newLaser.rotation.setZ(newRot);
+		var newRot = Math.atan2(_target.position.x - _source.position.x, 
+			_target.position.z - _source.position.z);
 
-		newLaser.position.x = _source.position.x - (Math.cos(newRot)*distance*.5);
-		newLaser.position.z = _source.position.z + (Math.sin(newRot)*distance*.5);
-		//console.log(radRot);
-		//console.log(newRot+Math.PI*.5);
+		newLaser.rotation.setY(newRot-(90*deg));
+		/** end laser update loop **/
 
 		scene.add(newLaser);
+		return newLaser;
 	}
 
+	var updateLaser = function(){
+
+	}
 
 
 	parseAllGeometry(
 		{
-			/*'missile': "../models.Missile.json",*/
+			/*'starCube': "../models/StarCube.json",*/
+			'laser': "../models/Laser.json",
 			'fishShip': "../models/FishShip.json",
 			'spear': "../models/Spear.json",
 			'starbase': "../models/Starbase.json",
@@ -243,8 +272,8 @@
 		Add Update Stuff BELOW Here
 		****/
 			// use dt for frame rate independent speed
-			//player.rotation.setY(player.rotation.y+(dt*.1));
-			camera.position = distanceElevationHeading(50, 60 * deg, 0/*player.rotation.y*/);
+			player.rotation.setY(player.rotation.y+(dt*.1));
+			camera.position = distanceElevationHeading(50, 15 * deg, player.rotation.y);
 			camera.lookAt(player.position);
 
 			var i = updateObjects.length;
@@ -308,7 +337,7 @@
 		var a = _distance * Math.cos(radE);
 		return new THREE.Vector3(a * Math.cos(radH), _distance * Math.sin(radE), -a * Math.sin(radH));
 	};
-
+/*
 // create the particle variables
 var particleCount = 500,
     particles = new THREE.Geometry(),
@@ -350,7 +379,7 @@ var particleSystem =
     pMaterial);
 particleSystem.sortParticles = true;
 // add it to the scene
-scene.add(particleSystem);
+scene.add(particleSystem);*/
 
 
 </script>
