@@ -23,7 +23,6 @@ document.body.appendChild(rend.domElement);
 
 function stopRender(){
 	if (animRequest) {
-		console.log("stopping render");
        window.cancelAnimationFrame(animRequest);
        animRequest = undefined;
        document.body.removeChild(rend.domElement);
@@ -32,7 +31,6 @@ function stopRender(){
 
 function startRender(){
 	if (!animRequest) {
-		console.log("starting rendering");
 		document.body.removeChild(rend.domElement);
        update();
     }
@@ -70,6 +68,7 @@ var parseAllGeometry = function(_geoPath, _callback) {
 };
 
 var player;
+var enemies=[];
 
 var whatToDoWhenAllTheGeometriesAreParsedOkayYupSeriously = function(){
 
@@ -115,40 +114,92 @@ var whatToDoWhenAllTheGeometriesAreParsedOkayYupSeriously = function(){
 
 	var directionalLightPointedFromCamera = new THREE.DirectionalLight(0xffffff, 0.5);
 	directionalLightPointedFromCamera.position.set( -1, 0, 0 );
+
 	camera.add(directionalLightPointedFromCamera);
+
+
+	var mesh = new THREE.Mesh(geometryObjects.fishShip, geometryObjects.fishShip.matLib[0]);
+	mesh.position.set(50,0,0);
+	mesh.lookAt(player.position);
+	mesh.rotation.setY(mesh.rotation.y-(90*deg));
+	scene.add(mesh);
+	enemies.push(mesh);
+
+	var mesh = new THREE.Mesh(geometryObjects.fishShip, geometryObjects.fishShip.matLib[0]);
+	mesh.position.set(-50,0,0);
+	mesh.lookAt(player.position);
+	mesh.rotation.setY(mesh.rotation.y-(90*deg));
+	scene.add(mesh);
+	enemies.push(mesh);
+
+	var mesh = new THREE.Mesh(geometryObjects.fishShip, geometryObjects.fishShip.matLib[0]);
+	mesh.position.set(100,0,-50);
+	mesh.lookAt(player.position);
+	mesh.rotation.setY(mesh.rotation.y-(90*deg));
+	scene.add(mesh);
+	enemies.push(mesh);
+
+	var mesh = new THREE.Mesh(geometryObjects.fishShip, geometryObjects.fishShip.matLib[0]);
+	mesh.position.set(-50,0,150);
+	mesh.lookAt(player.position);
+	mesh.rotation.setY(mesh.rotation.y-(90*deg));
+	scene.add(mesh);
+	enemies.push(mesh);
+
+	var mesh = new THREE.Mesh(geometryObjects.fishShip, geometryObjects.fishShip.matLib[0]);
+	mesh.position.set(75,0,150);
+	mesh.lookAt(player.position);
+	mesh.rotation.setY(mesh.rotation.y-(90*deg));
+	scene.add(mesh);
+	enemies.push(mesh);
+
+	var mesh = new THREE.Mesh(geometryObjects.starbase, geometryObjects.starbase.matLib[0]);
+	mesh.position.set(0,0,150);
+	mesh.lookAt(player.position);
+	mesh.rotation.setY(mesh.rotation.y-(90*deg));
+	scene.add(mesh);
+
+	var mesh = new THREE.Mesh(geometryObjects.starbase, geometryObjects.starbase.matLib[0]);
+	mesh.position.set(0,0,-200);
+	mesh.lookAt(player.position);
+	mesh.rotation.setY(mesh.rotation.y-(90*deg));
+	scene.add(mesh);
+
+	makeLaser();
 
 	update(); // start loop
 };
+var laser;
+var target;
+var makeLaser = function(){
+	target = enemies[Math.floor(Math.random()*enemies.length)];
 
-var makeLaser = function(_source, _target){
-	_target = _target || enemies[3];
-
-	var newLaser = new THREE.Mesh(
+	laser = new THREE.Mesh(
 		geometryObjects.laser,
 		geometryObjects.laser.matLib[0]);
 
-	var distance = _source.position.distanceTo(_target.position);
-	newLaser.scale.x = distance*0.5;
-	newLaser.position = _source.position;
+	var distance = player.position.distanceTo(target.position);
+	laser.scale.x = distance*0.5;
+	laser.position = player.position;
 
-	var newRot = Math.atan2(_target.position.x - _source.position.x, 
-		_target.position.z - _source.position.z);
+	var newRot = Math.atan2(target.position.x - player.position.x, 
+		target.position.z - player.position.z);
 
-	newLaser.rotation.setY(newRot-(90*deg));
+	laser .rotation.setY(newRot-(90*deg));
 
-	scene.add(newLaser);
-	return newLaser;
+	scene.add(laser );
+	return laser;
 };
 
-var updateLaser = function(_laser, _source, _target){
-	var distance = _source.position.distanceTo(_target.position);
-	_laser.scale.x = distance*0.5;
-	_laser.position = _source.position;
+var updateLaser = function(){
+	var distance = player.position.distanceTo(target.position);
+	laser.scale.x = distance*0.5;
+	laser.position = player.position;
 
-	var newRot = Math.atan2(_target.position.x - _source.position.x, 
-		_target.position.z - _source.position.z);
+	var newRot = Math.atan2(target.position.x - player.position.x, 
+		target.position.z - player.position.z);
 
-	_laser.rotation.setY(newRot-(90*deg));
+	laser.rotation.setY(newRot-(90*deg));
 }
 
 parseAllGeometry(
@@ -169,6 +220,8 @@ var timer = 0.0;
 
 var client = client || {paused:false};
 var animRequest;
+var lastLaser = 0.0;
+var timeToSwitch = 3.0;
 var update = function(){
 	animRequest = requestAnimationFrame(update);
 
@@ -178,7 +231,19 @@ var update = function(){
 	//if(client.paused == false){ // main 'update' loop
 		timer += dt;
 
-		//player.rotation.setY(player.rotation.y+(dt*.1));
+		player.rotation.setY(player.rotation.y+(dt*.1));
+
+		particleSystem.rotation.setY(player.rotation.y*.5);
+
+		if(timer > timeToSwitch){
+			timeToSwitch = timer+(Math.random()*3);
+			var newRnd = Math.floor(Math.random()*enemies.length);
+			while(enemies[newRnd] == target){
+				newRnd = Math.floor(Math.random()*enemies.length);
+			}
+			target = enemies[newRnd];
+		}
+		updateLaser();
 
 		/*
 		iterate though list of objects and position
@@ -213,3 +278,46 @@ var distanceElevationHeading = function (_distance, _elevation, _heading){
 	var a = _distance * Math.cos(radE);
 	return new THREE.Vector3(a * Math.cos(radH), _distance * Math.sin(radE), -a * Math.sin(radH));
 };
+
+// create the particle variables
+var particleCount = 750,
+    particles = new THREE.Geometry(),
+ 	pMaterial = new THREE.ParticleBasicMaterial({
+    	color: 0xFFFFFF,
+    	size: 10,
+		map: THREE.ImageUtils.loadTexture(
+      	"particle.png"
+    ),
+    blending: THREE.AdditiveBlending,
+    transparent: true
+  });
+
+// now create the individual particles
+for(var p = 0; p < particleCount; p++) {
+
+  // create a particle with random
+  // position values, -250 -> 250
+  var pX = Math.random() * 1000 - 500,
+      pY = Math.random() * 1000 - 500,
+      pZ = Math.random() * 1000 - 500,
+      particle = new THREE.Vertex(
+        new THREE.Vector3(pX, pY, pZ)
+      );
+      // create a velocity vector
+	particle.velocity = new THREE.Vector3(
+		0,              // x
+		-Math.random(), // y: random vel
+		0);
+	// add it to the geometry
+  	particles.vertices.push(particle);
+}
+
+
+// create the particle system
+var particleSystem =
+  new THREE.ParticleSystem(
+    particles,
+    pMaterial);
+particleSystem.sortParticles = true;
+// add it to the scene
+scene.add(particleSystem);
