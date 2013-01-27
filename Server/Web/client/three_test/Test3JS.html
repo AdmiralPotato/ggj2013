@@ -73,27 +73,65 @@
 			}
 		}
 	}
-	var fishShipMesh;
+	var keys = {};
+
+	var keyHandlers = {
+		"32down": function(){
+			paused = !paused;
+		}
+	};
+	var onKeyDown=function(e){
+		e=(e||window.event);
+		//if(e.preventDefault){e.preventDefault();}
+		var kc = /*String.fromCharCode(*/(e.keyCode||e.which)/*)*/;
+		if(null == keys[kc]){
+			keys[kc] = true;
+			if(keyHandlers[kc+"down"]){
+				keyHandlers[kc+"down"]();
+			}
+		}
+	}
+	var onKeyUp=function(e){
+		e=(e||window.event);
+		//if(e.preventDefault){e.preventDefault();}
+		var kc = /*String.fromCharCode(*/(e.keyCode||e.which)/*)*/;
+		if(true == keys[kc]){
+			delete keys[kc];
+			if(keyHandlers[kc+"up"]){
+				keyHandlers[kc+"up"]();
+			}
+		}
+	}
+
+	var meshObjects = {};
+
 	var whatToDoWhenAllTheGeometriesAreParsedOkayYupSeriously = function(){
-		fishShipMesh = new THREE.Mesh(geometryObjects.fishShip, geometryObjects.fishShip.matLib[0]);
-		scene.add(fishShipMesh);
+		document.addEventListener("keydown", onKeyDown, false);
+		document.addEventListener("keyup", onKeyUp, false);
 
-		var spearMesh = new THREE.Mesh(geometryObjects.spear, geometryObjects.spear.matLib[0]);
-		spearMesh.position.z = -20;
-		scene.add(spearMesh);
 
-		var starbaseMesh = new THREE.Mesh(geometryObjects.starbase, geometryObjects.starbase.matLib[0]);
-		starbaseMesh.position.x = -50;
-		scene.add(starbaseMesh);
+		var newMesh = new THREE.Mesh(geometryObjects.fishShip, geometryObjects.fishShip.matLib[0]);
+		meshObjects['fish'] = newMesh;
+		scene.add(newMesh);
+
+		newMesh = new THREE.Mesh(geometryObjects.spear, geometryObjects.spear.matLib[0]);
+		newMesh.position.z = -20;
+		meshObjects['spear'] = newMesh;
+		scene.add(newMesh);
+
+		newMesh = new THREE.Mesh(geometryObjects.starbase, geometryObjects.starbase.matLib[0]);
+		newMesh.position.x = -50;
+		meshObjects['starbase'] = newMesh;
+		scene.add(newMesh);
 
 
 		var directionalLightA = new THREE.DirectionalLight(0xffffff,2);
 		directionalLightA.position.set( 0, -1, 0 );
-		fishShipMesh.add(directionalLightA);
+		meshObjects['fish'].add(directionalLightA);
 
 		var directionalLightB = new THREE.DirectionalLight(0xffffff,1.5);
 		directionalLightB.position.set( 0, 1, 0 );
-		fishShipMesh.add(directionalLightB);
+		meshObjects['fish'].add(directionalLightB);
 
 		var directionalLightPointedFromCamera = new THREE.DirectionalLight(0xffffff, 0.5);
 		directionalLightPointedFromCamera.position.set( -1, 0, 0 );
@@ -101,6 +139,9 @@
 		update();
 	};
 
+	var fireLaser = function(){
+
+	}
 
 	parseAllGeometry(
 		{
@@ -123,12 +164,49 @@
 		var dt = ((now-last) > .2) ? .2 : now-last; // calculate time between frames
 		last = now; // save new time
 		if(paused == false){ // main 'update' loop
+		/****
+		Add Update Stuff BELOW Here
+		****/
 			// use dt for frame rate independent speed
-			fishShipMesh.rotation.setY(fishShipMesh.rotation.y+(dt*.1));
-			camera.position = distanceElevationHeading(30, 15 * deg, fishShipMesh.rotation.y);
-			camera.lookAt(fishShipMesh.position);
+			meshObjects['fish'].rotation.setY(meshObjects['fish'] .rotation.y+(dt*.1));
+			camera.position = distanceElevationHeading(30, 15 * deg, meshObjects['fish'] .rotation.y);
+			camera.lookAt(meshObjects['fish'] .position);
+			
+			/*var pCount = particleCount;
+  			while(pCount--) {
 
+    			// get the particle
+    			var particle =
+      				particles.vertices[pCount];
+      		console.log(pCount);
+      		console.log(particles.vertices[pCount]);
+	  
+    			// check if we need to reset
+    			if(particle.position.y < -200) {
+      				particle.position.y = 200;
+      				particle.velocity.y = 0;
+    			}
+
+    			// update the velocity with
+    			// a splat of randomniz
+    			particle.velocity.y -=
+      				Math.random() * .1;
+
+    			// and the position
+    			particle.position.addSelf(
+      			particle.velocity);
+  			}
+
+  			// flag to the particle system
+  			// that we've changed its vertices.
+  			particleSystem.
+    		geometry.
+    		__dirtyVertices = true;*/
 		}
+
+		/****
+		Add Update Stuff ABOVE Here
+		****/
 		render();
 	}
 
@@ -152,7 +230,7 @@
 	};
 
 // create the particle variables
-var particleCount = 1800,
+var particleCount = 500,
     particles = new THREE.Geometry(),
  	pMaterial = new THREE.ParticleBasicMaterial({
     	color: 0xFFFFFF,
@@ -175,10 +253,15 @@ for(var p = 0; p < particleCount; p++) {
       particle = new THREE.Vertex(
         new THREE.Vector3(pX, pY, pZ)
       );
-
-  // add it to the geometry
-  particles.vertices.push(particle);
+      // create a velocity vector
+	particle.velocity = new THREE.Vector3(
+		0,              // x
+		-Math.random(), // y: random vel
+		0);
+	// add it to the geometry
+  	particles.vertices.push(particle);
 }
+
 
 // create the particle system
 var particleSystem =
@@ -190,23 +273,5 @@ particleSystem.sortParticles = true;
 scene.add(particleSystem);
 
 
-/*
-// create the particle variables
-var pMaterial =
-  new THREE.ParticleBasicMaterial({
-    color: 0xFFFFFF,
-    size: 20,
-    map: THREE.ImageUtils.loadTexture(
-      "images/particle.png"
-    ),
-    blending: THREE.AdditiveBlending,
-    transparent: true
-  });
-
-// also update the particle system to
-// sort the particles which enables
-// the behaviour we want
-particleSystem.sortParticles = true;
-*/
 </script>
 </body>
