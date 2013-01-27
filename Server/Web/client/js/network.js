@@ -9,7 +9,9 @@ if (isLocal) {
 
 var gameHub = $.connection.gameHub;
 gameHub.client.handleUpdate = function (update) {
-    console.log(JSON.stringify(update));
+    if (loggingEnabled) {
+        console.log(JSON.stringify(update));
+    }
     setGameStateFromServer(update);
 };
 

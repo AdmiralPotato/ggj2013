@@ -1,7 +1,4 @@
-﻿@{
-    Layout = null;
-}
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <title>Game #705799 - GGJ2013</title>
@@ -163,7 +160,7 @@
     </div>
 
     <script type="text/javascript">
-        gameId = @Model.Id;
+        gameId = window.location.hash;
         isLocal = false;
     </script>
 
@@ -176,11 +173,6 @@
     <script type="text/javascript" src="/client/js/game.js"></script>
     <script type="text/javascript" src="/client/js/audio.js"></script>
     <script type="text/javascript" src="/client/js/network.js"></script>
-
-    <script type="text/javascript">
-        client.station = "@ViewBag.Player.Station";
-    </script>
-
     
     <!-- move this wherever -->
     <script>
@@ -210,41 +202,9 @@
         var audioList = new preloadAudioList(sfxList, null, document.getElementById("errorDiv"), onLoadCallback);
     </script>
 
-    @*    <script type="text/javascript">
-
-        //$.connection.hub.logging = true;
-
-        var gameHub = $.connection.gameHub;
-        gameHub.client.handleUpdate = function (update) {
-            console.log(JSON.stringify(update));
-            //console.log("update.missionUpdate:"+update.missionUpdate);
-            //if( update.missionUpdate != null )
-            //    missionStatus.value = update.missionUpdate;
-            setGameStateFromServer(update);
-        };
-
-        gameHub.client.addMessage = function (sourceId, sourceName, message) {
-            AppendChatMessage(sourceId, sourceName, message);
-        };
-
-        //$.connection.hub.start()
-        //    .done(function () { alert("Now connected!"); })
-        //    .fail(function () { alert("Could not Connect!"); });
-
-        $.connection.hub.start()
-            .done(function () { gameHub.server.setShip(@Model.Id, 0); })
-            .fail(function () { alert("Could not Connect!"); });
-
-        $(window).unload(function () {
-            gameHub.server.disconnecting(@Model.Id, 0);
-        });
-    </script>*@
-
     <audio id="notify">
         <source src="/Sounds/chime.ogg" type="audio/ogg" />
         <source src="/Sounds/chime.mp3" type="audio/mp3" />
     </audio>
-
-
 </body>
 </html>

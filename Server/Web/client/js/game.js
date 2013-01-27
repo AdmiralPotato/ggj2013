@@ -1,5 +1,3 @@
-
-
 var n = NPos3d,
 	s = new n.Scene({
 
@@ -10,7 +8,44 @@ var n = NPos3d,
 	    entityTypes: {}
 	},
 	playerEntity;
-var gameId = 705888;
+
+var gameId = window.location.hash;
+if (gameId === '') {
+//    window.location.P
+}
+
+
+//var keys = {};
+//var keyHandlers = {
+//    "32down": function () {
+//        client.paused = !client.paused;
+//    }
+//};
+//var keyEventHandler = function (event) {
+//    console.log(event);
+//    var whichKey = (e.keyCode || e.which),
+//        ;
+//    if (event.type === 'keydown') {
+//        type = 
+//    }
+//    if (null == keys[whichKey]) {
+//        keys[whichKey] = true;
+//        if (keyHandlers[whichKey + "down"]) {
+//            keyHandlers[whichKey + "down"]();
+//        }
+//    }
+//    e = (e || window.event);
+//    //if(e.preventDefault){e.preventDefault();}
+//    var kc = /*String.fromCharCode(*/(e.keyCode || e.which)/*)*/;
+//    if (true == keys[kc]) {
+//        delete keys[kc];
+//        if (keyHandlers[kc + "up"]) {
+//            keyHandlers[kc + "up"]();
+//        }
+//    }
+//}
+//$(window).on('keydown keyup', keyEventHandler);
+var loggingEnabled = false;
 var timeSinceLastFrame = 0;
 var timeOfLastFrame = new Date().getTime();
 var timeSinceLastUpdate = 0;
@@ -212,7 +247,7 @@ var setEntityAsPlayer = function (entity) {
 };
 
 var setGameStateFromServer = function (data) {
-    if (!isLocal || data.GameId === gameId) {
+    if (data.GameId === gameId) {
         var entityDataIndex,
 			numEntities = data.Entities.length,
 			entityData,
