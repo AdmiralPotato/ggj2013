@@ -5,8 +5,7 @@
 <style></style>
 </head>
 <body>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
-<script type = "text/javascript" src = "http://stemkoski.github.com/Three.js/js/Three.js">
+<script type = "text/javascript" src = "https://raw.github.com/mrdoob/three.js/master/build/three.js">
 </script>
 <script>
 
@@ -26,8 +25,9 @@
 	
 	var scene = new THREE.Scene();
 	var camera = new THREE.PerspectiveCamera(50, width/height, 0.1, 1000);
-
-	var rend = new THREE.WebGLRenderer();
+	scene.add(camera);
+	//var rend = new THREE.WebGLRenderer();
+	rend = new THREE.WebGLRenderer( { clearColor: 0x020202, clearAlpha: 1, antialias: true } );
 	rend.setSize(width, height);
 	document.body.appendChild(rend.domElement);
 	
@@ -43,8 +43,11 @@
 				
 				
 				function createMesh(_propertyName){
-					var meshCreationHandler = function(_geometry) {
+					var meshCreationHandler = function(_geometry, _materials) {
+						_geometry.computeTangents();
+						_geometry.matLib = _materials;
 						geometryObjects[_propertyName] = _geometry;
+
 						modelsLoaded += 1;
 					
 						console.log(_propertyName+":"+modelsLoaded+":"+modelCount);
@@ -60,26 +63,36 @@
 			}
 		}
 	}
-
+	var fishShipMesh;
 	var whatToDoWhenAllTheGeometriesAreParsedOkayYupSeriously = function(){
-		
-		var myMesh = new THREE.Mesh(geometryObjects.fishShip, geometryObjects.fishShip.materials[0]);
-		myMesh.rotation.set(0,0,0);
-		scene.add(myMesh);
+		fishShipMesh = new THREE.Mesh(geometryObjects.fishShip, geometryObjects.fishShip.matLib[0]);
+		scene.add(fishShipMesh);
 
+		var tmpMesh = new THREE.Mesh(geometryObjects.spear, geometryObjects.spear.matLib[0]);
+		tmpMesh.position.z = -20;
+		scene.add(tmpMesh);
+
+		var tmpMesh = new THREE.Mesh(geometryObjects.starbase, geometryObjects.starbase.matLib[0]);
+		tmpMesh.position.x = -50;
+		scene.add(tmpMesh);
+
+		render();
 	};
 	var light = new THREE.PointLight(0xffffff,1.5);
-	light.position.z=512;
+	light.position.y=1000;
 	scene.add(light);
 	
 	
 	parseAllGeometry(
 		{
-			'fishShip': "../models/fishShip.js",
+			'fishShip': "../models/FishShip.json",
+			'spear': "../models/Spear.json",
+			'starbase': "../models/Starbase.json"
 		},
 		whatToDoWhenAllTheGeometriesAreParsedOkayYupSeriously
 	);
-	
+	var tau = Math.PI*2;
+	var deg = tau/360;
 	var render = function(){
 		requestAnimFrame(render);
 		if(window.innerWidth != width || window.innerHeight != height){
@@ -89,8 +102,9 @@
 			camera.updateProjectionMatrix()
 			rend.setSize(width, height);
 		}
-		//camera.position.z = 50;
-		camera.position = distanceElevationHeading(50, 45, 0);
+
+		fishShipMesh.rotation.setY(fishShipMesh.rotation.y+(deg*.125));
+		camera.position = distanceElevationHeading(30, 15, rad2Deg(fishShipMesh.rotation.y)-90);
 
 		camera.lookAt(new THREE.Vector3(0,0,0));
 
@@ -108,6 +122,46 @@
 	var rad2Deg = function(_rad){
 		return (_rad*180)/Math.PI;
 	}
-	render();
+
+/*
+// common material parameters
+
+var ambient = 0x050505, diffuse = 0x331100, specular = 0xffffff, shininess = 10, scale = 23;
+
+// normal map shader
+
+var shader = THREE.ShaderUtils.lib[ "normal" ];
+var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+
+uniforms[ "enableAO" ].value = true;
+uniforms[ "enableDiffuse" ].value = false;
+uniforms[ "enableSpecular" ].value = false;
+uniforms[ "enableReflection" ].value = true;
+
+uniforms[ "tNormal" ].texture = THREE.ImageUtils.loadTexture( "normal.jpg" );
+uniforms[ "tAO" ].texture = THREE.ImageUtils.loadTexture( "ao.jpg" );
+
+uniforms[ "tDisplacement" ].texture = THREE.ImageUtils.loadTexture( "displacement.jpg" );
+uniforms[ "uDisplacementBias" ].value = - 0.428408 * scale;
+uniforms[ "uDisplacementScale" ].value = 2.436143 * scale;
+
+uniforms[ "uDiffuseColor" ].value.setHex( diffuse );
+uniforms[ "uSpecularColor" ].value.setHex( specular );
+uniforms[ "uAmbientColor" ].value.setHex( ambient );
+
+uniforms[ "uShininess" ].value = shininess;
+
+uniforms[ "tCube" ].texture = reflectionCube;
+uniforms[ "uReflectivity" ].value = 0.1;
+
+uniforms[ "uDiffuseColor" ].value.convertGammaToLinear();
+uniforms[ "uSpecularColor" ].value.convertGammaToLinear();
+uniforms[ "uAmbientColor" ].value.convertGammaToLinear();
+
+
+var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, fog: false };
+var displacementMaterial = new THREE.ShaderMaterial( parameters );
+*/
+
 </script>
 </body>
