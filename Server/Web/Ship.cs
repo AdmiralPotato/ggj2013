@@ -270,6 +270,7 @@ namespace WebGame
         /// hp / second
         /// </summary>
         private const double repairRate = 1;
+        private const double energyPerRepair = 0.01;
 
         private void UpdateRepair(TimeSpan elapsed)
         {
@@ -278,7 +279,13 @@ namespace WebGame
                 var target = this.RepairCrewTargets[i];
                 if (target != null)
                 {
-                    this.parts[target] += repairRate * elapsed.TotalSeconds;
+                    var repairAmount = repairRate * elapsed.TotalSeconds;
+                    var repairEnergy = energyPerRepair * repairAmount;
+                    if (!this.SpendRawEnergy(repairEnergy))
+                    {
+                        break;
+                    }
+                    this.parts[target] += repairAmount;
                     if (this.parts[target] >= partsHp)
                     {
                         this.parts[target] = partsHp;
@@ -542,30 +549,28 @@ namespace WebGame
                     {
                         target.Damage(100);
                         LastBeamBanksUsed[bank] = DateTime.UtcNow;
-                        UseRawEnergy(5);
+                        SpendRawEnergy(5);
                         PlaySound("FireStandardPhaser");
                     }
                     break;
                 case BeamType.HullPiercing:
-                    if (IsEntityCloserThan(target, 50) && Energy > 25 && BeamCoolDownTime(bank) > 4)
+                    if (IsEntityCloserThan(target, 50) && SpendRawEnergy(25) && BeamCoolDownTime(bank) > 4)
                     {
                         target.Damage(300);
                         LastBeamBanksUsed[bank] = DateTime.UtcNow;
-                        UseRawEnergy(25);
                         PlaySound("FireHullPiercing");
                     }
                     break;
                 case BeamType.SuppresionPulse:
-                    if (IsEntityCloserThan(target, 150) && Energy > 75 && BeamCoolDownTime(bank) > 10)
+                    if (IsEntityCloserThan(target, 150) && SpendRawEnergy(75) && BeamCoolDownTime(bank) > 10)
                     {
                         target.DamagePart(100, target.GetRandomWorkingPart());
                         LastBeamBanksUsed[bank] = DateTime.UtcNow;
-                        UseRawEnergy(25);
                         PlaySound("FireSuppresionPulse");
                     }
                     break;
                 case BeamType.PlasmaVent:
-                    if (Energy > 100 && BeamCoolDownTime(bank) > 60)
+                    if (SpendRawEnergy(100) && BeamCoolDownTime(bank) > 60)
                     {
                         foreach (var entity in StarSystem.Entites.ToArray()) // ToArray here to avoid threading issues. Lame I know.
                         {
@@ -574,12 +579,11 @@ namespace WebGame
                         }
 
                         LastBeamBanksUsed[bank] = DateTime.UtcNow;
-                        UseRawEnergy(100);
                         PlaySound("FirePlasmaVent");
                     }
                     break;
                 case BeamType.TractorBeam:
-                    if (IsEntityCloserThan(target, 200) && Energy > 75 && BeamCoolDownTime(bank) > 5)
+                    if (IsEntityCloserThan(target, 200) && SpendRawEnergy(75) && BeamCoolDownTime(bank) > 5)
                     {
                         //target..Velocity
                         var displacement = this.Position - target.Position;
@@ -588,7 +592,6 @@ namespace WebGame
                         target.ApplyEnergyForce(75, orientation);
 
                         LastBeamBanksUsed[bank] = DateTime.UtcNow;
-                        UseRawEnergy(25);
                         PlaySound("FireTractorBeam");
                     }
                     break;

@@ -84,14 +84,19 @@ namespace WebGame
         [ProtoMember(9)]
         public double Energy { get; private set; }
 
-        public void UseRawEnergy(double amountToUse)
+        public bool SpendRawEnergy(double amountToUse)
         {
-            Energy -= amountToUse;
+            if (amountToUse > this.Energy)
+            {
+                this.Energy -= amountToUse;
+                return true;
+            }
+            return false;
         }
 
-        public void LoseEnergyFrom(double intendedForce, TimeSpan elapsedTime)
+        public bool LoseEnergyFrom(double intendedForce, TimeSpan elapsedTime)
         {
-            Energy -= intendedForce * energyCostPerForcePerSecond * elapsedTime.TotalSeconds;
+            return SpendRawEnergy(intendedForce * energyCostPerForcePerSecond * elapsedTime.TotalSeconds);
         }
 
         protected virtual double InitialEnergy
