@@ -24,7 +24,7 @@ namespace WebGame
 
         internal override void MissionSetup()
         {
-            Enemy missionEnemy = new Enemy( new Vector3((Utility.randomBool() ? 1 : -1) * Utility.Random.Next(100) + 200, (Utility.randomBool() ? 1 : -1) * Utility.Random.Next(100) + 200, 0) );
+            Enemy missionEnemy = new Enemy(new Vector3((Utility.randomBool() ? 1 : -1) * Utility.Random.Next(100) + 200, (Utility.randomBool() ? 1 : -1) * Utility.Random.Next(100) + 200, 0)) { Tubes = 3 };
             starSystem.AddEntity(missionEnemy);
             enemyId = missionEnemy.Id;
         }
