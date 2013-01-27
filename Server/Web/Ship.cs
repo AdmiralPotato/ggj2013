@@ -263,7 +263,7 @@ namespace WebGame
         {
             if (this.ProjectileTubes[tubeNumber].ProjectileStatus == ProjectileStatus.Loaded && this.StarSystem == target.StarSystem)
             {
-                var projectile = new Projectile(this.Velocity);
+                var projectile = new Projectile(this.Position, this.Velocity);
                 projectile.Target = target;
                 this.StarSystem.AddEntity(projectile);
                 PlaySound("MissileLaunch");
