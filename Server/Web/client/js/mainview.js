@@ -55,8 +55,6 @@ var parseAllGeometry = function(_geoPath, _callback) {
 var player;
 
 var whatToDoWhenAllTheGeometriesAreParsedOkayYupSeriously = function(){
-	document.addEventListener("keydown", onKeyDown, false);
-	document.addEventListener("keyup", onKeyUp, false);
 
 	var urls = [
 		'../models/starfield.png',
