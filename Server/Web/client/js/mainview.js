@@ -184,10 +184,10 @@ var updateLaser = function(){
 
 parseAllGeometry(
 	{
-		'laser': "../models/Laser.json",
-		'fishShip': "../models/FishShip.json",
-		'spear': "../models/Spear.json",
-		'starbase': "../models/Starbase.json",
+		'laser': "models/Laser.json",
+		'fishShip': "models/FishShip.json",
+		'spear': "models/Spear.json",
+		'starbase': "models/Starbase.json",
 	},
 	whatToDoWhenAllTheGeometriesAreParsedOkayYupSeriously
 );
