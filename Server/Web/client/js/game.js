@@ -10,9 +10,23 @@ var n = NPos3d,
 		loggingEnabled: false
 	},
 	playerEntity;
+client.station = "None";
+
 var gameId = window.location.hash;
 if (gameId === '') {
-//    window.location.P
+    // try to load the game id from a url like this: http://localhost:62700/Game-705888/
+    var parts = window.location.href.split("/");
+    for (i = 0; i < parts.length; i++) {
+        if (parts[i].indexOf("Game-") != -1) {
+            gameId = parts[i].split('-')[1];
+
+            isUsingRemoteServer = false;
+            break;
+        }
+    }
+}
+else {
+    gameId = gameId.replace("#", "");
 }
 var keyStateMap = {};
 var keyHandlerMap = {
@@ -295,11 +309,11 @@ var setGameStateFromServer = function (data) {
     }
 };
 
-if (typeof isLocal === 'undefined') {
-    isLocal = true;
+if (typeof isUsingRemoteServer === 'undefined') {
+    isUsingRemoteServer = true;
 }
-var serverPath = isLocal ? 'http://legendstudio.com/' : '/';
-var currentGame = isLocal ? 'Game-' + gameId + '/' : '';
+var serverPath = isUsingRemoteServer ? 'http://legendstudio.com/' : '/';
+var currentGame = isUsingRemoteServer ? 'Game-' + gameId + '/' : '';
 var loadScript = function (relativePath) {
 
     document.write('<script type="text/javascript" src="' + serverPath + relativePath + '"></script>');
