@@ -249,9 +249,12 @@ var setGameStateFromServer = function (data) {
         }
 
         // play sounds
-        for( var sound in data.Sounds )
+        if (audioLoaded)
         {
-            SFX[sound].play();
+            for (var sound in data.Sounds)
+            {
+                SFX[sound].play();
+            }
         }
     }
 };
