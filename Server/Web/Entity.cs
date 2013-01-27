@@ -19,6 +19,7 @@ namespace WebGame
                 throw new ArgumentException("Mass must be positive.");
             }
             this.Mass = mass;
+            this.Energy = this.InitialEnergy;
             SetupParts();
         }
 
@@ -30,6 +31,8 @@ namespace WebGame
                 Parts.Add(part, partsHp);
             }
         }
+
+        protected const double energyCostPerForce = 0.01;
 
         protected abstract IEnumerable<string> PartList
         {
@@ -70,20 +73,32 @@ namespace WebGame
         [ProtoMember(8)]
         private Dictionary<string, int> Parts { get; set; }
 
-        protected const int partsHp = 5;
+        [ProtoMember(9)]
+        public double Energy { get; private set; }
 
+        public void LoseEnergyFrom(double intendedForce)
+        {
+            Energy -= intendedForce * energyCostPerForce;
+        }
+
+        protected virtual double InitialEnergy
+        {
+            get
+            {
+                return 0;
+            }
+        }
+
+        protected const int partsHp = 100;
 
         /// <summary>
         /// Meters Per Second Per Ton
         /// Applied in the direction of the Orientation
         /// Can be positive or negative
         /// </summary>
-        public virtual double Force
+        public virtual double ApplyForce()
         {
-            get
-            {
-                return 0;
-            }
+            return 0;
         }
 
         public virtual void Update(TimeSpan elapsed)
@@ -107,7 +122,7 @@ namespace WebGame
         {            
             // Force = Mass * Acceleration;
             // Acceleration = Force / Mass
-            var accelerationMagnitude = this.Force / this.Mass;
+            var accelerationMagnitude = this.ApplyForce() / this.Mass;
             var flatAcceleration = new Vector3((float)accelerationMagnitude, 0, 0);
             var acceleration = Vector3.Transform(flatAcceleration, Matrix.CreateRotationZ((float)this.Orientation));
 

@@ -59,16 +59,14 @@ namespace WebGame
         [ProtoMember(7)]
         public ProjectileStatus ProjectileStatus { get; set; }
 
-        [ProtoMember(8)]
-        public  int Energy { get; set; }
         [ProtoMember(9)]
-        public  int FrontShield { get; set; }
+        public int FrontShield { get; set; }
         [ProtoMember(10)]
-        public  int RearShield { get; set; }
+        public int RearShield { get; set; }
         [ProtoMember(11)]
-        public  int LeftShield { get; set; }
+        public int LeftShield { get; set; }
         [ProtoMember(12)]
-        public  int RightShield { get; set; }
+        public int RightShield { get; set; }
         [ProtoMember(13)]
         public bool ShieldsEngaged { get; set; }
 
@@ -96,6 +94,15 @@ namespace WebGame
                 return this.Effective(turnRate, "Thrusters");
             }
         }
+        private const int maximumEnergy = 1000;
+        protected int EffectiveMaximumEnergy
+        {
+            get
+            {
+                return (int)this.Effective(maximumForce, "Energy Storage");
+            }
+        }
+
         /// <summary>
         /// Meters Per Second Per Ton
         /// </summary>
@@ -123,13 +130,15 @@ namespace WebGame
             Players = new List<Player>();
         }
 
-        public void LoadProjectile()
+        public bool LoadProjectile()
         {
             if (this.ProjectileStatus == ProjectileStatus.Unloaded)
             {
                 this.ProjectileLoadTime = TimeSpan.Zero;
                 this.ProjectileStatus = ProjectileStatus.Loading;
+                return true;
             }
+            return false;
         }
 
         public Projectile LaunchProjectile(Entity target)
@@ -226,7 +235,14 @@ namespace WebGame
             return remaining;
         }
 
-        public override double Force
+        public override double ApplyForce()
+        {
+            var intendedForce = this.ImpulsePercentage / 100 * maximumForce;
+            this.LoseEnergyFrom(intendedForce); // the idea here is that if their engines aren't working at full capacity, they'll still lose energy as if they were. They're punching it, and losing all that energy, but only the Effective force is output.
+            return Force;
+        }
+
+        private double Force
         {
             get
             {
@@ -257,7 +273,7 @@ namespace WebGame
         {
             if (Players.Count > 0)
             {
-                var update = new UpdateToClient() { ShipId = Id, Energy = this.Energy, FrontShield = this.FrontShield, RearShield = this.RearShield, LeftShield = this.LeftShield, RightShield = this.RightShield, ShieldsEngaged = this.ShieldsEngaged };
+                var update = new UpdateToClient() { ShipId = Id, Energy = (int)this.Energy, FrontShield = this.FrontShield, RearShield = this.RearShield, LeftShield = this.LeftShield, RightShield = this.RightShield, ShieldsEngaged = this.ShieldsEngaged };
                 foreach (var entity in StarSystem.Entites)
                 {
                     update.Entities.Add(new EntityUpdate() { Id = entity.Id, Type = entity.Type, Rotation = (float)entity.Orientation, Position = entity.Position });
@@ -274,6 +290,9 @@ namespace WebGame
                 yield return "Thrusters";
                 yield return "Engines";
                 yield return "Projectile Tube";
+                yield return "Shield Regenerators";
+                yield return "Energy Collectors";
+                yield return "Energy Storage";
             }
         }
 

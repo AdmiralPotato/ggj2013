@@ -11,14 +11,22 @@ namespace WebGame
         public Projectile()
             : this(1)
         {
+            
         }
 
-        public override double Force
+        protected override double InitialEnergy
         {
             get
             {
                 return 100;
             }
+        }
+
+        public override double ApplyForce()
+        {
+            var force = 100;
+            this.LoseEnergyFrom(force);
+            return force;
         }
         public override double Radius
         {

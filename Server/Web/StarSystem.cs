@@ -27,21 +27,6 @@ namespace WebGame
 
         public void Update(TimeSpan timeElapsed)
         {
-            foreach (var entity in Entites)
-            {
-                entity.Update(timeElapsed);
-            }
-
-            foreach (var ship in Ships)
-            {
-                ship.SendUpdate();
-            }
-
-            if (Utility.Random.Next(480) <= 2)
-            {
-                AddEntity(new Enemy() { Position = new Vector3(Utility.Random.Next(1000) - 500, Utility.Random.Next(1000) - 500, 0) });
-            }
-
             foreach (var added in addedEntities)
             {
                 Entites.Add(added);
@@ -62,6 +47,21 @@ namespace WebGame
                 }
             }
             removedEntities.Clear();
+
+            foreach (var entity in Entites)
+            {
+                entity.Update(timeElapsed);
+            }
+
+            foreach (var ship in Ships)
+            {
+                ship.SendUpdate();
+            }
+
+            if (Utility.Random.Next(480) <= 2)
+            {
+                AddEntity(new Enemy() { Position = new Vector3(Utility.Random.Next(1000) - 500, Utility.Random.Next(1000) - 500, 0) });
+            }
         }
 
         public void AddEntity(Entity entity)

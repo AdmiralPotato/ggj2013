@@ -120,7 +120,6 @@ namespace WebGame.PhysicsTest
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void LoadProjectileLaunchWithoutLoading()
         {
             var game = new Game();
@@ -128,11 +127,11 @@ namespace WebGame.PhysicsTest
             game.Add(system);
             var ship = new Ship();
             system.AddEntity(ship);
-            ship.LaunchProjectile(ship);
+            var projectile = ship.LaunchProjectile(ship);
+            Assert.IsNull(projectile, "The projectile shouldn't have been launched if it hadn't been loaded.");
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void LoadProjectileLaunchWithoutWaitingAfterLoading()
         {
             var game = new Game();
@@ -141,11 +140,11 @@ namespace WebGame.PhysicsTest
             var ship = new Ship();
             system.AddEntity(ship);
             ship.LoadProjectile();
-            ship.LaunchProjectile(ship);
+            var projectile = ship.LaunchProjectile(ship);
+            Assert.IsNull(projectile, "The projectile shouldn't have been launched if there hasn't been enough time to load it.");
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void LoadProjectileDoubleLoad()
         {
             var game = new Game();
@@ -153,8 +152,11 @@ namespace WebGame.PhysicsTest
             game.Add(system);
             var ship = new Ship();
             system.AddEntity(ship);
-            ship.LoadProjectile();
-            ship.LoadProjectile();
+            var loaded = ship.LoadProjectile();
+            Assert.IsTrue(loaded, "Couldn't load the first projectile");
+            loaded = ship.LoadProjectile();
+            Assert.IsFalse(loaded, "Somehow Loaded a second projectile.");
         }
     }
 }
+
