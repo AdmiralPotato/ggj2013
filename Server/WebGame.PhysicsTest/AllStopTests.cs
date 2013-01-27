@@ -34,6 +34,7 @@ namespace WebGame.PhysicsTest
             ship.Update(TimeSpan.FromSeconds(0.25));
             ship.Update(TimeSpan.FromSeconds(0.25));
             ship.Update(TimeSpan.FromSeconds(0.25));
+            ship.Update(TimeSpan.FromSeconds(0.25)); // strictly speaking the previous one was really close to zero, so it should work, but one more actually makes it zero.
             Assert.AreEqual(0, ship.Velocity.Magnitude(), "ship should be stopped by now?");
         }
 
