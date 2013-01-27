@@ -86,7 +86,7 @@ namespace WebGame
 
         public bool SpendRawEnergy(double amountToUse)
         {
-            if (amountToUse > this.Energy)
+            if (amountToUse <= this.Energy)
             {
                 this.Energy -= amountToUse;
                 return true;
@@ -115,7 +115,7 @@ namespace WebGame
         /// Applied in the direction of the Orientation
         /// Can be positive or negative
         /// </summary>
-        public virtual double ApplyForce(TimeSpan elapsed)
+        public virtual double? ApplyForce(TimeSpan elapsed)
         {
             return 0;
         }
@@ -141,13 +141,12 @@ namespace WebGame
         {            
             // Force = Mass * Acceleration;
             // Acceleration = Force / Mass
-            var accelerationMagnitude = this.ApplyForce(elapsed) / this.Mass;
-            var flatAcceleration = new Vector3((float)accelerationMagnitude, 0, 0);
-            var acceleration = Vector3.Transform(flatAcceleration, Matrix.CreateRotationZ((float)this.Orientation));
-
-            // before applying force, we need to check energy:
-            if (CheckEnergy())
+            var force = this.ApplyForce(elapsed);
+            if (force.HasValue)
             {
+                var accelerationMagnitude = force.Value / this.Mass;
+                var flatAcceleration = new Vector3((float)accelerationMagnitude, 0, 0);
+                var acceleration = Vector3.Transform(flatAcceleration, Matrix.CreateRotationZ((float)this.Orientation));
                 this.Velocity += acceleration * (elapsed.Ticks / (float)TimeSpan.FromSeconds(1).Ticks);
                 //if (this.Velocity.Magnitude() < 0.01) // small enough not to care.
                 //{
@@ -164,17 +163,6 @@ namespace WebGame
             var flatAcceleration = new Vector3((float)accelerationMagnitude, 0, 0);
             var acceleration = Vector3.Transform(flatAcceleration, Matrix.CreateRotationZ((float)orientation));
             this.Velocity += acceleration; // no time in this equation because it is applied as if it were one second
-        }
-
-
-        private bool CheckEnergy()
-        {
-            if (Energy < 0)
-            {
-                Energy = 0;
-                return false;
-            }
-            return true;
         }
 
         public string GetRandomWorkingPart()

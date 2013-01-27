@@ -52,11 +52,17 @@ namespace WebGame
             return result;
         }
 
-        public override double ApplyForce(TimeSpan elapsedTime)
+        public override double? ApplyForce(TimeSpan elapsedTime)
         {
             var force = 100;
-            this.LoseEnergyFrom(force, elapsedTime);
-            return force;
+            if (this.LoseEnergyFrom(force, elapsedTime))
+            {
+                return force;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public override void Update(TimeSpan elapsed)
