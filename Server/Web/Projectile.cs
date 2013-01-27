@@ -22,10 +22,10 @@ namespace WebGame
             }
         }
 
-        public override double ApplyForce()
+        public override double ApplyForce(TimeSpan elapsedTime)
         {
             var force = 100;
-            this.LoseEnergyFrom(force);
+            this.LoseEnergyFrom(force, elapsedTime);
             return force;
         }
         public override double Radius

@@ -130,6 +130,14 @@ namespace WebGame
             Players = new List<Player>();
         }
 
+        protected override double InitialEnergy
+        {
+            get
+            {
+                return 1000;
+            }
+        }
+
         public bool LoadProjectile()
         {
             if (this.ProjectileStatus == ProjectileStatus.Unloaded)
@@ -235,10 +243,10 @@ namespace WebGame
             return remaining;
         }
 
-        public override double ApplyForce()
+        public override double ApplyForce(TimeSpan elapsedTime)
         {
             var intendedForce = this.ImpulsePercentage / 100 * maximumForce;
-            this.LoseEnergyFrom(intendedForce); // the idea here is that if their engines aren't working at full capacity, they'll still lose energy as if they were. They're punching it, and losing all that energy, but only the Effective force is output.
+            this.LoseEnergyFrom(intendedForce, elapsedTime); // the idea here is that if their engines aren't working at full capacity, they'll still lose energy as if they were. They're punching it, and losing all that energy, but only the Effective force is output.
             return Force;
         }
 

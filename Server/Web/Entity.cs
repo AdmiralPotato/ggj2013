@@ -32,7 +32,7 @@ namespace WebGame
             }
         }
 
-        protected const double energyCostPerForce = 0.01;
+        protected const double energyCostPerForcePerSecond = 0.0005;
 
         protected abstract IEnumerable<string> PartList
         {
@@ -76,9 +76,9 @@ namespace WebGame
         [ProtoMember(9)]
         public double Energy { get; private set; }
 
-        public void LoseEnergyFrom(double intendedForce)
+        public void LoseEnergyFrom(double intendedForce, TimeSpan elapsedTime)
         {
-            Energy -= intendedForce * energyCostPerForce;
+            Energy -= intendedForce * energyCostPerForcePerSecond * elapsedTime.TotalSeconds;
         }
 
         protected virtual double InitialEnergy
@@ -96,7 +96,7 @@ namespace WebGame
         /// Applied in the direction of the Orientation
         /// Can be positive or negative
         /// </summary>
-        public virtual double ApplyForce()
+        public virtual double ApplyForce(TimeSpan elapsed)
         {
             return 0;
         }
@@ -122,15 +122,29 @@ namespace WebGame
         {            
             // Force = Mass * Acceleration;
             // Acceleration = Force / Mass
-            var accelerationMagnitude = this.ApplyForce() / this.Mass;
+            var accelerationMagnitude = this.ApplyForce(elapsed) / this.Mass;
             var flatAcceleration = new Vector3((float)accelerationMagnitude, 0, 0);
             var acceleration = Vector3.Transform(flatAcceleration, Matrix.CreateRotationZ((float)this.Orientation));
 
-            this.Velocity += acceleration;
-            if (this.Velocity.Magnitude() < 0.1) // small enough not to care.
+            // before applying force, we need to check energy:
+            if (CheckEnergy())
             {
-                this.Velocity = Vector3.Zero;
+                this.Velocity += acceleration;
+                if (this.Velocity.Magnitude() < 0.1) // small enough not to care.
+                {
+                    this.Velocity = Vector3.Zero;
+                }
             }
+        }
+
+        private bool CheckEnergy()
+        {
+            if (Energy < 0)
+            {
+                Energy = 0;
+                return false;
+            }
+            return true;
         }
 
         public void Damage(int damage)
