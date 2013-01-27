@@ -23,6 +23,17 @@
         <input type="submit" onclick='$.post("SetMainScreen", "view=LongRange");' value="LongRange" />
         <input type="submit" onclick='$.post("SetMainScreen", "view=Status");' value="Status" />
         <br />
+        <select id="shipSelect">
+            <option value="1">Heart of the Deep</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+        </select>
+        <input type="text" id="shipName" value="Enter Ship Name" />
+        <input type="submit" onclick='$.post("SelectShip", "defaultShipNumber=" + $("#shipSelect").val() + "&name=" + $("#shipName").val());' value="Select Ship" />
+        <br />
         <select id="desiredStation">
             <option value="None">None</option>
             <option value="Main">Main</option>
@@ -88,6 +99,14 @@
         <input type="submit" onclick='$.post("Start");' value="Reset" />
         <input type="submit" onclick='$.post("BuildBase");' value="Build Base" />
         <input type="submit" onclick='$.post("BuildShip");' value="Build Ship" />
+
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <textarea id="missionStatus"></textarea>
     </div>
 
     <script src="https://raw.github.com/AdmiralPotato/npos3d/master/src/core.js"></script>
@@ -101,6 +120,9 @@
         var gameHub = $.connection.gameHub;
         gameHub.client.handleUpdate = function (update) {
             console.log(JSON.stringify(update));
+            console.log("update.missionUpdate:"+update.missionUpdate);
+            if( update.missionUpdate != null )
+                missionStatus.value = update.missionUpdate;
             setGameStateFromServer(update);
         };
 

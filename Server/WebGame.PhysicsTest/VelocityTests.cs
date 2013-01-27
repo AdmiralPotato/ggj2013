@@ -21,7 +21,12 @@ namespace WebGame.PhysicsTest
         [TestMethod]
         public void RunOutOfEnergy()
         {
+            var game = new Game();
+            var system = new StarSystem();
+            system.RandomlySpawnEnemies = false;
+            game.Add(system);
             var ship = new Ship();
+            system.AddEntity(ship);
             ship.ImpulsePercentage = 100;
             Assert.IsTrue(ship.Energy > 0, "Ship didn't have any energy");
             var oldVelocity = ship.Velocity;
@@ -29,10 +34,10 @@ namespace WebGame.PhysicsTest
 
             for (int i = 0; i < 200; i++)
             {
-                ship.Update(TimeSpan.FromSeconds(0.25));
-                ship.Update(TimeSpan.FromSeconds(0.25));
-                ship.Update(TimeSpan.FromSeconds(0.25));
-                ship.Update(TimeSpan.FromSeconds(0.25));
+                game.Update(TimeSpan.FromSeconds(0.25));
+                game.Update(TimeSpan.FromSeconds(0.25));
+                game.Update(TimeSpan.FromSeconds(0.25));
+                game.Update(TimeSpan.FromSeconds(0.25));
                 Assert.IsTrue(oldVelocity.Magnitude() < ship.Velocity.Magnitude(), "The ship didn't increase in speed");
                 oldVelocity = ship.Velocity;
             }

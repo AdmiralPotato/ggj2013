@@ -17,5 +17,7 @@ namespace WebGame
         public bool Alert;
         public MainView View;
         public List<EntityUpdate> Entities = new List<EntityUpdate>();
+        public List<string> Sounds = new List<string>();
+        public String missionUpdate;
     }
 }

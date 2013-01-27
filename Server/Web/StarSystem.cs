@@ -23,10 +23,18 @@ namespace WebGame
         {
             Entites = new List<Entity>();
             Ships = new List<Ship>();
+            this.RandomlySpawnEnemies = true;
         }
+
 
         public void Update(TimeSpan timeElapsed)
         {
+            foreach (var entity in Entites)
+            {
+                if (entity.Sounds.Count > 0)
+                    entity.Sounds.Clear();
+            }
+
             foreach (var added in addedEntities)
             {
                 Entites.Add(added);
@@ -58,9 +66,12 @@ namespace WebGame
                 ship.SendUpdate();
             }
 
-            if (Utility.Random.Next(480) <= 2)
+            if (this.RandomlySpawnEnemies)
             {
-                AddEntity(new Enemy() { Position = new Vector3(Utility.Random.Next(1000) - 500, Utility.Random.Next(1000) - 500, 0) });
+                if (Utility.Random.Next(480) <= 2)
+                {
+                    AddEntity(new Enemy() { Position = new Vector3(Utility.Random.Next(1000) - 500, Utility.Random.Next(1000) - 500, 0) });
+                }
             }
         }
 
@@ -84,5 +95,7 @@ namespace WebGame
         {
             return (from e in Entites where e.Id == targetId select e).FirstOrDefault();
         }
+
+        public bool RandomlySpawnEnemies { get; set; }
     }
 }

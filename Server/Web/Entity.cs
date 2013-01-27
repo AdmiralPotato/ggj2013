@@ -90,6 +90,7 @@ namespace WebGame
         }
 
         protected const int partsHp = 100;
+        public List<string> Sounds = new List<string>();
 
         /// <summary>
         /// Meters Per Second Per Ton
@@ -182,6 +183,11 @@ namespace WebGame
 
         internal void ReceiveCommand(Ship ship, Command command)
         {
+        }
+
+        public void PlaySound(string name)
+        {
+            Sounds.Add(name);
         }
     }
 }
