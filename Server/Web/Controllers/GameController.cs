@@ -348,7 +348,7 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
             Initalize(id);
 
             if (game.DefaultShip != null)
-                game.DefaultShip.SetMainScreenView(view);
+                game.DefaultShip.MainView = view;
 
             return null;
         }
@@ -396,7 +396,7 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
             Initalize(id);
 
             if (game.DefaultShip != null && player.Station == Station.Weapons)
-                game.DefaultShip.ToggleAlert();
+                game.DefaultShip.Alert = !game.DefaultShip.Alert;
 
             return null;
         }
@@ -406,8 +406,8 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
             Initalize(id);
 
             if (game.DefaultShip != null && player.Station == Station.Weapons)
-                game.DefaultShip.ToggleShields();
-
+                game.DefaultShip.ShieldsEngaged = !game.DefaultShip.ShieldsEngaged;
+            
             return null;
         }
 
