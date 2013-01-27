@@ -139,6 +139,8 @@ namespace WebGame
 
         [ProtoMember(22)]
         public int PhaserBanks { get; set; }
+
+        public Dictionary<int, DateTime> LastBeamBanksUsed = new Dictionary<int,DateTime>();
  
         public override string Type { get { return "Ship"; } }
         public MissionStatus missionState = null;
@@ -479,5 +481,39 @@ namespace WebGame
                 this.RepairCrewTargets[repairCrewIndex] = part;
             }
         }
-   }
+
+        public bool IsEntityCloserThan(Entity target, float distance)
+        {
+            return (Position - target.Position).LengthSquared() < distance * distance;
+        }
+
+        public double BeamCoolDownTime(int bank)
+        {
+            if (LastBeamBanksUsed.ContainsKey(bank))
+            {
+                return (DateTime.UtcNow - LastBeamBanksUsed[bank]).TotalSeconds;
+            }
+            else
+                return Single.MaxValue;
+
+        }
+
+        internal void FireBeam(int bank, Entity target, BeamType type)
+        {
+            if (!BeamWeapons.Contains(type))
+                return;
+
+            switch (type)
+            {
+                case BeamType.StandardPhaser:
+                    if (IsEntityCloserThan(target, 150) && Energy > 5 && BeamCoolDownTime(bank) > 2)
+                    {
+                        target.Damage(100);
+                        LastBeamBanksUsed[bank] = DateTime.UtcNow;
+//                        Energy -= 5;
+                    }
+                    break;
+            }
+        }
+    }
 }
