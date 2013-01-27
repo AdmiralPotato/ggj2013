@@ -1,28 +1,3 @@
-
-<!DOCTYPE html>
-
-<html>
-<head>
-<title>Global Game Jam 2013</title>
-<style>
-*{
-	margin: 0;
-	padding: 0;
-	border: 0;
-	outline: 0;
-}
-canvas{
-	position: fixed;
-	top: 0;
-	left: 0;
-}
-</style>
-</head>
-
-<body>
-<script type = "text/javascript" src = "https://raw.github.com/mrdoob/three.js/master/build/three.js"></script>
-
-<script>
 window.requestAnimFrame = (function(){
 	return  window.requestAnimationFrame       ||
 		window.webkitRequestAnimationFrame ||
@@ -248,7 +223,3 @@ var distanceElevationHeading = function (_distance, _elevation, _heading){
 	var a = _distance * Math.cos(radE);
 	return new THREE.Vector3(a * Math.cos(radH), _distance * Math.sin(radE), -a * Math.sin(radH));
 };
-
-</script>
-</body>
-</html>
