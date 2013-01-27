@@ -53,11 +53,24 @@ namespace WebGame
         /// <summary>
         /// How long ago the projectile was loaded
         /// </summary>
-        [ProtoMember(4)]
+        [ProtoMember(6)]
         public TimeSpan ProjectileLoadTime { get; private set; }
 
-        [ProtoMember(5)]
+        [ProtoMember(7)]
         public ProjectileStatus ProjectileStatus { get; set; }
+
+        [ProtoMember(8)]
+        public  int Energy { get; set; }
+        [ProtoMember(9)]
+        public  int FrontShield { get; set; }
+        [ProtoMember(10)]
+        public  int RearShield { get; set; }
+        [ProtoMember(11)]
+        public  int LeftShield { get; set; }
+        [ProtoMember(12)]
+        public  int RightShield { get; set; }
+        [ProtoMember(13)]
+        public bool ShieldsEngaged { get; set; }
 
         private static TimeSpan timeToLoadProjectile = TimeSpan.FromSeconds(5);
 
@@ -112,32 +125,34 @@ namespace WebGame
 
         public void LoadProjectile()
         {
-            if (this.ProjectileStatus != ProjectileStatus.Unloaded)
+            if (this.ProjectileStatus == ProjectileStatus.Unloaded)
             {
-                throw new InvalidOperationException("The tube must be empty to load a projectile.");
+                this.ProjectileLoadTime = TimeSpan.Zero;
+                this.ProjectileStatus = ProjectileStatus.Loading;
             }
-            this.ProjectileLoadTime = TimeSpan.Zero;
-            this.ProjectileStatus = ProjectileStatus.Loading;
         }
 
         public Projectile LaunchProjectile(Entity target)
         {
-            if (this.ProjectileStatus != ProjectileStatus.Loaded)
+            if (this.ProjectileStatus == ProjectileStatus.Loaded && this.StarSystem == target.StarSystem)
             {
-                throw new InvalidOperationException("The tube must be loaded to launch a projectile");
+                var projectile = new Projectile();
+                projectile.Target = target;
+                this.StarSystem.AddEntity(projectile);
+                return projectile;
             }
-            if (this.StarSystem != target.StarSystem)
-            {
-                throw new ArgumentException("The target is not in the current star system");
-            }
-            var projectile = new Projectile();
-            projectile.Target = target;
-            this.StarSystem.AddEntity(projectile);
-            return projectile;
+            return null;
         }
 
         public override void Update(TimeSpan elapsed)
         {
+            if (ShieldsEngaged)
+            {
+                FrontShield++;
+                if (FrontShield > 100)
+                    FrontShield = 100;
+            }
+
             if (this.ProjectileStatus == ProjectileStatus.Loading)
             {
                 this.ProjectileLoadTime += elapsed;
@@ -242,7 +257,7 @@ namespace WebGame
         {
             if (Players.Count > 0)
             {
-                var update = new UpdateToClient();
+                var update = new UpdateToClient() { ShipId = Id, Energy = this.Energy, FrontShield = this.FrontShield, RearShield = this.RearShield, LeftShield = this.LeftShield, RightShield = this.RightShield, ShieldsEngaged = this.ShieldsEngaged };
                 foreach (var entity in StarSystem.Entites)
                 {
                     update.Entities.Add(new EntityUpdate() { Id = entity.Id, Type = entity.Type, Rotation = (float)entity.Orientation, Position = entity.Position });
@@ -250,11 +265,6 @@ namespace WebGame
                 GameHub.SendUpdate(Game.Id, Id, update);
                 System.Diagnostics.Debug.WriteLine("Update Sent.");
             }
-        }
-
-        internal void ToggleShields()
-        {
-            throw new NotImplementedException();
         }
 
         protected override IEnumerable<string> PartList
@@ -273,16 +283,6 @@ namespace WebGame
 
         internal void SetCoolant(string part, int amount)
         {
-        }
-
-        internal void ToggleAlert()
-        {
-            Alert = !Alert;
-        }
-
-        internal void SetMainScreenView(MainView view)
-        {
-            MainView = view;
         }
 
         internal void SetRepairTarget(string part)

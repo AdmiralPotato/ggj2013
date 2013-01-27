@@ -33,13 +33,16 @@ namespace WebGame
         {
             if (this.StarSystem != Target.StarSystem)
             {
-                throw new ArgumentException("The target is not in the current star system");
+                this.Destroy();
             }
-            var displacementToTarget = DisplacementToTarget();
-            var displacementToTargetQuadrance = displacementToTarget.Quadrance();
-            this.Orientation = Math.Atan2(displacementToTarget.Y, displacementToTarget.X).NormalizeOrientation();
+            else
+            {
+                var displacementToTarget = DisplacementToTarget();
+                var displacementToTargetQuadrance = displacementToTarget.Quadrance();
+                this.Orientation = Math.Atan2(displacementToTarget.Y, displacementToTarget.X).NormalizeOrientation();
 
-            base.Update(elapsed);
+                base.Update(elapsed);
+            }
         }
 
         private Vector3 DisplacementToTarget()
