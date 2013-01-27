@@ -123,6 +123,7 @@ namespace WebGame
             : base(mass)
         {
             Players = new List<Player>();
+            missionState = new MissionStatus(this);
         }
 
         public void LoadProjectile()

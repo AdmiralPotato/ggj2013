@@ -13,7 +13,7 @@ namespace WebGame
         MISSION_TYPE_DEFEAT_ENEMY
     }
 
-    public class Mission
+    public abstract class Mission
     {
         public MissionType Type { get; set; }
 
