@@ -178,11 +178,8 @@
     <Content Include="client\sounds\shieldsup.wav" />
     <Content Include="client\sounds\thruster-loop.mp3" />
     <Content Include="client\sounds\thruster-loop.wav" />
-    <Content Include="client\three_test\Assets\FishColorMap.png" />
-    <Content Include="client\three_test\Assets\FishNormalMap.png" />
     <Content Include="client\three_test\Assets\SpearColorMap.png" />
     <Content Include="client\three_test\Assets\SpearNormalMap.png" />
-    <Content Include="client\three_test\Assets\Starbasebasecolor.png" />
     <Content Include="client\three_test\Assets\StarBaseNormalMap.png" />
     <Content Include="client\three_test\eyeguy.js" />
     <Content Include="client\three_test\eyeguy_tex.png" />
