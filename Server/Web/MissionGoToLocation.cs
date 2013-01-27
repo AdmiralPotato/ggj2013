@@ -20,13 +20,18 @@ namespace WebGame
             targetLocationY = initTargetY;
         }
 
-        public override bool IsComplete()
+        internal override bool IsComplete()
         {
             if (Math.Abs(missionOwnerShip.Position.X - targetLocationX) < COMPLETED_MISSION_DISTANCE && Math.Abs(missionOwnerShip.Position.Y - targetLocationY) < COMPLETED_MISSION_DISTANCE )
             {
                 return true;
             }
             return false;
+        }
+
+        internal override void MissionSetup()
+        {
+            // nothing to do here
         }
     }
 }

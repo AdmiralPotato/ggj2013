@@ -70,7 +70,7 @@ namespace WebGame
             {
                 if (Utility.Random.Next(480) <= 0)
                 {
-                    AddEntity(new Enemy(new Vector3(Utility.Random.Next(1000) - 500, Utility.Random.Next(1000) - 500, 0)));
+                    AddEntity(new Enemy(new Vector3(Utility.Random.Next(1000) - 500, Utility.Random.Next(1000) - 500, 0)) { Tubes = 3 });
                 }
             }
         }

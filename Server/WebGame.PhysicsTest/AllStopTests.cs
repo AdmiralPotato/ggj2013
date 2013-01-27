@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.Xna.Framework;
 
 namespace WebGame.PhysicsTest
 {
@@ -7,7 +8,7 @@ namespace WebGame.PhysicsTest
     public class AllStopTests
     {
         [TestMethod]
-        public void TestAllStop()
+        public void TestCrazyAllStop()
         {
             var ship = new Ship(4000);
             Assert.AreEqual(0, ship.Velocity.Magnitude(), "new ship wasn't stopped");
@@ -33,7 +34,41 @@ namespace WebGame.PhysicsTest
             ship.Update(TimeSpan.FromSeconds(0.25));
             ship.Update(TimeSpan.FromSeconds(0.25));
             ship.Update(TimeSpan.FromSeconds(0.25));
+            ship.Update(TimeSpan.FromSeconds(0.25)); // strictly speaking the previous one was really close to zero, so it should work, but one more actually makes it zero.
             Assert.AreEqual(0, ship.Velocity.Magnitude(), "ship should be stopped by now?");
+        }
+
+        [TestMethod]
+        public void TestAllStop0Radians()
+        {
+            var ship = new Ship(4000);
+            Assert.AreEqual(0, ship.Velocity.Magnitude(), "new ship wasn't stopped");
+            Assert.AreEqual(0, ship.Orientation, "ship wasn't oriented 0");
+            ship.Update(TimeSpan.FromSeconds(0.25));
+            ship.ImpulsePercentage = 100;
+            ship.Update(TimeSpan.FromSeconds(0.25));
+            ship.Update(TimeSpan.FromSeconds(0.25));
+            ship.Update(TimeSpan.FromSeconds(0.25));
+            ship.Update(TimeSpan.FromSeconds(0.25));
+            ship.Update(TimeSpan.FromSeconds(0.25));
+            ship.Update(TimeSpan.FromSeconds(0.25));
+            ship.Update(TimeSpan.FromSeconds(0.25));
+            ship.Update(TimeSpan.FromSeconds(0.25));
+            ship.Update(TimeSpan.FromSeconds(0.25));
+            Assert.AreEqual(0, ship.Orientation, "ship turned during acceleration");
+            ship.TargetSpeedMetersPerSecond = 0;
+            ship.Update(TimeSpan.FromSeconds(0.25));
+            ship.Update(TimeSpan.FromSeconds(0.25));
+            ship.Update(TimeSpan.FromSeconds(0.25));
+            ship.Update(TimeSpan.FromSeconds(0.25));
+            ship.Update(TimeSpan.FromSeconds(0.25));
+            ship.Update(TimeSpan.FromSeconds(0.25));
+            ship.Update(TimeSpan.FromSeconds(0.25));
+            ship.Update(TimeSpan.FromSeconds(0.25));
+            Assert.AreNotEqual(Vector3.Zero, ship.Velocity, "Ship couldn't have been stopped by now.");
+            Assert.IsTrue(Utility.ApproximatelyEqual(0, ship.Orientation), "ship turned during all stop");
+            ship.Update(TimeSpan.FromSeconds(0.25));
+            Assert.AreEqual(Vector3.Zero, ship.Velocity, "velocity wasn't stopped long after all stop message sent");
         }
 
         [TestMethod]

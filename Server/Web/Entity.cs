@@ -144,10 +144,10 @@ namespace WebGame
             if (CheckEnergy())
             {
                 this.Velocity += acceleration * (elapsed.Ticks / (float)TimeSpan.FromSeconds(1).Ticks);
-                if (this.Velocity.Magnitude() < 0.1) // small enough not to care.
-                {
-                    this.Velocity = Vector3.Zero;
-                }
+                //if (this.Velocity.Magnitude() < 0.01) // small enough not to care.
+                //{
+                //    //this.Velocity = Vector3.Zero;
+                //}
             }
         }
 

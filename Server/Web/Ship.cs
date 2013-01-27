@@ -71,12 +71,12 @@ namespace WebGame
         [ProtoMember(5)]
         public MainView MainView { get; set; }
 
-        private Dictionary<int, Tube> _tubes = new Dictionary<int,Tube>();
-        private IDictionary<int, Tube> ProjectileTubes
+        private List<Tube> _projectileTubes = new List<Tube>();
+        private ReadOnlyCollection<Tube> ProjectileTubes
         {
             get
             {
-                return new ReadOnlyDictionary<int, Tube>(_tubes);
+                return new ReadOnlyCollection<Tube>(_projectileTubes);
             }
         }
 
@@ -140,8 +140,26 @@ namespace WebGame
         [ProtoMember(20)]
         public int MaxShields { get; set; }
 
+        private int _tubes = 0;
         [ProtoMember(21)]
-        public int Tubes { get; set; }
+        public int Tubes
+        {
+            get { return _tubes; }
+            set
+            {
+                _tubes = value;
+                // make sure there's enough tubes
+                while (this.ProjectileTubes.Count < this.Tubes)
+                {
+                    this._projectileTubes.Add(new Tube());
+                }
+                // make sure there aren't too many 
+                while (this.ProjectileTubes.Count > this.Tubes)
+                {
+                    this._projectileTubes.RemoveAt(this._projectileTubes.Count - 1); // remove the last one
+                }
+            }
+        }
 
         [ProtoMember(22)]
         public int PhaserBanks { get; set; }
@@ -292,11 +310,13 @@ namespace WebGame
                     // align with velocity
                     var velocityDirection = Math.Atan2(this.Velocity.Y, this.Velocity.X).NormalizeOrientation();
                     var velocityOrientationAngle = this.Orientation - velocityDirection;
+
                     this._desiredOrientation = velocityDirection; // we need to directly access the underscore members so that we don't call the set method, which will unset the target speed 
-                    if (Math.Abs(velocityOrientationAngle) > Math.PI / 2)
+                    if (Math.Abs(velocityOrientationAngle) > Math.PI / 2) // if it would be less turning for us to turn into the velocity, do that instead
                     {
                         this._desiredOrientation = (velocityDirection + Math.PI).NormalizeOrientation(); // we need to directly access the underscore members so that we don't call the set method, which will unset the target speed 
                     }
+
                     // apply a slowing force
                     this._impulsePercentage = -100 * Math.Cos(velocityOrientationAngle); // we need to directly access the underscore members so that we don't call the set method, which will unset the target speed 
                     // but make sure it won't push us past the desired velocity
@@ -304,7 +324,7 @@ namespace WebGame
                     var targetDeceleration = speed - this.TargetSpeedMetersPerSecond.Value;
                     if (targetDeceleration < Math.Abs(decelerationAmount))
                     {
-                        this._impulsePercentage = targetDeceleration / (this.EffectiveMaximumForce / this.Mass) * 100 * Math.Sign(decelerationAmount); // we need to directly access the underscore members so that we don't call the set method, which will unset the target speed 
+                        this._impulsePercentage = targetDeceleration / (this.EffectiveMaximumForce / this.Mass) / elapsed.TotalSeconds * 100 * Math.Sign(decelerationAmount); // we need to directly access the underscore members so that we don't call the set method, which will unset the target speed 
                     }
                 }
             }
@@ -312,15 +332,8 @@ namespace WebGame
 
         private void UpdateProjectileLoading(TimeSpan elapsed)
         {
-            // make sure there's enough tubes
-            while (this.ProjectileTubes.Count < this.Tubes)
+            foreach (var tube in this.ProjectileTubes)
             {
-                this._tubes[this.ProjectileTubes.Count] = new Tube();
-            }
-
-            foreach (var pair in this.ProjectileTubes)
-            {
-                var tube = pair.Value;
                 if (tube.ProjectileStatus == ProjectileStatus.Loading)
                 {
                     tube.ProjectileLoadTime += elapsed;
@@ -393,7 +406,7 @@ namespace WebGame
         {
             if (missionState != null)
             {
-                missionState.checkSuccess();
+                missionState.updateMissionStatus();
             }
         }
 
@@ -581,5 +594,7 @@ namespace WebGame
                     break;
             }
         }
+
+        public string Name { get; set; }
     }
 }

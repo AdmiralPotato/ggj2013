@@ -160,6 +160,7 @@
     <Content Include="client\index.html" />
     <Content Include="client\index2.html" />
     <Content Include="client\js\game.js" />
+    <Content Include="client\js\network.js" />
     <Content Include="client\js\shapes-wireframe.js" />
     <Content Include="client\js\signalR.js" />
     <Content Include="client\js\Three.js" />
