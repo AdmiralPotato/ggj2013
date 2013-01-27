@@ -139,6 +139,8 @@ namespace WebGame
 
         [ProtoMember(22)]
         public int PhaserBanks { get; set; }
+
+        public Dictionary<int, DateTime> LastBeamBanksUsed = new Dictionary<int,DateTime>();
  
         public override string Type { get { return "Ship"; } }
         public MissionStatus missionState = null;
@@ -410,7 +412,8 @@ namespace WebGame
                         update.Sounds.AddRange(entity.Sounds);
                     update.Entities.Add(new EntityUpdate() { Id = entity.Id, Type = entity.Type, Rotation = (float)entity.Orientation, Position = entity.Position });
                 }
-                update.missionUpdate = missionState.getMissionStatusUpdate();
+                if (missionState != null)
+                    update.missionUpdate = missionState.getMissionStatusUpdate();
                 GameHub.SendUpdate(Game.Id, Id, update);
                 System.Diagnostics.Debug.WriteLine("Update Sent. Mission status:" + update.missionUpdate);
             }
@@ -478,5 +481,38 @@ namespace WebGame
                 this.RepairCrewTargets[repairCrewIndex] = part;
             }
         }
-   }
+
+        public bool IsEntityCloserThan(Entity target, float distance)
+        {
+            return (Position - target.Position).LengthSquared() < distance * distance;
+        }
+
+        public double BeamCoolDownTime(int bank)
+        {
+            if (LastBeamBanksUsed.ContainsKey(bank))
+            {
+                return (DateTime.UtcNow - LastBeamBanksUsed[bank]).TotalSeconds;
+            }
+            else
+                return Single.MaxValue;
+        }
+
+        internal void FireBeam(int bank, Entity target, BeamType type)
+        {
+            if (!BeamWeapons.Contains(type))
+                return;
+
+            switch (type)
+            {
+                case BeamType.StandardPhaser:
+                    if (IsEntityCloserThan(target, 150) && Energy > 5 && BeamCoolDownTime(bank) > 2)
+                    {
+                        target.Damage(100);
+                        LastBeamBanksUsed[bank] = DateTime.UtcNow;
+                        UseRawEnergy(5);
+                    }
+                    break;
+            }
+        }
+    }
 }

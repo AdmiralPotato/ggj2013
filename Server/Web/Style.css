@@ -634,12 +634,12 @@ ul.noty_cont.noty_layout_topRight li
 /* chat box default border*/
 .cb_default {
 	border: 1px solid #ccc;
-	background-color: #fff;	
+	background-color: #333;	
 }
 /* chat box highlight border*/
 .cb_highlight {
 	border: 1px solid #000;
-	background-color: #F9FAFF;	
+	background-color: #444;	
 }
 
 /* CHAT PARTNER NAME */
