@@ -101,7 +101,6 @@ client.entityTypes.Ship.prototype = {
     type: 'Ship',
     color: '#ff0',
     shape: wireframes.spear,
-	renderAlways: true,
     update: function () {
         var t = this;
         deltaInterpolate(t);
@@ -129,7 +128,6 @@ client.entityTypes.Starbase.prototype = {
     type: 'Starbase',
     color: '#00f',
     shape: wireframes.starBase,
-	renderAlways: true,
     update: function () {
         var t = this;
         deltaInterpolate(t);
@@ -156,7 +154,6 @@ client.entityTypes.Enemy.prototype = {
     type: 'Enemy',
     color: '#f00',
     shape: wireframes.fishShip,
-	renderAlways: true,
     update: function () {
         var t = this;
         deltaInterpolate(t);
@@ -183,7 +180,6 @@ client.entityTypes.Projectile.prototype = {
     type: 'Projectile',
     color: '#f00',
     shape: wireframes.simpleShip,
-	renderAlways: true,
     update: function () {
         var t = this;
         deltaInterpolate(t);
@@ -200,7 +196,6 @@ var setEntityAsPlayer = function (entity) {
         shape: new n.Geom.Circle({
             radius: 3
         }),
-		renderAlways: true,
         pos: [15, 0, 0],
         color: '#9f0'
     });
@@ -208,7 +203,6 @@ var setEntityAsPlayer = function (entity) {
         shape: new n.Geom.Circle({
             radius: 15
         }),
-		renderAlways: true,
         color: '#ccc'
     });
     entity.color = '#0f0';
@@ -254,10 +248,14 @@ var setGameStateFromServer = function (data) {
 			}
 		}
 
-		// play sounds
-		for( var sound in data.Sounds ) {
-			SFX[sound].play();
-		}
+        // play sounds
+        if (audioLoaded)
+        {
+            for (var sound in data.Sounds)
+            {
+                SFX[sound].play();
+            }
+        }
     }
 };
 
@@ -267,6 +265,7 @@ if (typeof isLocal === 'undefined') {
 var serverPath = isLocal ? 'http://legendstudio.com/' : '/';
 var currentGame = isLocal ? 'Game-' + gameId + '/' : '';
 var loadScript = function (relativePath) {
+
     document.write('<script type="text/javascript" src="' + serverPath + relativePath + '"></script>');
 };
 loadScript('Scripts/jquery.signalR-1.0.0-rc2.js');
