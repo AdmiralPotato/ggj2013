@@ -7,6 +7,7 @@ using ProtoBuf;
 
 namespace WebGame
 {
+    [ProtoInclude(100, typeof(Enemy))]
     [ProtoContract]
     public class Ship : Entity
     {
@@ -38,7 +39,7 @@ namespace WebGame
             }
             set
             {
-                _desiredOrientation = value;
+                _desiredOrientation = value.NormalizeOrientation();
                 TargetSpeedMetersPerSecond = null; // setting orientation means "forget about what I said about 'all stop' or whatever other speed I said to try to get to"
             }
         }
@@ -59,16 +60,14 @@ namespace WebGame
         [ProtoMember(7)]
         public ProjectileStatus ProjectileStatus { get; set; }
 
-        [ProtoMember(8)]
-        public  int Energy { get; set; }
         [ProtoMember(9)]
-        public  int FrontShield { get; set; }
+        public int FrontShield { get; set; }
         [ProtoMember(10)]
-        public  int RearShield { get; set; }
+        public int RearShield { get; set; }
         [ProtoMember(11)]
-        public  int LeftShield { get; set; }
+        public int LeftShield { get; set; }
         [ProtoMember(12)]
-        public  int RightShield { get; set; }
+        public int RightShield { get; set; }
         [ProtoMember(13)]
         public bool ShieldsEngaged { get; set; }
 
@@ -76,47 +75,42 @@ namespace WebGame
         public int DefaultShipNumber { get; set; }
 
         private static TimeSpan timeToLoadProjectile = TimeSpan.FromSeconds(5);
-
-        public TimeSpan EffectiveTimeToLoadProjectile
-        {
-            get
-            {
-                return this.Effective(timeToLoadProjectile, "Projectile Tube");
-            }
-        }
+        public TimeSpan EffectiveTimeToLoadProjectile { get { return this.Effective(timeToLoadProjectile, "Projectile Tube"); }}
 
         /// <summary>
         /// Angle Per Second
         /// </summary>
-        private const double turnRate = Math.PI / 4;
+        [ProtoMember(15)]
+        public double TurnRate = Math.PI / 4;
+
         /// <summary>
         /// AnglePerSecond
         /// </summary>
-        public double EffectiveTurnRate
+        public double EffectiveTurnRate { get { return this.Effective(TurnRate, "Thrusters"); } }
+
+        [ProtoMember(15)]
+        public double MaximumForce = 10000;
+        protected int EffectiveMaximumEnergy
         {
             get
             {
-                return this.Effective(turnRate, "Thrusters");
+                return (int)this.Effective(MaximumForce, "Energy Storage");
             }
         }
+
         /// <summary>
         /// Meters Per Second Per Ton
         /// </summary>
-        private const double maximumForce = 10000;
-        public double EffectiveMaximumForce
-        {
-            get
-            {
-                return this.Effective(maximumForce, "Engines");
-            }
-        }
+        public double EffectiveMaximumForce { get { return this.Effective(MaximumForce, "Engines"); } }
+
+        [ProtoMember(16)]
+        public List<BeamType> BeamWeapons = new List<BeamType>();
+
+        [ProtoMember(17)]
+        public Dictionary<ProjectileType, int> Projectiles = new Dictionary<ProjectileType, int>();
 
         public override string Type { get { return "Ship"; } }
-        
-
-        public MissionStatus missionState;
-
-
+        public MissionStatus missionState = null;
 
         public Ship()
             : this(1000)
@@ -126,18 +120,80 @@ namespace WebGame
         public Ship(double mass)
             : base(mass)
         {
-            Players = new List<Player>();
+            //if (Type.Equals("Ship") )  // aka not enemy
+            //{
+                Players = new List<Player>();
+            //}
+        }
+
+        internal void SetupMissions()
+        {
+            // this.StarSystem must be set at this point
             missionState = new MissionStatus(this);
         }
 
-        public void LoadProjectile()
+        protected override double InitialEnergy { get { return 1000; } }
+
+        public static Ship Create(ShipType type)
+        {
+            Ship result;
+            switch (type)
+            {
+                case ShipType.Spearhead:
+                    result = new Ship(2000) { MaxShields = 500, TorpedoTubes = 2, PhaserBanks = 1 };
+                    result.BeamWeapons.AddRange((BeamType[])Enum.GetValues(typeof(BeamType)));
+                    result.BeamWeapons.Remove(BeamType.ShadowTether);
+                    result.Projectiles[ProjectileType.Torpedo] = 10;
+                    result.Projectiles[ProjectileType.Nuke] = 1;
+                    result.Projectiles[ProjectileType.Hardshell] = 1;
+                    result.Projectiles[ProjectileType.Knockshot] = 1;
+                    result.Projectiles[ProjectileType.Skattershot] = 1;
+                    break;
+                case ShipType.Skirmisher:
+                    result = new Ship(2000) { MaxShields = 500, TorpedoTubes = 2, PhaserBanks = 2 };
+                    result.BeamWeapons.AddRange((BeamType[])Enum.GetValues(typeof(BeamType)));
+                    result.BeamWeapons.Remove(BeamType.ShadowTether);
+                    result.Projectiles[ProjectileType.Torpedo] = 10;
+                    break;
+                case ShipType.Beserker:
+                    result = new Ship(5000) { MaxShields = 0, TorpedoTubes = 0, PhaserBanks = 1 , MaximumForce = 12500 };
+                    result.BeamWeapons.Add(BeamType.HullPiercing);
+                    result.BeamWeapons.Add(BeamType.SelfDestruct);
+                    result.BeamWeapons.Add(BeamType.PlasmaVent);
+                    break;
+                case ShipType.Gunboat:
+                    result = new Ship(1500) { MaxShields = 600, TorpedoTubes = 4, PhaserBanks = 1 };
+                    result.BeamWeapons.Add(BeamType.SuppresionPulse);
+                    result.BeamWeapons.Add(BeamType.ShadowTether);
+                    result.Projectiles[ProjectileType.Torpedo] = 10;
+                    result.Projectiles[ProjectileType.Nuke] = 1;
+                    result.Projectiles[ProjectileType.Hardshell] = 1;
+                    break;
+                case ShipType.Capital:
+                    result = new Ship(3000) { MaxShields = 1000, TorpedoTubes = 5 };
+                    result.BeamWeapons.Add(BeamType.StandardPhaser);
+                    result.BeamWeapons.Add(BeamType.ShieldDamper);
+                    result.BeamWeapons.Add(BeamType.ShadowTether);
+                    result.Projectiles[ProjectileType.Torpedo] = 10;
+                    result.Projectiles[ProjectileType.Nuke] = 1;
+                    result.Projectiles[ProjectileType.Hardshell] = 1;
+                    break;
+                default:
+                    throw new NotImplementedException("Unknown ship type " + type.ToString());
+            }
+            return result;
+        }
+
+        public bool LoadProjectile()
         {
             if (this.ProjectileStatus == ProjectileStatus.Unloaded)
             {
                 this.ProjectileLoadTime = TimeSpan.Zero;
                 this.ProjectileStatus = ProjectileStatus.Loading;
+                return true;
                 PlaySound("MissileLoad");
             }
+            return false;
         }
 
         public Projectile LaunchProjectile(Entity target)
@@ -209,8 +265,9 @@ namespace WebGame
             TurnShipToDesiredOrientation(elapsed);
 
             base.Update(elapsed);
-            
-            UpdateMission();
+
+            if( missionState != null )
+                UpdateMission();
         }
 
         private void TurnShipToDesiredOrientation(TimeSpan elapsed)
@@ -237,7 +294,14 @@ namespace WebGame
             return remaining;
         }
 
-        public override double Force
+        public override double ApplyForce(TimeSpan elapsedTime)
+        {
+            var intendedForce = this.ImpulsePercentage / 100 * MaximumForce;
+            this.LoseEnergyFrom(intendedForce, elapsedTime); // the idea here is that if their engines aren't working at full capacity, they'll still lose energy as if they were. They're punching it, and losing all that energy, but only the Effective force is output.
+            return Force;
+        }
+
+        private double Force
         {
             get
             {
@@ -280,7 +344,7 @@ namespace WebGame
         {
             if (Players.Count > 0)
             {
-                var update = new UpdateToClient() { ShipId = Id, Energy = this.Energy, FrontShield = this.FrontShield, RearShield = this.RearShield, LeftShield = this.LeftShield, RightShield = this.RightShield, ShieldsEngaged = this.ShieldsEngaged };
+                var update = new UpdateToClient() { ShipId = Id, Energy = (int)this.Energy, FrontShield = this.FrontShield, RearShield = this.RearShield, LeftShield = this.LeftShield, RightShield = this.RightShield, ShieldsEngaged = this.ShieldsEngaged };
                 foreach (var entity in StarSystem.Entites)
                 {
                     if (entity.Sounds.Count > 0)
@@ -289,7 +353,7 @@ namespace WebGame
                 }
                 update.missionUpdate = missionState.getMissionStatusUpdate();
                 GameHub.SendUpdate(Game.Id, Id, update);
-                System.Diagnostics.Debug.WriteLine("Update Sent. Mission status:"+update.missionUpdate);
+                System.Diagnostics.Debug.WriteLine("Update Sent. Mission status:" + update.missionUpdate);
             }
         }
 
@@ -300,6 +364,9 @@ namespace WebGame
                 yield return "Thrusters";
                 yield return "Engines";
                 yield return "Projectile Tube";
+                yield return "Shield Regenerators";
+                yield return "Energy Collectors";
+                yield return "Energy Storage";
             }
         }
 
@@ -314,5 +381,11 @@ namespace WebGame
         internal void SetRepairTarget(string part)
         {
         }
+
+        public int MaxShields { get; set; }
+
+        public int TorpedoTubes { get; set; }
+
+        public int PhaserBanks { get; set; }
     }
 }

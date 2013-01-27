@@ -17,5 +17,33 @@ namespace WebGame.PhysicsTest
             Assert.AreNotEqual(ship.Velocity, Vector3.Zero, "Ship isn't moving.");
             Assert.AreNotEqual(ship.Position, Vector3.Zero, "Ship hasn't moved.");
         }
+
+        [TestMethod]
+        public void RunOutOfEnergy()
+        {
+            var game = new Game();
+            var system = new StarSystem();
+            system.RandomlySpawnEnemies = false;
+            game.Add(system);
+            var ship = new Ship();
+            system.AddEntity(ship);
+            ship.ImpulsePercentage = 100;
+            Assert.IsTrue(ship.Energy > 0, "Ship didn't have any energy");
+            var oldVelocity = ship.Velocity;
+            Assert.AreEqual(0, ship.Velocity.Magnitude(), "Ship should be at rest at first");
+
+            for (int i = 0; i < 200; i++)
+            {
+                game.Update(TimeSpan.FromSeconds(0.25));
+                game.Update(TimeSpan.FromSeconds(0.25));
+                game.Update(TimeSpan.FromSeconds(0.25));
+                game.Update(TimeSpan.FromSeconds(0.25));
+                Assert.IsTrue(oldVelocity.Magnitude() < ship.Velocity.Magnitude(), "The ship didn't increase in speed");
+                oldVelocity = ship.Velocity;
+            }
+            Assert.AreEqual(0, ship.Energy, "The ship didn't run out of energy");
+            ship.Update(TimeSpan.FromSeconds(1));
+            Assert.AreEqual(oldVelocity, ship.Velocity, "The ship should not have been able to increase it's velocity without energy.");
+        }
     }
 }

@@ -105,6 +105,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ShipType.cs" />
     <Compile Include="Mission.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="Enemy.cs" />

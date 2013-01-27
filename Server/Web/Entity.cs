@@ -19,17 +19,20 @@ namespace WebGame
                 throw new ArgumentException("Mass must be positive.");
             }
             this.Mass = mass;
+            this.Energy = this.InitialEnergy;
             SetupParts();
         }
 
         private void SetupParts()
         {
-            Parts = new Dictionary<string, int>();
+            parts = new Dictionary<string, int>();
             foreach (var part in PartList)
             {
-                Parts.Add(part, partsHp);
+                parts.Add(part, partsHp);
             }
         }
+
+        protected const double energyCostPerForcePerSecond = 0.0005;
 
         protected abstract IEnumerable<string> PartList
         {
@@ -67,25 +70,34 @@ namespace WebGame
         [ProtoMember(7)]
         public bool IsDestroyed { get; private set; }
 
-        [ProtoMember(8)]
-        private Dictionary<string, int> Parts { get; set; }
+        Dictionary<string, int> parts;
+        [ProtoMember(9)]
+        public double Energy { get; private set; }
 
-        protected const int partsHp = 5;
+        public void LoseEnergyFrom(double intendedForce, TimeSpan elapsedTime)
+        {
+            Energy -= intendedForce * energyCostPerForcePerSecond * elapsedTime.TotalSeconds;
+        }
 
+        protected virtual double InitialEnergy
+        {
+            get
+            {
+                return 0;
+            }
+        }
+
+        protected const int partsHp = 100;
         public List<string> Sounds = new List<string>();
-
 
         /// <summary>
         /// Meters Per Second Per Ton
         /// Applied in the direction of the Orientation
         /// Can be positive or negative
         /// </summary>
-        public virtual double Force
+        public virtual double ApplyForce(TimeSpan elapsed)
         {
-            get
-            {
-                return 0;
-            }
+            return 0;
         }
 
         public virtual void Update(TimeSpan elapsed)
@@ -109,29 +121,43 @@ namespace WebGame
         {            
             // Force = Mass * Acceleration;
             // Acceleration = Force / Mass
-            var accelerationMagnitude = this.Force / this.Mass;
+            var accelerationMagnitude = this.ApplyForce(elapsed) / this.Mass;
             var flatAcceleration = new Vector3((float)accelerationMagnitude, 0, 0);
             var acceleration = Vector3.Transform(flatAcceleration, Matrix.CreateRotationZ((float)this.Orientation));
 
-            this.Velocity += acceleration;
-            if (this.Velocity.Magnitude() < 0.1) // small enough not to care.
+            // before applying force, we need to check energy:
+            if (CheckEnergy())
             {
-                this.Velocity = Vector3.Zero;
+                this.Velocity += acceleration;
+                if (this.Velocity.Magnitude() < 0.1) // small enough not to care.
+                {
+                    this.Velocity = Vector3.Zero;
+                }
             }
+        }
+
+        private bool CheckEnergy()
+        {
+            if (Energy < 0)
+            {
+                Energy = 0;
+                return false;
+            }
+            return true;
         }
 
         public void Damage(int damage)
         {
-            while (damage > 0 && this.Parts.Values.Sum() > 0)
+            while (damage > 0 && this.parts.Values.Sum() > 0)
             {
-                var systemsThatCanBeDamaged = this.Parts.Where((pair) => pair.Value > 0).ToArray();
+                var systemsThatCanBeDamaged = this.parts.Where((pair) => pair.Value > 0).ToArray();
                 var systemIndexToDamage = Utility.Random.Next(systemsThatCanBeDamaged.Length);
                 var systemToDamage = systemsThatCanBeDamaged[systemIndexToDamage];
-                this.Parts[systemToDamage.Key] = systemToDamage.Value - 1;
+                this.parts[systemToDamage.Key] = systemToDamage.Value - 1;
                 damage--;
             }
 
-            if (this.Parts.Values.Sum() == 0)
+            if (this.parts.Values.Sum() == 0)
             {
                 this.Destroy();
             }
@@ -139,12 +165,12 @@ namespace WebGame
 
         public double Effective(double maximum, string partName)
         {
-            return maximum * this.Parts[partName] / partsHp;
+            return maximum * this.parts[partName] / partsHp;
         }
 
         public TimeSpan Effective(TimeSpan minimum, string partName)
         {
-            return TimeSpan.FromTicks((long)(minimum.Ticks / (this.Parts[partName] / (double)partsHp)));
+            return TimeSpan.FromTicks((long)(minimum.Ticks / (this.parts[partName] / (double)partsHp)));
         }
 
         protected void Destroy()

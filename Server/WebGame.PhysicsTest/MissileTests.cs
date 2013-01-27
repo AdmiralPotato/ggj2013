@@ -120,41 +120,148 @@ namespace WebGame.PhysicsTest
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void LoadProjectileLaunchWithoutLoading()
         {
             var game = new Game();
             var system = new StarSystem();
+            system.RandomlySpawnEnemies = false;
             game.Add(system);
             var ship = new Ship();
             system.AddEntity(ship);
-            ship.LaunchProjectile(ship);
+            var projectile = ship.LaunchProjectile(ship);
+            Assert.IsNull(projectile, "The projectile shouldn't have been launched if it hadn't been loaded.");
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void LoadProjectileLaunchWithoutWaitingAfterLoading()
         {
             var game = new Game();
             var system = new StarSystem();
+            system.RandomlySpawnEnemies = false;
             game.Add(system);
             var ship = new Ship();
             system.AddEntity(ship);
             ship.LoadProjectile();
-            ship.LaunchProjectile(ship);
+            var projectile = ship.LaunchProjectile(ship);
+            Assert.IsNull(projectile, "The projectile shouldn't have been launched if there hasn't been enough time to load it.");
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void LoadProjectileDoubleLoad()
         {
             var game = new Game();
             var system = new StarSystem();
+            system.RandomlySpawnEnemies = false;
             game.Add(system);
             var ship = new Ship();
             system.AddEntity(ship);
-            ship.LoadProjectile();
-            ship.LoadProjectile();
+            var loaded = ship.LoadProjectile();
+            Assert.IsTrue(loaded, "Couldn't load the first projectile");
+            loaded = ship.LoadProjectile();
+            Assert.IsFalse(loaded, "Somehow Loaded a second projectile.");
         }
+
+        [TestMethod]
+        public void DestroyShip()
+        {
+            var game = new Game();
+            var system = new StarSystem();
+            system.RandomlySpawnEnemies = false;
+            game.Add(system);
+            var ship = new Ship();
+            system.AddEntity(ship);
+            ship.ImpulsePercentage = 100;
+            Assert.IsTrue(ship.Energy > 0, "Ship didn't have any energy");
+            var oldVelocity = ship.Velocity;
+            Assert.AreEqual(0, ship.Velocity.Magnitude(), "Ship should be at rest at first");
+
+            for (int i = 0; i < 20; i++)
+            {
+                game.Update(TimeSpan.FromSeconds(0.25));
+                game.Update(TimeSpan.FromSeconds(0.25));
+                game.Update(TimeSpan.FromSeconds(0.25));
+                game.Update(TimeSpan.FromSeconds(0.25));
+                Assert.IsTrue(oldVelocity.Magnitude() < ship.Velocity.Magnitude(), "The ship didn't increase in speed");
+                oldVelocity = ship.Velocity;
+            }
+            var missile = new Projectile();
+            system.AddEntity(missile);
+            missile.Target = ship;
+            oldVelocity = missile.Velocity;
+            Assert.AreEqual(0, missile.Velocity.Magnitude(), "Missile should be at rest at first.");
+            for (int i = 0; i < 9; i++)
+            {
+                game.Update(TimeSpan.FromSeconds(0.25));
+                game.Update(TimeSpan.FromSeconds(0.25));
+                game.Update(TimeSpan.FromSeconds(0.25));
+                game.Update(TimeSpan.FromSeconds(0.25));
+                Assert.IsFalse(missile.IsDestroyed, "the missile got destroyed.");
+                Assert.IsTrue(oldVelocity.Magnitude() < missile.Velocity.Magnitude(), "The missile didn't increase in speed");
+                oldVelocity = missile.Velocity;
+            }
+            game.Update(TimeSpan.FromSeconds(0.25));
+            game.Update(TimeSpan.FromSeconds(0.25));
+            game.Update(TimeSpan.FromSeconds(0.25));
+            game.Update(TimeSpan.FromSeconds(0.25));
+            Assert.IsTrue(missile.IsDestroyed, "the missile didn't get destroyed.");
+            oldVelocity = missile.Velocity;
+            game.Update(TimeSpan.FromSeconds(0.25));
+            Assert.AreEqual(oldVelocity.Magnitude(), missile.Velocity.Magnitude(), "The (dead) missile didn't increase in speed");
+        }
+
+        [TestMethod]
+        public void RunOutOfEnergy()
+        {
+            var game = new Game();
+            var system = new StarSystem();
+            system.RandomlySpawnEnemies = false;
+            game.Add(system);
+            var ship = new Ship();
+            system.AddEntity(ship);
+            ship.ImpulsePercentage = 100;
+            Assert.IsTrue(ship.Energy > 0, "Ship didn't have any energy");
+            var oldVelocity = ship.Velocity;
+            Assert.AreEqual(0, ship.Velocity.Magnitude(), "Ship should be at rest at first");
+
+            for (int i = 0; i < 200; i++)
+            {
+                game.Update(TimeSpan.FromSeconds(0.25));
+                game.Update(TimeSpan.FromSeconds(0.25));
+                game.Update(TimeSpan.FromSeconds(0.25));
+                game.Update(TimeSpan.FromSeconds(0.25));
+                Assert.IsTrue(oldVelocity.Magnitude() < ship.Velocity.Magnitude(), "The ship didn't increase in speed");
+                oldVelocity = ship.Velocity;
+            }
+            Assert.AreEqual(0, ship.Energy, "The ship didn't run out of energy");
+            game.Update(TimeSpan.FromSeconds(1));
+            Assert.AreEqual(oldVelocity, ship.Velocity, "The ship should not have been able to increase it's velocity without energy.");
+            game.Update(TimeSpan.FromSeconds(100000)); // get that ship very far away, so the missile won't detonate
+            var missile = new Projectile();
+            system.AddEntity(missile);
+            missile.Target = ship;
+            oldVelocity = missile.Velocity;
+            Assert.AreEqual(0, missile.Velocity.Magnitude(), "Missile should be at rest at first.");
+            for (int i = 0; i < 20; i++)
+            {
+                game.Update(TimeSpan.FromSeconds(0.25));
+                game.Update(TimeSpan.FromSeconds(0.25));
+                game.Update(TimeSpan.FromSeconds(0.25));
+                game.Update(TimeSpan.FromSeconds(0.25));
+                Assert.IsFalse(missile.IsDestroyed, "the missile got destroyed.");
+                Assert.IsTrue(oldVelocity.Magnitude() < missile.Velocity.Magnitude(), "The missile didn't increase in speed");
+                oldVelocity = missile.Velocity;
+            }
+            game.Update(TimeSpan.FromSeconds(0.25));
+            game.Update(TimeSpan.FromSeconds(0.25));
+            game.Update(TimeSpan.FromSeconds(0.25));
+            game.Update(TimeSpan.FromSeconds(0.25));
+            Assert.IsFalse(missile.IsDestroyed, "the missile didn't get destroyed.");
+            oldVelocity = missile.Velocity;
+            game.Update(TimeSpan.FromSeconds(0.25));
+            Assert.AreEqual(oldVelocity.Magnitude(), missile.Velocity.Magnitude(), "The missile didn't run out of energy after over 20 seconds");
+
+        }
+
     }
 }
+
