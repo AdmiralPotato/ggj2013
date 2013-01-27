@@ -183,8 +183,10 @@ namespace WebGame
             }
         }
 
-        public void Damage(int damage)
+        public void Damage(int damage, double orientation = 0)
         {
+            HandleDamage(ref damage, Orientation);
+
             while (damage > 0 && this.parts.Values.Sum() > 0)
             {
                 var systemsThatCanBeDamaged = this.parts.Where((pair) => pair.Value > 0).ToArray();
@@ -198,6 +200,10 @@ namespace WebGame
             {
                 this.Destroy();
             }
+        }
+
+        protected virtual void HandleDamage(ref int damage, double orientation = 0)
+        {
         }
 
         public double Effective(double maximum, string partName)

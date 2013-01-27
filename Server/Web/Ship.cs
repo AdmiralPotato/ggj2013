@@ -624,6 +624,24 @@ namespace WebGame
             }
         }
 
+        protected override void HandleDamage(ref int damage, double orientation = 0)
+        {
+            if (ShieldsEngaged)
+            {
+                var shield = this.DetermineShieldFrom(orientation);
+                if (damage > shield.Strength)
+                {
+                    damage -= (int)shield.Strength;
+                    shield.Strength = 0;
+                }
+                else
+                {
+                    shield.Strength -= damage;
+                    damage = 0;
+                }
+            }
+        }
+
         [ProtoContract]
         public class Shield
         {
