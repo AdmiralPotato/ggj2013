@@ -68,9 +68,9 @@ namespace WebGame
 
             if (this.RandomlySpawnEnemies)
             {
-                if (Utility.Random.Next(480) <= 2)
+                if (Utility.Random.Next(480) <= 0)
                 {
-                    AddEntity(new Enemy() { Position = new Vector3(Utility.Random.Next(1000) - 500, Utility.Random.Next(1000) - 500, 0) });
+                    AddEntity(new Enemy(new Vector3(Utility.Random.Next(1000) - 500, Utility.Random.Next(1000) - 500, 0)));
                 }
             }
         }

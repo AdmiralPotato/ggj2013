@@ -10,7 +10,7 @@ namespace WebGame
     {
         public override double Radius { get { return 1; } }
 
-        const int destructionPower = partsHp;
+        const int destructionPower = partsHp * 0;
 
         public Entity Target { get; set; }
 
@@ -26,6 +26,10 @@ namespace WebGame
 
         public Projectile(double mass)
             : base(mass)
+        {
+        }
+
+        public Projectile(Vector3 velocity): base(1, velocity: velocity)
         {
         }
 

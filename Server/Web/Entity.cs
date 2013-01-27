@@ -12,7 +12,7 @@ namespace WebGame
     [ProtoContract]
     public abstract class Entity
     {
-        public Entity(double mass)
+        public Entity(double mass, Vector3? position = null, Vector3? velocity = null)
         {
             if (mass <= 0)
             {
@@ -20,12 +20,21 @@ namespace WebGame
             }
             this.Mass = mass;
             this.Energy = this.InitialEnergy;
+            if (position.HasValue)
+            {
+                this.Position = position.Value;
+            }
+            if (velocity.HasValue)
+            {
+                this.Velocity = velocity.Value;
+            }
+
             SetupParts();
         }
 
         private void SetupParts()
         {
-            parts = new Dictionary<string, int>();
+            parts = new Dictionary<string, double>();
             foreach (var part in PartList)
             {
                 parts.Add(part, partsHp);
@@ -47,7 +56,7 @@ namespace WebGame
         public abstract string Type { get; }
 
 //        [ProtoMember(2)]
-        public Vector3 Position;// { get; protected set; }
+        public Vector3 Position { get; protected set; }
         [ProtoMember(3)]
         public double Orientation { get; protected set; }
 
@@ -55,7 +64,7 @@ namespace WebGame
         /// Meters Per Second
         /// </summary>
         //[ProtoMember(4)]
-        public Vector3 Velocity;// { get; protected set; }
+        public Vector3 Velocity { get; protected set; }
         /// <summary>
         /// Tons
         /// </summary>
@@ -70,10 +79,15 @@ namespace WebGame
         [ProtoMember(7)]
         public bool IsDestroyed { get; private set; }
 
-        protected Dictionary<string, int> parts;
+        protected Dictionary<string, double> parts;
 
         [ProtoMember(9)]
         public double Energy { get; private set; }
+
+        public void UseRawEnergy(double amountToUse)
+        {
+            Energy -= amountToUse;
+        }
 
         public void LoseEnergyFrom(double intendedForce, TimeSpan elapsedTime)
         {
@@ -129,13 +143,24 @@ namespace WebGame
             // before applying force, we need to check energy:
             if (CheckEnergy())
             {
-                this.Velocity += acceleration;
+                this.Velocity += acceleration * (elapsed.Ticks / (float)TimeSpan.FromSeconds(1).Ticks);
                 if (this.Velocity.Magnitude() < 0.1) // small enough not to care.
                 {
                     this.Velocity = Vector3.Zero;
                 }
             }
         }
+
+        public void ApplyEnergyForce(double energy, double orientation)
+        {
+            const double efficiency = 0.1;
+            var force = energy / energyCostPerForcePerSecond * efficiency; // No time in this equation, because we will apply this force over one second
+            var accelerationMagnitude = force / this.Mass;
+            var flatAcceleration = new Vector3((float)accelerationMagnitude, 0, 0);
+            var acceleration = Vector3.Transform(flatAcceleration, Matrix.CreateRotationZ((float)orientation));
+            this.Velocity += acceleration; // no time in this equation because it is applied as if it were one second
+        }
+
 
         private bool CheckEnergy()
         {
@@ -145,6 +170,24 @@ namespace WebGame
                 return false;
             }
             return true;
+        }
+
+        public string GetRandomWorkingPart()
+        {
+            var systemsThatCanBeDamaged = this.parts.Where((pair) => pair.Value > 0).ToArray();
+            var systemIndexToDamage = Utility.Random.Next(systemsThatCanBeDamaged.Length);
+            var systemToDamage = systemsThatCanBeDamaged[systemIndexToDamage];
+            return systemToDamage.Key;
+        }
+
+        public void DamagePart(int damage, string part)
+        {
+            parts[part] = Math.Max(parts[part] - damage, 0);
+
+            if (this.parts.Values.Sum() == 0)
+            {
+                this.Destroy();
+            }
         }
 
         public void Damage(int damage)

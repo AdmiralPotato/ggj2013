@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using ProtoBuf;
+using System.Collections.ObjectModel;
 
 namespace WebGame
 {
@@ -16,8 +17,13 @@ namespace WebGame
         {
         }
 
-        public Ship(double mass)
-            : base(mass)
+        public Ship(Vector3 position) : this(1000, position: position)
+        {
+
+        }
+
+        public Ship(double mass, Vector3? position = null)
+            : base(mass, position: position)
         {
             //if (Type.Equals("Ship") )  // aka not enemy
             //{
@@ -65,14 +71,14 @@ namespace WebGame
         [ProtoMember(5)]
         public MainView MainView { get; set; }
 
-        /// <summary>
-        /// How long ago the projectile was loaded
-        /// </summary>
-        [ProtoMember(6)]
-        public TimeSpan ProjectileLoadTime { get; private set; }
-
-        [ProtoMember(7)]
-        public ProjectileStatus ProjectileStatus { get; set; }
+        private Dictionary<int, Tube> _tubes = new Dictionary<int,Tube>();
+        private IDictionary<int, Tube> ProjectileTubes
+        {
+            get
+            {
+                return new ReadOnlyDictionary<int, Tube>(_tubes);
+            }
+        }
 
         [ProtoMember(9)]
         public int FrontShield { get; set; }
@@ -91,7 +97,7 @@ namespace WebGame
         /// <summary>
         /// The string is the name of the system they are repairing
         /// </summary>
-        public List<string> RepairCrewTargets = new List<string>();
+        public readonly List<string> RepairCrewTargets = new List<string>();
 
         private static TimeSpan timeToLoadProjectile = TimeSpan.FromSeconds(5);
         public TimeSpan EffectiveTimeToLoadProjectile { get { return this.Effective(timeToLoadProjectile, "Projectile Tube"); }}
@@ -128,6 +134,20 @@ namespace WebGame
         [ProtoMember(18)]
         public Dictionary<ProjectileType, int> Projectiles = new Dictionary<ProjectileType, int>();
 
+        [ProtoMember(19)]
+        public int RepairCrews { get; set; }
+
+        [ProtoMember(20)]
+        public int MaxShields { get; set; }
+
+        [ProtoMember(21)]
+        public int Tubes { get; set; }
+
+        [ProtoMember(22)]
+        public int PhaserBanks { get; set; }
+
+        public Dictionary<int, DateTime> LastBeamBanksUsed = new Dictionary<int,DateTime>();
+ 
         public override string Type { get { return "Ship"; } }
         public MissionStatus missionState = null;
 
@@ -139,13 +159,13 @@ namespace WebGame
 
         protected override double InitialEnergy { get { return 1000; } }
 
-        public static Ship Create(ShipType type)
+        public static Ship Create(ShipType type, Vector3? position = null)
         {
             Ship result;
             switch (type)
             {
                 case ShipType.Spearhead:
-                    result = new Ship(2000) { MaxShields = 500, TorpedoTubes = 2, PhaserBanks = 1, RepairCrews = 3 };
+                    result = new Ship(2000, position) { MaxShields = 500, Tubes = 2, PhaserBanks = 1, RepairCrews = 3 };
                     result.BeamWeapons.AddRange((BeamType[])Enum.GetValues(typeof(BeamType)));
                     result.BeamWeapons.Remove(BeamType.ShadowTether);
                     result.Projectiles[ProjectileType.Torpedo] = 10;
@@ -155,19 +175,19 @@ namespace WebGame
                     result.Projectiles[ProjectileType.Skattershot] = 1;
                     break;
                 case ShipType.Skirmisher:
-                    result = new Ship(2000) { MaxShields = 500, TorpedoTubes = 2, PhaserBanks = 2, RepairCrews = 3 };
+                    result = new Ship(2000, position) { MaxShields = 500, Tubes = 2, PhaserBanks = 2, RepairCrews = 3 };
                     result.BeamWeapons.AddRange((BeamType[])Enum.GetValues(typeof(BeamType)));
                     result.BeamWeapons.Remove(BeamType.ShadowTether);
                     result.Projectiles[ProjectileType.Torpedo] = 10;
                     break;
                 case ShipType.Beserker:
-                    result = new Ship(5000) { MaxShields = 0, TorpedoTubes = 0, PhaserBanks = 1, MaximumForce = 12500, RepairCrews = 3 };
+                    result = new Ship(5000, position) { MaxShields = 0, Tubes = 0, PhaserBanks = 1, MaximumForce = 12500, RepairCrews = 3 };
                     result.BeamWeapons.Add(BeamType.HullPiercing);
                     result.BeamWeapons.Add(BeamType.SelfDestruct);
                     result.BeamWeapons.Add(BeamType.PlasmaVent);
                     break;
                 case ShipType.Gunboat:
-                    result = new Ship(1500) { MaxShields = 600, TorpedoTubes = 4, PhaserBanks = 1, RepairCrews = 3 };
+                    result = new Ship(1500, position) { MaxShields = 600, Tubes = 4, PhaserBanks = 1, RepairCrews = 3 };
                     result.BeamWeapons.Add(BeamType.SuppresionPulse);
                     result.BeamWeapons.Add(BeamType.ShadowTether);
                     result.Projectiles[ProjectileType.Torpedo] = 10;
@@ -175,7 +195,7 @@ namespace WebGame
                     result.Projectiles[ProjectileType.Hardshell] = 1;
                     break;
                 case ShipType.Capital:
-                    result = new Ship(3000) { MaxShields = 1000, TorpedoTubes = 5, RepairCrews = 3 };
+                    result = new Ship(3000, position) { MaxShields = 1000, Tubes = 5, RepairCrews = 3 };
                     result.BeamWeapons.Add(BeamType.StandardPhaser);
                     result.BeamWeapons.Add(BeamType.ShieldDamper);
                     result.BeamWeapons.Add(BeamType.ShadowTether);
@@ -191,10 +211,10 @@ namespace WebGame
 
         public bool LoadProjectile(int tubeNumber, ProjectileType type)
         {
-            if (this.ProjectileStatus == ProjectileStatus.Unloaded)
+            if (this.ProjectileTubes[tubeNumber].ProjectileStatus == ProjectileStatus.Unloaded)
             {
-                this.ProjectileLoadTime = TimeSpan.Zero;
-                this.ProjectileStatus = ProjectileStatus.Loading;
+                this.ProjectileTubes[tubeNumber].ProjectileLoadTime = TimeSpan.Zero;
+                this.ProjectileTubes[tubeNumber].ProjectileStatus = ProjectileStatus.Loading;
                 PlaySound("MissileLoad");
                 return true;
             }
@@ -203,9 +223,9 @@ namespace WebGame
 
         public Projectile LaunchProjectile(int tubeNumber, Entity target)
         {
-            if (this.ProjectileStatus == ProjectileStatus.Loaded && this.StarSystem == target.StarSystem)
+            if (this.ProjectileTubes[tubeNumber].ProjectileStatus == ProjectileStatus.Loaded && this.StarSystem == target.StarSystem)
             {
-                var projectile = new Projectile();
+                var projectile = new Projectile(this.Velocity);
                 projectile.Target = target;
                 this.StarSystem.AddEntity(projectile);
                 PlaySound("MissileLaunch");
@@ -216,17 +236,41 @@ namespace WebGame
 
         public override void Update(TimeSpan elapsed)
         {
-            UpdateShields();
+            UpdateShields(elapsed);
             UpdateProjectileLoading(elapsed);
-            UpdateTargetVelocity();
+            UpdateTargetVelocity(elapsed);
             UpdateOrientation(elapsed);
+            UpdateRepair(elapsed);
+
             UpdateMission();
 
             base.Update(elapsed);
 
         }
 
-        private void UpdateTargetVelocity()
+        /// <summary>
+        /// hp / second
+        /// </summary>
+        private const double repairRate = 1;
+
+        private void UpdateRepair(TimeSpan elapsed)
+        {
+            for (int i = 0; i < this.RepairCrewTargets.Count; i++)
+            {
+                var target = this.RepairCrewTargets[i];
+                if (target != null)
+                {
+                    this.parts[target] += repairRate * elapsed.TotalSeconds;
+                    if (this.parts[target] >= partsHp)
+                    {
+                        this.parts[target] = partsHp;
+                        this.RepairCrewTargets[i] = null;
+                    }
+                }
+            }
+        }
+
+        private void UpdateTargetVelocity(TimeSpan elapsed)
         {
             if (this.TargetSpeedMetersPerSecond.HasValue)
             {
@@ -256,7 +300,7 @@ namespace WebGame
                     // apply a slowing force
                     this._impulsePercentage = -100 * Math.Cos(velocityOrientationAngle); // we need to directly access the underscore members so that we don't call the set method, which will unset the target speed 
                     // but make sure it won't push us past the desired velocity
-                    var decelerationAmount = this.Force / this.Mass;
+                    var decelerationAmount = this.Force / this.Mass * elapsed.TotalSeconds;
                     var targetDeceleration = speed - this.TargetSpeedMetersPerSecond.Value;
                     if (targetDeceleration < Math.Abs(decelerationAmount))
                     {
@@ -268,19 +312,29 @@ namespace WebGame
 
         private void UpdateProjectileLoading(TimeSpan elapsed)
         {
-
-            if (this.ProjectileStatus == ProjectileStatus.Loading)
+            // make sure there's enough tubes
+            while (this.ProjectileTubes.Count < this.Tubes)
             {
-                this.ProjectileLoadTime += elapsed;
-                if (this.ProjectileLoadTime >= EffectiveTimeToLoadProjectile)
+                this._tubes[this.ProjectileTubes.Count] = new Tube();
+            }
+
+            foreach (var pair in this.ProjectileTubes)
+            {
+                var tube = pair.Value;
+                if (tube.ProjectileStatus == ProjectileStatus.Loading)
                 {
-                    this.ProjectileStatus = ProjectileStatus.Loaded;
+                    tube.ProjectileLoadTime += elapsed;
+                    if (tube.ProjectileLoadTime >= EffectiveTimeToLoadProjectile)
+                    {
+                        tube.ProjectileStatus = ProjectileStatus.Loaded;
+                    }
                 }
             }
         }
 
-        private void UpdateShields()
+        private void UpdateShields(TimeSpan elapsed)
         {
+            // todo: make time dependant
             if (ShieldsEngaged)
             {
                 FrontShield++;
@@ -291,7 +345,7 @@ namespace WebGame
 
         private void UpdateOrientation(TimeSpan elapsed)
         {
-            var desiredDiffAngle = TurnAngleNeededForDesire();
+            var desiredDiffAngle = TurnAngleNeededForDesiredOrientation();
             var currentAllowedDiffAngle = elapsed.TotalSeconds * this.EffectiveTurnRate;
             var absoluteDesiredDiffAngle = Math.Abs(desiredDiffAngle);
             if (currentAllowedDiffAngle >= absoluteDesiredDiffAngle)
@@ -304,7 +358,7 @@ namespace WebGame
             }
         }
 
-        private double TurnAngleNeededForDesire()
+        private double TurnAngleNeededForDesiredOrientation()
         {
             // difference
             var remaining = this.DesiredOrientation - this.Orientation;
@@ -373,7 +427,8 @@ namespace WebGame
                         update.Sounds.AddRange(entity.Sounds);
                     update.Entities.Add(new EntityUpdate() { Id = entity.Id, Type = entity.Type, Rotation = (float)entity.Orientation, Position = entity.Position });
                 }
-                update.missionUpdate = missionState.getMissionStatusUpdate();
+                if (missionState != null)
+                    update.missionUpdate = missionState.getMissionStatusUpdate();
                 GameHub.SendUpdate(Game.Id, Id, update);
                 System.Diagnostics.Debug.WriteLine("Update Sent. Mission status:" + update.missionUpdate);
             }
@@ -385,10 +440,11 @@ namespace WebGame
             {
                 yield return "Thrusters";
                 yield return "Engines";
-                yield return "Projectile Tube";
+                yield return "Projectile Tube"; // expand to number of tubes
                 yield return "Shield Regenerators";
-                yield return "Energy Collectors";
+                yield return "Energy Collectors"; // not implemented
                 yield return "Energy Storage";
+                yield return "Beam Weapon Bank"; // not implemented
             }
         }
 
@@ -400,17 +456,131 @@ namespace WebGame
         {
         }
 
-        public void SetRepairTarget(string part)
+        public void SetRepairTarget(string part, int repairCrewIndex = -1)
         {
+            if (repairCrewIndex > this.RepairCrews)
+            {
+                // Fit repair crew to correct size
+                while (this.RepairCrewTargets.Count < this.RepairCrews)
+                {
+                    this.RepairCrewTargets.Add(null);
+                }
+                while (this.RepairCrewTargets.Count > this.RepairCrews)
+                {
+                    // I can't imagine how this would happen though.
+                    this.RepairCrewTargets.RemoveAt(this.RepairCrews);
+                }
+
+                if (repairCrewIndex == -1) // Let Main Computer decide;
+                {
+                    var bestHp = -1;
+                    repairCrewIndex = 0; // choose something other than -1 if for some reason all of them are at negative Hp;
+                    for (int i = 0; i < this.RepairCrewTargets.Count; i++)
+                    {
+                        var targetPart = this.RepairCrewTargets[i];
+                        if (targetPart == null)
+                        {
+                            // found a lazy repair crew? Use them immediately
+                            repairCrewIndex = i;
+                            break;
+                        }
+                        var repairingHp = this.parts[targetPart];
+                        if (repairingHp > bestHp)
+                        {
+                            repairingHp = bestHp;
+                            repairCrewIndex = i;
+                        }
+                    }
+                }
+
+                this.RepairCrewTargets[repairCrewIndex] = part;
+            }
         }
 
-        public int RepairCrews { get; set; }
+        public bool IsEntityCloserThan(Entity target, float distance)
+        {
+            return (Position - target.Position).LengthSquared() < distance * distance;
+        }
 
-        public int MaxShields { get; set; }
+        public double BeamCoolDownTime(int bank)
+        {
+            if (LastBeamBanksUsed.ContainsKey(bank))
+            {
+                return (DateTime.UtcNow - LastBeamBanksUsed[bank]).TotalSeconds;
+            }
+            else
+                return Single.MaxValue;
+        }
 
-        public int TorpedoTubes { get; set; }
+        private void BeamDamage(Entity target, double amount)
+        {
+            target.Damage((int)Effective(amount, "Beam Weapon Bank"));
+        }
 
-        public int PhaserBanks { get; set; }
+        internal void FireBeam(int bank, Entity target, BeamType type)
+        {
+            if (!BeamWeapons.Contains(type))
+                return;
+
+            switch (type)
+            {
+                case BeamType.StandardPhaser:
+                    if (IsEntityCloserThan(target, 150) && Energy > 5 && BeamCoolDownTime(bank) > 2)
+                    {
+                        target.Damage(100);
+                        LastBeamBanksUsed[bank] = DateTime.UtcNow;
+                        UseRawEnergy(5);
+                        PlaySound("FireStandardPhaser");
+                    }
+                    break;
+                case BeamType.HullPiercing:
+                    if (IsEntityCloserThan(target, 50) && Energy > 25 && BeamCoolDownTime(bank) > 4)
+                    {
+                        target.Damage(300);
+                        LastBeamBanksUsed[bank] = DateTime.UtcNow;
+                        UseRawEnergy(25);
+                        PlaySound("FireHullPiercing");
+                    }
+                    break;
+                case BeamType.SuppresionPulse:
+                    if (IsEntityCloserThan(target, 150) && Energy > 75 && BeamCoolDownTime(bank) > 10)
+                    {
+                        target.DamagePart(100, target.GetRandomWorkingPart());
+                        LastBeamBanksUsed[bank] = DateTime.UtcNow;
+                        UseRawEnergy(25);
+                        PlaySound("FireSuppresionPulse");
+                    }
+                    break;
+                case BeamType.PlasmaVent:
+                    if (Energy > 100 && BeamCoolDownTime(bank) > 60)
+                    {
+                        foreach (var entity in StarSystem.Entites.ToArray()) // ToArray here to avoid threading issues. Lame I know.
+                        {
+                            if (IsEntityCloserThan(entity, 50))
+                                target.Damage(250);
+                        }
+
+                        LastBeamBanksUsed[bank] = DateTime.UtcNow;
+                        UseRawEnergy(100);
+                        PlaySound("FirePlasmaVent");
+                    }
+                    break;
+                case BeamType.TractorBeam:
+                    if (IsEntityCloserThan(target, 200) && Energy > 75 && BeamCoolDownTime(bank) > 5)
+                    {
+                        //target..Velocity
+                        var displacement = this.Position - target.Position;
+                        var orientation = Math.Atan2(displacement.Y, displacement.X).NormalizeOrientation();
+
+                        target.ApplyEnergyForce(75, orientation);
+
+                        LastBeamBanksUsed[bank] = DateTime.UtcNow;
+                        UseRawEnergy(25);
+                        PlaySound("FireTractorBeam");
+                    }
+                    break;
+            }
+        }
 
         public string Name { get; set; }
     }

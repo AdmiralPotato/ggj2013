@@ -62,8 +62,6 @@
 
 						modelsLoaded += 1;
 
-						console.log(_propertyName+":"+modelsLoaded+":"+modelCount);
-
 						if(modelsLoaded === modelCount){
 							_callback();
 						}
@@ -75,47 +73,168 @@
 			}
 		}
 	}
-	var fishShipMesh;
+	var keys = {};
+
+	var keyHandlers = {
+		"32down": function(){
+			paused = !paused;
+		}
+	};
+	var onKeyDown=function(e){
+		e=(e||window.event);
+		//if(e.preventDefault){e.preventDefault();}
+		var kc = /*String.fromCharCode(*/(e.keyCode||e.which)/*)*/;
+		if(null == keys[kc]){
+			keys[kc] = true;
+			if(keyHandlers[kc+"down"]){
+				keyHandlers[kc+"down"]();
+			}
+		}
+	}
+	var onKeyUp=function(e){
+		e=(e||window.event);
+		//if(e.preventDefault){e.preventDefault();}
+		var kc = /*String.fromCharCode(*/(e.keyCode||e.which)/*)*/;
+		if(true == keys[kc]){
+			delete keys[kc];
+			if(keyHandlers[kc+"up"]){
+				keyHandlers[kc+"up"]();
+			}
+		}
+	}
+
+	var meshObjects = {};
+	var player;
+
 	var whatToDoWhenAllTheGeometriesAreParsedOkayYupSeriously = function(){
-		fishShipMesh = new THREE.Mesh(geometryObjects.fishShip, geometryObjects.fishShip.matLib[0]);
-		scene.add(fishShipMesh);
+		document.addEventListener("keydown", onKeyDown, false);
+		document.addEventListener("keyup", onKeyUp, false);
 
-		var spearMesh = new THREE.Mesh(geometryObjects.spear, geometryObjects.spear.matLib[0]);
-		spearMesh.position.z = -20;
-		scene.add(spearMesh);
 
-		var starbaseMesh = new THREE.Mesh(geometryObjects.starbase, geometryObjects.starbase.matLib[0]);
-		starbaseMesh.position.x = -50;
-		scene.add(starbaseMesh);
+		var newMesh = new THREE.Mesh(geometryObjects.fishShipA, geometryObjects.fishShipA.matLib[0]);
+		meshObjects['fishA'] = newMesh;
+		newMesh.position.z = -20;
+		newMesh.position.x = -20;
+		scene.add(newMesh);
+
+		var newMesh = new THREE.Mesh(geometryObjects.fishShipB, geometryObjects.fishShipB.matLib[0]);
+		meshObjects['fishB'] = newMesh;
+		newMesh.position.z = 20;
+		newMesh.position.x = -20;
+		scene.add(newMesh);
+
+		var newMesh = new THREE.Mesh(geometryObjects.fishShipC, geometryObjects.fishShipC.matLib[0]);
+		meshObjects['fishC'] = newMesh;
+		newMesh.position.x = 20;
+		scene.add(newMesh);
+
+		newMesh = new THREE.Mesh(geometryObjects.spear, geometryObjects.spear.matLib[0]);
+		player = newMesh;
+		scene.add(newMesh);
+
+		newMesh = new THREE.Mesh(geometryObjects.starbaseA, geometryObjects.starbaseA.matLib[0]);
+		newMesh.position.x = -70;
+		newMesh.position.z = 10;
+		meshObjects['starbaseA'] = newMesh;
+		scene.add(newMesh);
+
+		newMesh = new THREE.Mesh(geometryObjects.starbaseB, geometryObjects.starbaseB.matLib[0]);
+		newMesh.position.x = 70;
+		newMesh.position.z = -30;
+		meshObjects['starbaseB'] = newMesh;
+		scene.add(newMesh);
 
 
 		var directionalLightA = new THREE.DirectionalLight(0xffffff,2);
 		directionalLightA.position.set( 0, -1, 0 );
-		fishShipMesh.add(directionalLightA);
+		player.add(directionalLightA);
 
 		var directionalLightB = new THREE.DirectionalLight(0xffffff,1.5);
 		directionalLightB.position.set( 0, 1, 0 );
-		fishShipMesh.add(directionalLightB);
+		player.add(directionalLightB);
 
 		var directionalLightPointedFromCamera = new THREE.DirectionalLight(0xffffff, 0.5);
 		directionalLightPointedFromCamera.position.set( -1, 0, 0 );
 		camera.add(directionalLightPointedFromCamera);
-		render();
+		update();
 	};
 
+	var fireLaser = function(){
+		//var rnd = Math.random()*
+	}
 
 	parseAllGeometry(
 		{
-			'fishShip': "../models/FishShip.json",
+			'fishShipA': "../models/FishShip.json",
+			'fishShipB': "../models/FishShip.json",
+			'fishShipC': "../models/FishShip.json",
 			'spear': "../models/Spear.json",
-			'starbase': "../models/Starbase.json"
+			'starbaseA': "../models/Starbase.json",
+			'starbaseB': "../models/Starbase.json",
 		},
 		whatToDoWhenAllTheGeometriesAreParsedOkayYupSeriously
 	);
 	var tau = Math.PI*2;
 	var deg = tau/360;
+
+	var paused = false;
+
+	var last = Date.now()/1000;
+
+	var update = function(){
+		requestAnimFrame(update);
+		var now = Date.now()/1000; // get current time
+		var dt = ((now-last) > .2) ? .2 : now-last; // calculate time between frames
+		last = now; // save new time
+		if(paused == false){ // main 'update' loop
+		/****
+		Add Update Stuff BELOW Here
+		****/
+			// use dt for frame rate independent speed
+			player.rotation.setY(player.rotation.y+(dt*.1));
+			camera.position = distanceElevationHeading(30, 15 * deg, player.rotation.y);
+			camera.lookAt(player.position);
+			
+			/*var pCount = particleCount;
+  			while(pCount--) {
+
+    			// get the particle
+    			var particle =
+      				particles.vertices[pCount];
+      		console.log(pCount);
+      		console.log(particles.vertices[pCount]);
+	  
+    			// check if we need to reset
+    			if(particle.position.y < -200) {
+      				particle.position.y = 200;
+      				particle.velocity.y = 0;
+    			}
+
+    			// update the velocity with
+    			// a splat of randomniz
+    			particle.velocity.y -=
+      				Math.random() * .1;
+
+    			// and the position
+    			particle.position.addSelf(
+      			particle.velocity);
+  			}
+
+  			// flag to the particle system
+  			// that we've changed its vertices.
+  			particleSystem.
+    		geometry.
+    		__dirtyVertices = true;*/
+		}
+
+		/****
+		Add Update Stuff ABOVE Here
+		****/
+		render();
+	}
+
 	var render = function(){
-		requestAnimFrame(render);
+		
 		if(window.innerWidth != width || window.innerHeight != height){
 			width = window.innerWidth;
 			height = window.innerHeight;
@@ -123,14 +242,9 @@
 			camera.updateProjectionMatrix();
 			rend.setSize(width, height);
 		}
-
-		fishShipMesh.rotation.setY(fishShipMesh.rotation.y+(deg*.125));
-		camera.position = distanceElevationHeading(30, 15 * deg, fishShipMesh.rotation.y);
-
-		camera.lookAt(new THREE.Vector3(0,0,0));
-
 		rend.render(scene, camera);
 	};
+
 	var distanceElevationHeading = function (_distance, _elevation, _heading){
 		var radH = _heading + Math.PI;
 		var radE = _elevation;
@@ -138,45 +252,49 @@
 		return new THREE.Vector3(a * Math.cos(radH), _distance * Math.sin(radE), -a * Math.sin(radH));
 	};
 
-/*
-// common material parameters
+// create the particle variables
+var particleCount = 500,
+    particles = new THREE.Geometry(),
+ 	pMaterial = new THREE.ParticleBasicMaterial({
+    	color: 0xFFFFFF,
+    	size: 20,
+		map: THREE.ImageUtils.loadTexture(
+      	"particle.png"
+    ),
+    blending: THREE.AdditiveBlending,
+    transparent: true
+  });
 
-var ambient = 0x050505, diffuse = 0x331100, specular = 0xffffff, shininess = 10, scale = 23;
+// now create the individual particles
+for(var p = 0; p < particleCount; p++) {
 
-// normal map shader
-
-var shader = THREE.ShaderUtils.lib[ "normal" ];
-var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-
-uniforms[ "enableAO" ].value = true;
-uniforms[ "enableDiffuse" ].value = false;
-uniforms[ "enableSpecular" ].value = false;
-uniforms[ "enableReflection" ].value = true;
-
-uniforms[ "tNormal" ].texture = THREE.ImageUtils.loadTexture( "normal.jpg" );
-uniforms[ "tAO" ].texture = THREE.ImageUtils.loadTexture( "ao.jpg" );
-
-uniforms[ "tDisplacement" ].texture = THREE.ImageUtils.loadTexture( "displacement.jpg" );
-uniforms[ "uDisplacementBias" ].value = - 0.428408 * scale;
-uniforms[ "uDisplacementScale" ].value = 2.436143 * scale;
-
-uniforms[ "uDiffuseColor" ].value.setHex( diffuse );
-uniforms[ "uSpecularColor" ].value.setHex( specular );
-uniforms[ "uAmbientColor" ].value.setHex( ambient );
-
-uniforms[ "uShininess" ].value = shininess;
-
-uniforms[ "tCube" ].texture = reflectionCube;
-uniforms[ "uReflectivity" ].value = 0.1;
-
-uniforms[ "uDiffuseColor" ].value.convertGammaToLinear();
-uniforms[ "uSpecularColor" ].value.convertGammaToLinear();
-uniforms[ "uAmbientColor" ].value.convertGammaToLinear();
+  // create a particle with random
+  // position values, -250 -> 250
+  var pX = Math.random() * 500 - 250,
+      pY = Math.random() * 500 - 250,
+      pZ = Math.random() * 500 - 250,
+      particle = new THREE.Vertex(
+        new THREE.Vector3(pX, pY, pZ)
+      );
+      // create a velocity vector
+	particle.velocity = new THREE.Vector3(
+		0,              // x
+		-Math.random(), // y: random vel
+		0);
+	// add it to the geometry
+  	particles.vertices.push(particle);
+}
 
 
-var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, fog: false };
-var displacementMaterial = new THREE.ShaderMaterial( parameters );
-*/
+// create the particle system
+var particleSystem =
+  new THREE.ParticleSystem(
+    particles,
+    pMaterial);
+particleSystem.sortParticles = true;
+// add it to the scene
+scene.add(particleSystem);
+
 
 </script>
 </body>
