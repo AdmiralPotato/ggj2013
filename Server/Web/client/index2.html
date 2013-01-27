@@ -11,13 +11,17 @@
 </head>
 <body>
     <div id="ui">
-        <input type="submit" onclick='$.post("http://legendstudio.com/Game-705804/SetImpulse", "amount=100");' value="Go" />
+        <input type="submit" onclick='$.post("http://legendstudio.com/Game-705814/Start");' value="Reset" />
+        <br />
+        <input type="submit" onclick='$.post("http://legendstudio.com/Game-705814/SetImpulse", "amount=100");' value="Go" />
+        <input type="submit" onclick='$.post("http://legendstudio.com/Game-705814/SetDesiredSpeed", "amount=0");' value="Stop" />
+        <br />
+        <input type="text" id="desiredHeading" value="0" />
+        <input type="submit" onclick='$.post("http://legendstudio.com/Game-705814/SetDesiredHeading", "amount=" + $("#desiredHeading").val());' value="Set Heading" />
+        <br />
+        <input type="submit" onclick='$.post("http://legendstudio.com/Game-705814/BuildBase");' value="Build Base" />
+        <input type="submit" onclick='$.post("http://legendstudio.com/Game-705814/BuildShip");' value="Build Ship" />
         <div id="modal">
-            <h1>NOT Artemis</h1>
-            <div>
-                <label for="server_ip">Input Server IP</label><input type="text" name="server_ip" id="server_ip">
-                <input type="submit" value="connect">
-            </div>
         </div>
     </div>
 
@@ -28,7 +32,7 @@
 
     <script type="text/javascript">
         jQuery.support.cors = true;
-        //		$.connection.hub.logging = true;		
+        //		$.connection.hub.logging = true;
         $.connection.hub.url = 'http://legendstudio.com/signalr';
 
         var gameHub = $.connection.gameHub;

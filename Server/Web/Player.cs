@@ -11,8 +11,6 @@ namespace WebGame
 	{
         [ProtoMember(1)]
         public int AccountId { get; set; }
-        [ProtoMember(2)]
-        public int Number;
         [ProtoMember(3)]
         public string Name;
 
@@ -30,25 +28,13 @@ namespace WebGame
         [ProtoMember(13)]
         public int RatingChange { get; set; }
 
+        public Station Station;
+        public string SessionId;
+        public Game Game;
+
         public bool IsEliminated
         {
             get { return Place > 0; }
-        }
-
-        public string GetColor()
-        {
-            switch (Number % 9)
-            {
-                case 1: return "#005087";
-                case 2: return "#357727";
-                case 3: return "#FFE45F";
-                case 4: return "#D45D00";
-                case 5: return "#89547F";
-                case 6: return "#50504C";
-                case 7: return "#862215";
-                case 8: return "#633D2E";
-                default: return "#000000";
-            }
         }
 
         public string GetPlace()
@@ -68,7 +54,7 @@ namespace WebGame
 
 		public override string ToString()
 		{
-			return String.Format("{0} {1}", Number, Name);
+			return Name;
 		}
     }
 }

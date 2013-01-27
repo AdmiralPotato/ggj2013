@@ -5,7 +5,8 @@ body
     margin-bottom: 5px;
     font-size: 13px;
     color: #000000;
-    background-color: #1C2E15;
+    background: url(/images/Orion_Nebula_2600wide.jpg) #000;
+    background-attachment:fixed;
 }
 
 /* for IE */
@@ -73,7 +74,7 @@ form
 
 .title, h2
 {
-    color: #001544;
+    color: #A0A0A0;
     font-weight: bold;
     font-size: 18px;
     margin: 0px;
@@ -81,46 +82,65 @@ form
 .subTitle, h3
 {
     font-size: 13px;
-    color: #001544;
+    color: #A0A0A0;
     font-weight: bold;
     margin: 0px;
 }
 
 select, input[type="text"], input[type="password"]
 {
-    background-color: #DFD9D2;
+    color: #eee;
+    background-color: #000;
     padding: 2px;
-    border: 1px solid #1C2E15;
+    border: 1px solid #2D2D2D;
 }
-
 select
 {
     width: 150px;
 }
-
 #MessageBox #InviteEmail #NewEmail
 {
     width: 400px;
 }
-
 textarea
 {
-    background-color: #DFD9D2;
-    border: 1px solid #1C2E15;
+    color: #eee;
+    background-color: #000;
+    border: 1px solid #2D2D2D;
 }
 
-input[type="submit"]
-{
-    font-weight: bold;
-    color: #DFD9D2;
-    background-color: #7B0000;
-    border: 1px solid #000;
-    padding: 3px 8px;
+input[type="submit"] {
+    margin: 2px;
+    background-color: #0066CC;
+    background-image: -webkit-linear-gradient(top,  #0066CC, #00478E);
+    background-image: linear-gradient(to top,  #00478E, #0066CC);
+    border: 0px solid #9caaba;
+    border-radius: 1px;
+    color: #f8f8f8;
+    line-height: 1;
+    padding: 6px;
+    text-align: center;
 }
-
-input[type="submit"]:hover
-{
-    background-color: #A80000;
+input[type="submit"]:hover {
+    background-color: #0066CC;
+    background-image: -webkit-linear-gradient(top,  #00478E, #0066CC);
+    background-image: linear-gradient(to top,  #0066CC, #00478E);
+    color: #fff;
+    border: 0px solid #9caaba;
+    cursor: pointer;
+}
+input[type="submit"]:active {
+    border: 0px solid #8c98a7;
+    box-shadow: inset 0 0 8px 2px #abbccf, 0 0 1px 0 #eeeeee;
+}
+input[type="submit"]:disabled {
+    background-color: #F8F8F8;
+    background-image: none;
+    color: #CCC;
+    border: 0px solid #CCC;
+    text-shadow: none;
+    box-shadow: none;
+    cursor: default;
 }
 
 .Menu
@@ -171,12 +191,12 @@ input[type="submit"]:hover
 {
     margin-left: 134px;
     padding: 5px;
-    background-color: #9C9F90;
+    background-color: #9E9E9E;
 }
 
 .Frame, .Top, .Side, .Bottom, .Forum
 {
-    background-color: #5D6E55;
+    background-color: #6B6B6B;
 }
 
 .Top
@@ -197,7 +217,7 @@ input[type="submit"]:hover
 .Center
 {
     padding: 10px;
-    background-color: #9C9F90;
+    background-color: #9E9E9E;
     margin: 0px;
     text-align: left;
 }
@@ -225,7 +245,7 @@ input[type="submit"]:hover
 #PlayerReadout
 {
     padding: 6px;
-    background-color: #9C9F90;
+    background-color: #9E9E9E;
     position: absolute;
     top: 455px;
     left: 330px;
@@ -244,7 +264,7 @@ input[type="submit"]:hover
     top: 435px;
     left: 360px;
     visibility: hidden;
-    background-color: #9C9F90;
+    background-color: #9E9E9E;
     position: absolute;
     min-width: 300px;
 }
@@ -256,7 +276,7 @@ p.Message
 
 #Messages tr
 {
-    border-bottom: 1px solid #5D6E55;
+    border-bottom: 1px solid #6B6B6B;
 }
 
 #Messages tr:last-child
@@ -284,7 +304,7 @@ p.Message
 
 .Forum
 {
-    background-color: #9C9F90;
+    background-color: #9E9E9E;
     padding: 5px 5px 5px 5px;
     text-align: left;
 }
@@ -428,7 +448,7 @@ ul.noty_cont.noty_layout_topRight li
 .noty_bar.noty_theme_default
 {
     color: #FFF;    
-    background-color: #5D6E55;
+    background-color: #6B6B6B;
 }
 
 /* if you use noty with customContainer you can access noty with this way 
@@ -635,11 +655,11 @@ ul.noty_cont.noty_layout_topRight li
 }
 
 .header_bg_default {
-	background-color: #5D6E55;
+	background-color: #6B6B6B;
 }
 
 .header_bg_blink {
-	background-color: #9C9F90;
+	background-color: #9E9E9E;
 }
 
 

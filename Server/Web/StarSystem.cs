@@ -12,6 +12,9 @@ namespace WebGame
         [ProtoMember(1)]
         public List<Entity> Entites { get; set; }
 
+        Queue<Entity> addedEntities = new Queue<Entity>();
+        Queue<Entity> removedEntities = new Queue<Entity>();
+
         public Game Game;
         public List<Ship> Ships = new List<Ship>();
 
@@ -32,6 +35,27 @@ namespace WebGame
             {
                 ship.SendUpdate();
             }
+
+            foreach (var added in addedEntities)
+            {
+                Entites.Add(added);
+
+                var ship = added as Ship;
+                if (ship != null)
+                    Ships.Add(ship);
+            }
+            addedEntities.Clear();
+
+            foreach (var removed in removedEntities)
+            {
+                Entites.Remove(removed);
+                var ship = removed as Ship;
+                if (ship != null)
+                {
+                    Ships.Remove(ship);
+                }
+            }
+            removedEntities.Clear();
         }
 
         public void AddEntity(Entity entity)
@@ -41,11 +65,18 @@ namespace WebGame
 
             if (entity.Id == 0)
                 entity.Id = ++Game.NextEntityId;
-            Entites.Add(entity);
 
-            var ship = entity as Ship;
-            if (ship != null)
-                Ships.Add(ship);
+            addedEntities.Enqueue(entity);
+        }
+
+        public void RemoveEntity(Entity entity)
+        {
+            removedEntities.Enqueue(entity);
+        }
+
+        internal Entity GetEntity(int targetId)
+        {
+            return (from e in Entites where e.Id == targetId select e).FirstOrDefault();
         }
     }
 }

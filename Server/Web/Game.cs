@@ -78,8 +78,8 @@ namespace WebGame
             }
         }
 
-
         public static Random Random = new Random();
+        public bool IsRunning;
 
         public Game()
         {
@@ -91,10 +91,21 @@ namespace WebGame
 
         public void Run()
         {
+            IsRunning = true;
             System.Diagnostics.Debug.WriteLine("Game " + Id + " thread started");
             timer = new System.Timers.Timer(250);
             timer.Elapsed += timer_Elapsed;
             timer.Start();
+        }
+
+        public void StopRunning()
+        {
+            if (timer != null)
+            {
+                timer.Stop();
+                timer = null;
+                IsRunning = false;
+            }
         }
 
         void timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -107,7 +118,8 @@ namespace WebGame
 
             lastUpdate = now;
 
-            timer.Enabled = true;
+            if (timer != null)
+                timer.Enabled = true;
         }
 
         public void Update(TimeSpan elapsed)
@@ -128,11 +140,6 @@ namespace WebGame
             return null;
         }
 
-        public Player GetPlayerByNumber(int playerNumber)
-        {
-            return (from p in Players where p.Number == playerNumber select p).FirstOrDefault();
-        }
-
         public Player Join(int accountId, string name, int rating)
         {
             var result = new Player() { AccountId = accountId, Name = name, Rating = rating };
@@ -142,8 +149,8 @@ namespace WebGame
 
         public void Join(Player player)
         {
+            player.Game = this;
             Players.Add(player);
-            player.Number = Players.Count;
 
             foreach (var invite in (from i in Invites where i.AccountId == player.AccountId select i))
             {
@@ -161,16 +168,7 @@ namespace WebGame
         {
             Players.Remove(player);
 
-            UpdatePlayerNumbers();
-
             SendForumMessage(player.Name + " left the game.");
-        }
-
-        void UpdatePlayerNumbers()
-        {
-            // update player numbers
-            foreach (var player in Players)
-                player.Number = Players.IndexOf(player) + 1;
         }
 
         public void SendForumMessage(string text, int sourceId = 1, string sourceName = "Computer")
@@ -181,17 +179,17 @@ namespace WebGame
             }
 
             var message = new Message() { Sent = DateTime.UtcNow, Text = text, SourceId = sourceId, SourceName = sourceName };
-            GameHub.Say("Game-" + Id, message.Print(false));
+            GameHub.Say(Id, message.Print(false));
         }
 
         public void Start()
         {
             // make sure not already created
-            if (Started)
-                throw new Exception("Game already started.");
+            //if (Started)
+            //    throw new Exception("Game already started.");
 
-            if (Players.Count < 2)
-                throw new Exception("Must have 2 players to start.");
+            //if (Players.Count < 2)
+            //    throw new Exception("Must have 2 players to start.");
 
             Started = true;
 
@@ -201,13 +199,15 @@ namespace WebGame
             // send player messages
             SendForumMessage("Game #" + GameName + " Started");
 
+            StarSystems.Clear();
+
             var starSystem = new StarSystem();
             Add(starSystem);
-            DefaultShip = new Ship();
+            DefaultShip = new Ship(1000);
             DefaultShip.DesiredOrientation = 1;
             starSystem.AddEntity(DefaultShip);
 
-            Run();
+//            Run();
 
             GameServer.SaveGame(this);
 
@@ -219,7 +219,7 @@ namespace WebGame
             //        GameHub.Refresh("Game-" + game.Id);
         }
 
-        void Add(StarSystem starSystem)
+        public void Add(StarSystem starSystem)
         {
             starSystem.Game = this;
             StarSystems.Add(starSystem);
@@ -264,7 +264,7 @@ namespace WebGame
             double scoreExpected = 0;
             foreach (var otherPlayer in Players)
             {
-                if (otherPlayer.Number != player.Number)
+                if (otherPlayer != player)
                     scoreExpected += GenScoreExpected(player.Rating, otherPlayer.Rating);
             }
             scoreExpected /= CurrentPlayers - 1;
@@ -341,7 +341,8 @@ namespace WebGame
                     }
                 }
 
-                result.Run();
+                foreach (var player in result.Players)
+                    player.Game = result;
 
                 return result;
             }
@@ -408,6 +409,56 @@ namespace WebGame
             result.Append("<br />");
 
             return result.ToString();
+        }
+
+        internal Player ConnectPlayer(string signalrConnectionId, string sessionId)
+        {
+            var player = (from p in Players where p.SessionId == sessionId select p).FirstOrDefault();
+            if (player != null)
+            {
+                if (DefaultShip != null)
+                    DefaultShip.AddPlayer(player);
+
+                if (!IsRunning)
+                    Run();
+
+                GameHub.Say(Id, player.Name + " connected.");
+            }
+
+            return player;
+        }
+
+        internal void DisconnectPlayer(string signalrConnectionId, string sessionId)
+        {
+            var player = (from p in Players where p.SessionId == sessionId select p).FirstOrDefault();
+            DisconnectPlayer(player);
+        }
+
+        internal void DisconnectPlayer(Player player)
+        {
+            if (player != null)
+            {
+                if (DefaultShip != null)
+                    DefaultShip.RemovePlayer(player);
+
+                if (GetActivePlayerCount() <= 0)
+                    StopRunning();
+
+                GameHub.Say(this, player.Name + " disconnected.");
+            }
+        }
+
+        public int GetActivePlayerCount()
+        {
+            var result = 0;
+            foreach (var star in StarSystems)
+            {
+                foreach (var ship in star.Ships)
+                {
+                    result += ship.Players.Count;
+                }
+            }
+            return result;
         }
     }
 }
