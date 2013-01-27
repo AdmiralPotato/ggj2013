@@ -112,6 +112,9 @@ namespace WebGame
         }
 
         public override string Type { get { return "Ship"; } }
+        
+
+        public MissionStatus missionState;
 
 
 
@@ -124,6 +127,7 @@ namespace WebGame
             : base(mass)
         {
             Players = new List<Player>();
+            missionState = new MissionStatus(this);
         }
 
         public void LoadProjectile()
@@ -205,6 +209,8 @@ namespace WebGame
             TurnShipToDesiredOrientation(elapsed);
 
             base.Update(elapsed);
+            
+            UpdateMission();
         }
 
         private void TurnShipToDesiredOrientation(TimeSpan elapsed)
@@ -246,6 +252,11 @@ namespace WebGame
             }
         }
 
+        private void UpdateMission()
+        {
+            missionState.checkSuccess();
+        }
+
         public void AddPlayer(Player player)
         {
             if (!Players.Contains(player))
@@ -276,8 +287,9 @@ namespace WebGame
                         update.Sounds.AddRange(entity.Sounds);
                     update.Entities.Add(new EntityUpdate() { Id = entity.Id, Type = entity.Type, Rotation = (float)entity.Orientation, Position = entity.Position });
                 }
+                update.missionUpdate = missionState.getMissionStatusUpdate();
                 GameHub.SendUpdate(Game.Id, Id, update);
-                System.Diagnostics.Debug.WriteLine("Update Sent.");
+                System.Diagnostics.Debug.WriteLine("Update Sent. Mission status:"+update.missionUpdate);
             }
         }
 

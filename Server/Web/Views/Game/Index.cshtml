@@ -99,6 +99,14 @@
         <input type="submit" onclick='$.post("Start");' value="Reset" />
         <input type="submit" onclick='$.post("BuildBase");' value="Build Base" />
         <input type="submit" onclick='$.post("BuildShip");' value="Build Ship" />
+
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <textarea id="missionStatus"></textarea>
     </div>
 
     <script src="https://raw.github.com/AdmiralPotato/npos3d/master/src/core.js"></script>
@@ -112,6 +120,9 @@
         var gameHub = $.connection.gameHub;
         gameHub.client.handleUpdate = function (update) {
             console.log(JSON.stringify(update));
+            console.log("update.missionUpdate:"+update.missionUpdate);
+            if( update.missionUpdate != null )
+                missionStatus.value = update.missionUpdate;
             setGameStateFromServer(update);
         };
 
