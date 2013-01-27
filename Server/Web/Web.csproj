@@ -286,6 +286,7 @@
     <Content Include="Sounds\playin_card_3.ogg" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Game.html" />
     <None Include="Properties\PublishProfiles\Profile1.pubxml" />
     <Content Include="Views\Game\_PlayerList.cshtml" />
     <Content Include="Views\Game\Lobby.cshtml" />
