@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
 	<title>GGJ2013</title>
@@ -9,7 +9,8 @@
 	<div id="stationSelect">
 		<h2>Station Select</h2>
 		<input type="button" class="customEvent" id="SelectStation-None" value="Observer" />
-		<input type="button" class="customEvent" id="SelectStation-Main" value="Main" />
+            <a href="http://legendstudio.com/Client/three_test/Test3JS.html">Main Viewport</a>
+<!--            <input type="button" class="customEvent" id="SelectStation-Main" value="Main" />-->
 		<input type="button" class="customEvent" id="SelectStation-Helm" value="Helm" />
 		<input type="button" class="customEvent" id="SelectStation-Weapons" value="Weapons" />
 		<input type="button" class="customEvent" id="SelectStation-Engineering" value="Engineering" />
@@ -157,7 +158,40 @@
 <!--<script type="text/javascript" src="js/Three.js"></script>-->
 <!--<script type="text/javascript" src="js/mainview.js"></script>-->
 <script type="text/javascript" src="js/game.js"></script>
+<script type="text/javascript" src="js/audio.js"></script>
 <script type="text/javascript" src="js/network.js"></script>
+
+        <!-- move this wherever -->
+    <script>
+        audioLoaded = false;
+        var sfxList = [
+		{
+		    name: 'ShieldsUp',
+		    src: 'sounds/shieldsup.wav',
+		    channels: 10
+		}, {
+		    name: 'ShieldsDown',
+		    src: 'sounds/powerdown.wav',
+		    channels: 10
+		}, {
+		    name: 'gameOver',
+		    src: 'invalid/error/sfx/game_over_music.wav',
+		    channels: 1
+		}
+        ];
+
+        function onLoadCallback() {
+            //if( audioList.fail != true )
+            audioLoaded = true;
+        }
+
+        var audioList = new preloadAudioList(sfxList, null, document.getElementById("errorDiv"), onLoadCallback);
+    </script>
+
+    <audio id="notify">
+        <source src="/Sounds/chime.ogg" type="audio/ogg" />
+        <source src="/Sounds/chime.mp3" type="audio/mp3" />
+    </audio>
 
 </body>
 </html>

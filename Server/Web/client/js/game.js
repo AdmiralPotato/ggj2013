@@ -7,39 +7,24 @@ var n = NPos3d,
 	    ui: [],
 	    entityTypes: {},
 		paused: false,
-		loggingEnabled: false
+		loggingEnabled: false,
+		isUsingRemoteServer: false
 	},
 	playerEntity;
 client.station = "None";
 
-//
-var windowHashParser = function() {
-	var args = window.location.hash.replace('?','').split('&'),
+var windowSearchParser = function() {
+	var args = window.location.search.replace('?','').split('&'),
 		i, len = args.length, pair;
 	for(i = 0; i < len; i += 1){
 		pair = args[i].split('=');
 		client[pair[0]] = pair[1];
 	}
-	console.log('hashchange event fired', client);
 };
-windowHashParser(); //once when this
-$(window).on('hashchange', windowHashParser);
-var gameId = window.location.hash;
-if (gameId === '') {
-    // try to load the game id from a url like this: http://localhost:62700/Game-705888/
-    var parts = window.location.href.split("/");
-    for (i = 0; i < parts.length; i++) {
-        if (parts[i].indexOf("Game-") != -1) {
-            gameId = parts[i].split('-')[1];
+windowSearchParser(); //once when this page loads
 
-            isUsingRemoteServer = false;
-            break;
-        }
-    }
-}
-else {
-    gameId = gameId.replace("#", "");
-}
+var gameId = client.Game;
+
 var keyStateMap = {};
 var keyHandlerMap = {
 	//Space Bar
@@ -164,6 +149,7 @@ client.entityTypes.Ship.prototype = {
     type: 'Ship',
     color: '#ff0',
     shape: wireframes.spear,
+    renderAlways: true,
     update: function () {
         var t = this;
         deltaInterpolate(t);
@@ -190,6 +176,7 @@ client.entityTypes.Starbase.prototype = {
     type: 'Starbase',
     color: '#00f',
     shape: wireframes.starBase,
+    renderAlways: true,
     update: function () {
         var t = this;
         deltaInterpolate(t);
@@ -215,6 +202,7 @@ client.entityTypes.Enemy.prototype = {
     type: 'Enemy',
     color: '#f00',
     shape: wireframes.fishShip,
+    renderAlways: true,
     update: function () {
         var t = this;
         deltaInterpolate(t);
@@ -240,6 +228,7 @@ client.entityTypes.Projectile.prototype = {
     type: 'Projectile',
     color: '#f00',
     shape: wireframes.simpleShip,
+    renderAlways: true,
     update: function () {
         var t = this;
         deltaInterpolate(t);
@@ -256,6 +245,7 @@ var setEntityAsPlayer = function (entity) {
         shape: new n.Geom.Circle({
             radius: 3
         }),
+        renderAlways: true,
         pos: [15, 0, 0],
         color: '#9f0'
     });
@@ -263,6 +253,7 @@ var setEntityAsPlayer = function (entity) {
         shape: new n.Geom.Circle({
             radius: 15
         }),
+        renderAlways: true,
         color: '#ccc'
     });
     entity.color = '#0f0';
@@ -272,7 +263,7 @@ var setEntityAsPlayer = function (entity) {
 };
 
 var setGameStateFromServer = function (data) {
-    if (data.GameId === gameId) {
+    if (data.GameId == gameId) {
         var entityDataIndex,
 			numEntities = data.Entities.length,
 			entityData,
@@ -321,11 +312,8 @@ var setGameStateFromServer = function (data) {
     }
 };
 
-if (typeof isUsingRemoteServer === 'undefined') {
-    isUsingRemoteServer = true;
-}
-var serverPath = isUsingRemoteServer ? 'http://legendstudio.com/' : '/';
-var currentGame = isUsingRemoteServer ? 'Game-' + gameId + '/' : '';
+var serverPath = client.isUsingRemoteServer ? 'http://legendstudio.com/' : '/';
+var currentGame = 'Game-' + gameId + '/';
 var loadScript = function (relativePath) {
 
     document.write('<script type="text/javascript" src="' + serverPath + relativePath + '"></script>');

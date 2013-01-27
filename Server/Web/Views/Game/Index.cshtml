@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿<!DOCTYPE html>
 <html>
 <head>
@@ -170,11 +171,11 @@
         var sfxList = [
 		{
 		    name: 'ShieldsUp',
-		    src: 'sounds/shieldsup.wav',
+		    src: '/client/sounds/shieldsup.wav',
 		    channels: 10,
 		}, {
 		    name: 'ShieldsDown',
-		    src: 'sounds/powerdown.wav',
+		    src: '/Sounds/chime.mp3',
 		    channels: 10,
 		}, {
 		    name: 'gameOver',
@@ -186,6 +187,9 @@
         function onLoadCallback() {
             //if( audioList.fail != true )
             audioLoaded = true;
+            console.log("SFX:" + SFX);
+            console.log("SFX['ShieldsDown']:" + SFX['ShieldsDown']);
+            SFX['ShieldsDown'].play();
         }
 
         var audioList = new preloadAudioList(sfxList, null, document.getElementById("errorDiv"), onLoadCallback);
@@ -197,3 +201,6 @@
     </audio>
 </body>
 </html>
+=======
+﻿
+>>>>>>> 23e8e2b890b78f567754898a91bb544c8ed0ad8b
