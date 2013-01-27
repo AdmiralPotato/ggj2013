@@ -1,70 +1,62 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <title>Game #705799 - GGJ2013</title>
+    <title>GGJ2013</title>
     <link rel="stylesheet" href="/Style.css" />
     <link rel="stylesheet" href="/client/css/styles.css" />
-    <style>
-        html
-        {
-            background: none;
-        }
-    </style>
 </head>
 <body>
     <div id="ui">
-        <input type="button" class="customEvent" id="SelectStation-None" value="Observer" />
-        <input type="button" class="customEvent" id="SelectStation-Main" value="Main" />
-        <input type="button" class="customEvent" id="SelectStation-Helm" value="Helm" />
-        <input type="button" class="customEvent" id="SelectStation-Weapons" value="Weapons" />
-        <input type="button" class="customEvent" id="SelectStation-Engineering" value="Engineering" />
-        <input type="button" class="customEvent" id="SelectStation-Communication" value="Communication" />
-        <input type="button" class="customEvent" id="SelectStation-GameMaster" value="Game Master" />
-
-        <div class="stationUI" id="None">
-            <select id="shipSelect">
-                <option value="1">Heart of the Deep</option>
-                <option value="2">Ship 2</option>
-                <option value="3">Ship 3</option>
-                <option value="4">Ship 4</option>
-                <option value="5">Ship 5</option>
-                <option value="6">Ship 6</option>
-            </select>
-            <input type="text" id="shipName" value="Enter Ship Name" />
-            <input type="submit" onclick='$.post("SelectShip", "defaultShipNumber=" + $("#shipSelect").val() + "&name=" + $("#shipName").val());' value="Select Ship" />
+        <div id="stationSelect">
+            <h2>Station Select</h2>
+            <input type="button" class="customEvent" id="SelectStation-None" value="Observer" />
+            <input type="button" class="customEvent" id="SelectStation-Main" value="Main" />
+            <input type="button" class="customEvent" id="SelectStation-Helm" value="Helm" />
+            <input type="button" class="customEvent" id="SelectStation-Weapons" value="Weapons" />
+            <input type="button" class="customEvent" id="SelectStation-Engineering" value="Engineering" />
+            <input type="button" class="customEvent" id="SelectStation-Communication" value="Communication" />
+            <input type="button" class="customEvent" id="SelectStation-GameMaster" value="Game Master" />
         </div>
 
-        <div class="stationUI active" id="Helm">
-            <h3>Helm</h3>
-            <input type="submit" onclick='$.post("SetMainScreen", "view=Front");' value="Front" />
-            <input type="submit" onclick='$.post("SetMainScreen", "view=Left");' value="Left" />
-            <input type="submit" onclick='$.post("SetMainScreen", "view=Right");' value="Right" />
-            <input type="submit" onclick='$.post("SetMainScreen", "view=Rear");' value="Rear" />
-            <input type="submit" onclick='$.post("SetMainScreen", "view=Tactical");' value="Tactical" />
-            <input type="submit" onclick='$.post("SetMainScreen", "view=LongRange");' value="LongRange" />
-            <input type="submit" onclick='$.post("SetMainScreen", "view=Status");' value="Status" />
-            <br />
-            <input type="submit" onclick='$.post("SetDesiredSpeed", "amount=50");' value="Slow" />
-            <input type="submit" onclick='$.post("SetDesiredSpeed", "amount=100");' value="Medium" />
-            <input type="submit" onclick='$.post("SetDesiredSpeed", "amount=300");' value="Fast" />
-            <input type="submit" onclick='$.post("SetImpulse", "amount=100");' value="Go" />
-            <input type="submit" onclick='$.post("SetDesiredSpeed", "amount=0");' value="Stop" />
+        <div id="shipSelectHolder">
+            <select id="shipId">
+                <option value="1">Heart of the Deep</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+            </select>
+            <input type="text" id="shipName" value="Enter Ship Name" />
+            <input type="submit" class="customEvent" id="shipSelect" value="Select Ship" />
+        </div>
+
+        <div id="mainScreenSelect">
+            <h2>Main Screen Station</h2>
+            <input type="button" class="sendMessage" id="SetMainScreen-view=Front" value="Front" />
+            <input type="button" class="sendMessage" id="SetMainScreen-view=Left" value="Left" />
+            <input type="button" class="sendMessage" id="SetMainScreen-view=Right" value="Right" />
+            <input type="button" class="sendMessage" id="SetMainScreen-view=Rear" value="Rear" />
+            <input type="button" class="sendMessage" id="SetMainScreen-view=Tactical" value="Tactical" />
+            <input type="button" class="sendMessage" id="SetMainScreen-view=LongRange" value="LongRange" />
+            <input type="button" class="sendMessage" id="SetMainScreen-view=Status" value="Status" />
+        </div>
+
+        <div class="stationUI" id="Helm">
+            <h2>Helm console</h2>
+            <input type="button" class="sendMessage" id="SetDesiredSpeed-amount=50" value="Slow" />
+            <input type="button" class="sendMessage" id="SetDesiredSpeed-amount=100" value="Medium" />
+            <input type="button" class="sendMessage" id="SetDesiredSpeed-amount=300" value="Fast" />
+            <input type="button" class="sendMessage" id="SetImpulse-amount=100" value="Go" />
+            <input type="button" class="sendMessage" id="SetDesiredSpeed-amount=0" value="Stop" />
             <br />
             <input type="text" id="desiredHeading" value="0" />
-            <input type="submit" onclick='$.post("SetDesiredHeading", "amount=" + $("#desiredHeading").val());' value="Set Heading" />
+            <input type="button" class="customEvent" id="SetDesiredHeading" value="Set Heading" />
         </div>
 
         <div class="stationUI" id="Weapons">
-            <h3>Weapons</h3>
-            <input type="submit" onclick='$.post("SetMainScreen", "view=Front");' value="Front" />
-            <input type="submit" onclick='$.post("SetMainScreen", "view=Left");' value="Left" />
-            <input type="submit" onclick='$.post("SetMainScreen", "view=Right");' value="Right" />
-            <input type="submit" onclick='$.post("SetMainScreen", "view=Rear");' value="Rear" />
-            <input type="submit" onclick='$.post("SetMainScreen", "view=Tactical");' value="Tactical" />
-            <input type="submit" onclick='$.post("SetMainScreen", "view=LongRange");' value="LongRange" />
-            <input type="submit" onclick='$.post("SetMainScreen", "view=Status");' value="Status" />
-            <br />
-            <input type="submit" onclick='$.post("ToggleShields");' value="Toggle Shields" />
+            <h2>Weapons console</h2>
+            <input type="button" class="sendMessage" id="ToggleShields" value="Toggle Shields" />
             <br />
             Target
             <input type="text" id="desiredTarget" value="0" />
@@ -78,12 +70,12 @@
             </select>
             <br />
             Tube 0
-            <input type="submit" onclick='$.post("LoadProjectile", "tube=0&type=" + $("#projectile").val());' value="Load" />
-            <input type="submit" onclick='$.post("LaunchProjectile", "tube=0&targetId=" + $("#desiredTarget").val() + "&type=" + $("#projectile").val());' value="Launch" />
+            <input type="button" class="customEvent" id="LoadProjectile-tube=0" value="Load" />
+            <input type="button" class="customEvent" id="LaunchProjectile-tube=0" value="Launch" />
             <br />
             Tube 1
-            <input type="submit" onclick='$.post("LoadProjectile", "tube=1&type=" + $("#projectile").val());' value="Load" />
-            <input type="submit" onclick='$.post("LaunchProjectile", "tube=1&targetId=" + $("#desiredTarget").val() + "&type=" + $("#projectile").val());' value="Launch" />
+		    <input type="button" class="customEvent" id="LoadProjectile-tube=1" value="Load" />
+            <input type="button" class="customEvent" id="LaunchProjectile-tube=1" value="Launch" />
             <br />
             <select id="beam">
                 <option value="StandardPhaser">Standard Phaser</option>
@@ -98,7 +90,7 @@
                 <option value="SelfDestruct">Self Destruct</option>
                 <option value="ShadowTether">Shadow Tether</option>
             </select>
-            <input type="submit" onclick='$.post("FireBeam", "bank=0&targetId=" + $("#desiredTarget").val() + "&type=" + $("#beam").val());' value="Fire" />
+            <input type="button" class="customEvent" id="FireBeam-bank=0" value="Fire" />
         </div>
 
         <div class="stationUI" id="Engineering">
@@ -159,9 +151,7 @@
         <div id="errorDiv"></div>
     </div>
 
-    <script type="text/javascript">
-        gameId = window.location.hash;
-        isLocal = false;
+    <script>
     </script>
 
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
@@ -173,28 +163,27 @@
     <script type="text/javascript" src="/client/js/game.js"></script>
     <script type="text/javascript" src="/client/js/audio.js"></script>
     <script type="text/javascript" src="/client/js/network.js"></script>
-    
+
     <!-- move this wherever -->
     <script>
         audioLoaded = false;
         var sfxList = [
 		{
-		    name:'ShieldsUp',
-		    src:'sounds/shieldsup.wav',
-		    channels:10,
-		},{
-		    name:'ShieldsDown',
-		    src:'sounds/powerdown.wav',
-		    channels:10,
-		},{
-		    name:'gameOver',
-		    src:'invalid/error/sfx/game_over_music.wav',
-		    channels:1,
+		    name: 'ShieldsUp',
+		    src: 'sounds/shieldsup.wav',
+		    channels: 10,
+		}, {
+		    name: 'ShieldsDown',
+		    src: 'sounds/powerdown.wav',
+		    channels: 10,
+		}, {
+		    name: 'gameOver',
+		    src: 'invalid/error/sfx/game_over_music.wav',
+		    channels: 1,
 		}
         ];
 
-        function onLoadCallback()
-        {
+        function onLoadCallback() {
             //if( audioList.fail != true )
             audioLoaded = true;
         }

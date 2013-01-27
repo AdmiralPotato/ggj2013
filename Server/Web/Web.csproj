@@ -289,6 +289,7 @@
     <None Include="Properties\PublishProfiles\Profile1.pubxml" />
     <Content Include="Views\Game\_PlayerList.cshtml" />
     <Content Include="Views\Game\Lobby.cshtml" />
+    <Content Include="Views\Game\_ViewStart.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
