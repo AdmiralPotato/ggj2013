@@ -62,8 +62,6 @@
 
 						modelsLoaded += 1;
 
-						console.log(_propertyName+":"+modelsLoaded+":"+modelCount);
-
 						if(modelsLoaded === modelCount){
 							_callback();
 						}
@@ -100,7 +98,7 @@
 		var directionalLightPointedFromCamera = new THREE.DirectionalLight(0xffffff, 0.5);
 		directionalLightPointedFromCamera.position.set( -1, 0, 0 );
 		camera.add(directionalLightPointedFromCamera);
-		render();
+		update();
 	};
 
 
@@ -114,8 +112,28 @@
 	);
 	var tau = Math.PI*2;
 	var deg = tau/360;
+
+	var paused = false;
+
+	var last = Date.now()/1000;
+
+	var update = function(){
+		requestAnimFrame(update);
+		var now = Date.now()/1000; // get current time
+		var dt = ((now-last) > .2) ? .2 : now-last; // calculate time between frames
+		last = now; // save new time
+		if(paused == false){ // main 'update' loop
+			// use dt for frame rate independent speed
+			fishShipMesh.rotation.setY(fishShipMesh.rotation.y+(dt*.1));
+			camera.position = distanceElevationHeading(30, 15 * deg, fishShipMesh.rotation.y);
+			camera.lookAt(fishShipMesh.position);
+
+		}
+		render();
+	}
+
 	var render = function(){
-		requestAnimFrame(render);
+		
 		if(window.innerWidth != width || window.innerHeight != height){
 			width = window.innerWidth;
 			height = window.innerHeight;
@@ -123,14 +141,9 @@
 			camera.updateProjectionMatrix();
 			rend.setSize(width, height);
 		}
-
-		fishShipMesh.rotation.setY(fishShipMesh.rotation.y+(deg*.125));
-		camera.position = distanceElevationHeading(30, 15 * deg, fishShipMesh.rotation.y);
-
-		camera.lookAt(new THREE.Vector3(0,0,0));
-
 		rend.render(scene, camera);
 	};
+
 	var distanceElevationHeading = function (_distance, _elevation, _heading){
 		var radH = _heading + Math.PI;
 		var radE = _elevation;
@@ -138,45 +151,62 @@
 		return new THREE.Vector3(a * Math.cos(radH), _distance * Math.sin(radE), -a * Math.sin(radH));
 	};
 
+// create the particle variables
+var particleCount = 1800,
+    particles = new THREE.Geometry(),
+ 	pMaterial = new THREE.ParticleBasicMaterial({
+    	color: 0xFFFFFF,
+    	size: 20,
+		map: THREE.ImageUtils.loadTexture(
+      	"particle.png"
+    ),
+    blending: THREE.AdditiveBlending,
+    transparent: true
+  });
+
+// now create the individual particles
+for(var p = 0; p < particleCount; p++) {
+
+  // create a particle with random
+  // position values, -250 -> 250
+  var pX = Math.random() * 500 - 250,
+      pY = Math.random() * 500 - 250,
+      pZ = Math.random() * 500 - 250,
+      particle = new THREE.Vertex(
+        new THREE.Vector3(pX, pY, pZ)
+      );
+
+  // add it to the geometry
+  particles.vertices.push(particle);
+}
+
+// create the particle system
+var particleSystem =
+  new THREE.ParticleSystem(
+    particles,
+    pMaterial);
+particleSystem.sortParticles = true;
+// add it to the scene
+scene.add(particleSystem);
+
+
 /*
-// common material parameters
+// create the particle variables
+var pMaterial =
+  new THREE.ParticleBasicMaterial({
+    color: 0xFFFFFF,
+    size: 20,
+    map: THREE.ImageUtils.loadTexture(
+      "images/particle.png"
+    ),
+    blending: THREE.AdditiveBlending,
+    transparent: true
+  });
 
-var ambient = 0x050505, diffuse = 0x331100, specular = 0xffffff, shininess = 10, scale = 23;
-
-// normal map shader
-
-var shader = THREE.ShaderUtils.lib[ "normal" ];
-var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-
-uniforms[ "enableAO" ].value = true;
-uniforms[ "enableDiffuse" ].value = false;
-uniforms[ "enableSpecular" ].value = false;
-uniforms[ "enableReflection" ].value = true;
-
-uniforms[ "tNormal" ].texture = THREE.ImageUtils.loadTexture( "normal.jpg" );
-uniforms[ "tAO" ].texture = THREE.ImageUtils.loadTexture( "ao.jpg" );
-
-uniforms[ "tDisplacement" ].texture = THREE.ImageUtils.loadTexture( "displacement.jpg" );
-uniforms[ "uDisplacementBias" ].value = - 0.428408 * scale;
-uniforms[ "uDisplacementScale" ].value = 2.436143 * scale;
-
-uniforms[ "uDiffuseColor" ].value.setHex( diffuse );
-uniforms[ "uSpecularColor" ].value.setHex( specular );
-uniforms[ "uAmbientColor" ].value.setHex( ambient );
-
-uniforms[ "uShininess" ].value = shininess;
-
-uniforms[ "tCube" ].texture = reflectionCube;
-uniforms[ "uReflectivity" ].value = 0.1;
-
-uniforms[ "uDiffuseColor" ].value.convertGammaToLinear();
-uniforms[ "uSpecularColor" ].value.convertGammaToLinear();
-uniforms[ "uAmbientColor" ].value.convertGammaToLinear();
-
-
-var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, fog: false };
-var displacementMaterial = new THREE.ShaderMaterial( parameters );
+// also update the particle system to
+// sort the particles which enables
+// the behaviour we want
+particleSystem.sortParticles = true;
 */
-
 </script>
 </body>
