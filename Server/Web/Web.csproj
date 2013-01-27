@@ -163,6 +163,16 @@
     <Content Include="client\js\audio.js" />
     <Content Include="client\js\game.js" />
     <Content Include="client\js\network.js" />
+    <Content Include="client\js\npos3d\core.js" />
+    <Content Include="client\js\npos3d\font.js" />
+    <Content Include="client\js\npos3d\fx.explosion.js" />
+    <Content Include="client\js\npos3d\fx.tween.js" />
+    <Content Include="client\js\npos3d\geom.circle.js" />
+    <Content Include="client\js\npos3d\geom.pn3.js" />
+    <Content Include="client\js\npos3d\geom.sphere.js" />
+    <Content Include="client\js\npos3d\layout.js" />
+    <Content Include="client\js\npos3d\sprite.js" />
+    <Content Include="client\js\npos3d\utils.color.js" />
     <Content Include="client\js\shapes-wireframe.js" />
     <Content Include="client\js\signalR.js" />
     <Content Include="client\js\Three.js" />
@@ -170,8 +180,7 @@
     <Content Include="client\models\FishShip.json" />
     <Content Include="client\models\FishShipColorMap.png" />
     <Content Include="client\models\FishShipNormalMap.png" />
-    <Content Include="client\models\Missile.mtl" />
-    <Content Include="client\models\Missile.obj" />
+    <Content Include="client\models\LaserColorMap.png" />
     <Content Include="client\models\Spear.json" />
     <Content Include="client\models\SpearColorMap.png" />
     <Content Include="client\models\SpearNormalMap.png" />
@@ -216,6 +225,7 @@
     <Content Include="client\three_test\Assets\FishShipColorMap.png" />
     <Content Include="client\three_test\Assets\FishShipNormalMap.png" />
     <Content Include="client\three_test\Assets\FishWireFrame.obj" />
+    <Content Include="client\three_test\Assets\LaserColorMap.png" />
     <Content Include="client\three_test\Assets\shapes.blend" />
     <Content Include="client\three_test\Assets\Spear.obj" />
     <Content Include="client\three_test\Assets\SpearColorMap.png" />
@@ -363,6 +373,9 @@
     <Content Include="Sounds\playin_card_3.ogg" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="client\models\Laser.json" />
+    <Content Include="client\three_test\Assets\Missile.mtl" />
+    <Content Include="client\three_test\Assets\Missile.obj" />
     <None Include="Properties\PublishProfiles\Profile1.pubxml" />
     <Content Include="Views\Game\_PlayerList.cshtml" />
     <Content Include="Views\Game\Lobby.cshtml" />
