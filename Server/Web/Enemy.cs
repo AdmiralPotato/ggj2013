@@ -29,8 +29,8 @@ namespace WebGame
                 {
                     if (!(ship is Enemy))
                     {
-                        this.LaunchProjectile(ship);
-                        this.LoadProjectile();
+                        this.LaunchProjectile(0, ship);
+                        this.LoadProjectile(0, ProjectileType.Torpedo);
                     }
                 }
                 timeSinceLastFire = TimeSpan.Zero;

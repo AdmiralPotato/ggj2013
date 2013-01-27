@@ -58,9 +58,23 @@
         <h3>Weapons</h3>
         <input type="submit" onclick='$.post("ToggleShields");' value="Toggle Shields" />
         <br />
-        <input type="submit" onclick='$.post("LoadProjectile");' value="Load" />
-        <input type="text" id="desiredTarget" value="0" />
-        <input type="submit" onclick='$.post("LaunchProjectile", "targetId=" + $("#desiredTarget").val());' value="Launch Projectile" />
+        Target <input type="text" id="desiredTarget" value="0" />
+        <br />
+        <select id="projectile">
+            <option value="Skattershot">Skattershot</option>
+            <option value="Torpedo">Torpedo</option>
+            <option value="Hardshell">Hardshell</option>
+            <option value="Knockshot">Knockshot</option>
+            <option value="Nuke">Nuke</option>
+        </select>
+        <br />
+        Tube 0
+        <input type="submit" onclick='$.post("LoadProjectile", "tube=0&type=" + $("#projectile").val());' value="Load" />
+        <input type="submit" onclick='$.post("LaunchProjectile", "tube=0&targetId=" + $("#desiredTarget").val() + "&type=" + $("#projectile").val());' value="Launch" />
+        <br />
+        Tube 1
+        <input type="submit" onclick='$.post("LoadProjectile", "tube=1&type=" + $("#projectile").val());' value="Load" />
+        <input type="submit" onclick='$.post("LaunchProjectile", "tube=1&targetId=" + $("#desiredTarget").val() + "&type=" + $("#projectile").val());' value="Launch" />
 
         <h3>Engineering</h3>
         <select id="engPart">

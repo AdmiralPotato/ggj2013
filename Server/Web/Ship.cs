@@ -88,7 +88,7 @@ namespace WebGame
         /// </summary>
         public double EffectiveTurnRate { get { return this.Effective(TurnRate, "Thrusters"); } }
 
-        [ProtoMember(15)]
+        [ProtoMember(16)]
         public double MaximumForce = 10000;
         protected int EffectiveMaximumEnergy
         {
@@ -103,10 +103,10 @@ namespace WebGame
         /// </summary>
         public double EffectiveMaximumForce { get { return this.Effective(MaximumForce, "Engines"); } }
 
-        [ProtoMember(16)]
+        [ProtoMember(17)]
         public List<BeamType> BeamWeapons = new List<BeamType>();
 
-        [ProtoMember(17)]
+        [ProtoMember(18)]
         public Dictionary<ProjectileType, int> Projectiles = new Dictionary<ProjectileType, int>();
 
         public override string Type { get { return "Ship"; } }
@@ -176,19 +176,19 @@ namespace WebGame
             return result;
         }
 
-        public bool LoadProjectile()
+        public bool LoadProjectile(int tubeNumber, ProjectileType type)
         {
             if (this.ProjectileStatus == ProjectileStatus.Unloaded)
             {
                 this.ProjectileLoadTime = TimeSpan.Zero;
                 this.ProjectileStatus = ProjectileStatus.Loading;
-                return true;
                 PlaySound("MissileLoad");
+                return true;
             }
             return false;
         }
 
-        public Projectile LaunchProjectile(Entity target)
+        public Projectile LaunchProjectile(int tubeNumber, Entity target)
         {
             if (this.ProjectileStatus == ProjectileStatus.Loaded && this.StarSystem == target.StarSystem)
             {

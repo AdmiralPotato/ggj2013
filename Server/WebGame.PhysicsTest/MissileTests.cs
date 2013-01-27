@@ -35,7 +35,7 @@ namespace WebGame.PhysicsTest
             system.AddEntity(enemy);
             var attacker = new Ship();
             system.AddEntity(attacker);
-            attacker.LoadProjectile();
+            attacker.LoadProjectile(0, ProjectileType.Torpedo);
             enemy.ImpulsePercentage = 100;
             game.Update(TimeSpan.FromSeconds(0.25));
             game.Update(TimeSpan.FromSeconds(0.25));
@@ -59,7 +59,7 @@ namespace WebGame.PhysicsTest
             game.Update(TimeSpan.FromSeconds(0.25));
             Assert.AreNotEqual(0, enemy.Position.X, "The enemy should have moved along the x axis");
             Assert.AreEqual(0, attacker.Position.X, "the attacker was not at the center");
-            var missile = attacker.LaunchProjectile(enemy);
+            var missile = attacker.LaunchProjectile(0, enemy);
             Assert.AreEqual(0, missile.Position.X, "the missile was not at the center");
             var oldDiff = enemy.Position.X - missile.Position.X;
             missile.Update(TimeSpan.FromSeconds(0.25));
@@ -77,7 +77,7 @@ namespace WebGame.PhysicsTest
             system.AddEntity(enemy);
             var attacker = new Ship();
             system.AddEntity(attacker);
-            attacker.LoadProjectile();
+            attacker.LoadProjectile(0, ProjectileType.Torpedo);
             enemy.ImpulsePercentage = 100;
             game.Update(TimeSpan.FromSeconds(0.25));
             game.Update(TimeSpan.FromSeconds(0.25));
@@ -101,7 +101,7 @@ namespace WebGame.PhysicsTest
             game.Update(TimeSpan.FromSeconds(0.25));
             Assert.AreNotEqual(0, enemy.Position.X, "The enemy should have moved along the x axis");
             Assert.AreEqual(0, attacker.Position.X, "the attacker was not at the center");
-            var missile = attacker.LaunchProjectile(enemy);
+            var missile = attacker.LaunchProjectile(0, enemy);
             Assert.AreEqual(0, missile.Position.X, "the missile was not at the center");
             var oldDiff = enemy.Position.X - missile.Position.X;
             missile.Update(TimeSpan.FromSeconds(0.25));
@@ -128,7 +128,7 @@ namespace WebGame.PhysicsTest
             game.Add(system);
             var ship = new Ship();
             system.AddEntity(ship);
-            var projectile = ship.LaunchProjectile(ship);
+            var projectile = ship.LaunchProjectile(0, ship);
             Assert.IsNull(projectile, "The projectile shouldn't have been launched if it hadn't been loaded.");
         }
 
@@ -141,8 +141,8 @@ namespace WebGame.PhysicsTest
             game.Add(system);
             var ship = new Ship();
             system.AddEntity(ship);
-            ship.LoadProjectile();
-            var projectile = ship.LaunchProjectile(ship);
+            ship.LoadProjectile(0, ProjectileType.Torpedo);
+            var projectile = ship.LaunchProjectile(0, ship);
             Assert.IsNull(projectile, "The projectile shouldn't have been launched if there hasn't been enough time to load it.");
         }
 
@@ -155,9 +155,9 @@ namespace WebGame.PhysicsTest
             game.Add(system);
             var ship = new Ship();
             system.AddEntity(ship);
-            var loaded = ship.LoadProjectile();
+            var loaded = ship.LoadProjectile(0, ProjectileType.Torpedo);
             Assert.IsTrue(loaded, "Couldn't load the first projectile");
-            loaded = ship.LoadProjectile();
+            loaded = ship.LoadProjectile(0, ProjectileType.Torpedo);
             Assert.IsFalse(loaded, "Somehow Loaded a second projectile.");
         }
 

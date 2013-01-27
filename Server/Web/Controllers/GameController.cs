@@ -431,18 +431,18 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
             return null;
         }
 
-        public ActionResult LoadProjectile(int id)
+        public ActionResult LoadProjectile(int id, int tube, ProjectileType type)
         {
             Initalize(id);
 
             if (player.Ship != null && player.Station == Station.Weapons)
             {
-                player.Ship.LoadProjectile();
+                player.Ship.LoadProjectile(tube, type);
             }
 
             return null;
         }
-        public ActionResult LaunchProjectile(int id, int targetId)
+        public ActionResult LaunchProjectile(int id, int tube, int targetId)
         {
             Initalize(id);
 
@@ -450,7 +450,7 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
             {
                 var target = player.Ship.StarSystem.GetEntity(targetId);
                 if (target != null)
-                    player.Ship.LaunchProjectile(target);
+                    player.Ship.LaunchProjectile(tube, target);
             }
 
             return null;

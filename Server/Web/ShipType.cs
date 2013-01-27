@@ -33,10 +33,10 @@ namespace WebGame
 
     public enum ProjectileType
     {
-        Skattershot,
         Torpedo,
+        Skattershot,
         Hardshell,
+        Knockshot,
         Nuke,
-        Knockshot
     }
 }
