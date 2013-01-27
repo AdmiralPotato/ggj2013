@@ -137,19 +137,13 @@ namespace WebGame
             if (!LoggedIn)
             {
                 ViewBag.ErrorMessage = "You must be logged in to join the game.";
-                return View("Index", game);
+                return View("Lobby", game);
             }
 
             if (game.GetPlayer(Account.Id) != null)
             {
                 ViewBag.ErrorMessage = "You are already part of the game.";
-                return View("Index", game);
-            }
-
-            if (game.Started)
-            {
-                ViewBag.ErrorMessage = "Game already started.";
-                return View("Index", game);
+                return View("Lobby", game);
             }
 
             if (game.IsPrivate)
@@ -158,7 +152,7 @@ namespace WebGame
                 if (invite == null)
                 {
                     ViewBag.ErrorMessage = "You must be invited to a private game.";
-                    return View("Index", game);
+                    return View("Lobby", game);
                 }
             }
 
@@ -169,7 +163,7 @@ namespace WebGame
 
             LoadMessages();
 
-            return View("Index", game);
+            return Redirect("/client/index.html?Game=" + game.Id);
         }
 
         public ActionResult Invite(int id, string inviteEmail)
@@ -232,7 +226,7 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
 
             LoadMessages();
 
-            return View("Index", game);
+            return View("Lobby", game);
         }
 
         void AddErrorMessage(string errorMessage)
@@ -273,7 +267,7 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
 
             LoadMessages();
 
-            return View("Index", game);
+            return Redirect("/client/index.html?Game=" + game.Id);
         }
 
         //public ActionResult Kick(int id, int playerNumber)
@@ -319,7 +313,7 @@ Visit http://{1}/Game-{2}/ to view the details and join the game.
 
             LoadMessages();
 
-            return View("Index", game);
+            return Redirect("/client/index.html?Game=" + game.Id);
         }
 
         [ValidateInput(false)]

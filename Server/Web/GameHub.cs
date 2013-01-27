@@ -120,11 +120,11 @@ namespace WebGame
 
             //if (groupsWorking)
             //{
-            var group = context.Clients.Group(groupName);
-            group.handleUpdate(update);
+            //var group = context.Clients.Group(groupName);
+            //group.handleUpdate(update);
             //}
             //else
-            //context.Clients.All.handleUpdate(update);
+            context.Clients.All.handleUpdate(update);
         }
 
         public static void Refresh(string group)
