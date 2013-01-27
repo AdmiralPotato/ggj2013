@@ -102,8 +102,8 @@
 			}
 		}
 	}
-
-	var meshObjects = {};
+	var enemies = [];
+	var weapons = [];
 	var player;
 
 	var whatToDoWhenAllTheGeometriesAreParsedOkayYupSeriously = function(){
@@ -111,38 +111,45 @@
 		document.addEventListener("keyup", onKeyUp, false);
 
 
-		var newMesh = new THREE.Mesh(geometryObjects.fishShipA, geometryObjects.fishShipA.matLib[0]);
-		meshObjects['fishA'] = newMesh;
-		newMesh.position.z = -20;
-		newMesh.position.x = -20;
+		var newMesh = new THREE.Mesh(geometryObjects.fishShip, geometryObjects.fishShip.matLib[0]);
+		enemies.push(newMesh);
+		newMesh.position.z = -10;
+		newMesh.position.x = -10;
 		scene.add(newMesh);
 
-		var newMesh = new THREE.Mesh(geometryObjects.fishShipB, geometryObjects.fishShipB.matLib[0]);
-		meshObjects['fishB'] = newMesh;
-		newMesh.position.z = 20;
-		newMesh.position.x = -20;
+		newMesh = new THREE.Mesh(geometryObjects.fishShip, geometryObjects.fishShip.matLib[0]);
+		enemies.push(newMesh);
+		newMesh.position.z = 10;
+		newMesh.position.x = -10;
 		scene.add(newMesh);
 
-		var newMesh = new THREE.Mesh(geometryObjects.fishShipC, geometryObjects.fishShipC.matLib[0]);
-		meshObjects['fishC'] = newMesh;
-		newMesh.position.x = 20;
+		newMesh = new THREE.Mesh(geometryObjects.fishShip, geometryObjects.fishShip.matLib[0]);
+		enemies.push(newMesh);
+		newMesh.position.z = -10;
+		newMesh.position.x = 10;
+		scene.add(newMesh);
+
+		newMesh = new THREE.Mesh(geometryObjects.fishShip, geometryObjects.fishShip.matLib[0]);
+		enemies.push(newMesh);
+		newMesh.position.z = 10;
+		newMesh.position.x = 0;
 		scene.add(newMesh);
 
 		newMesh = new THREE.Mesh(geometryObjects.spear, geometryObjects.spear.matLib[0]);
 		player = newMesh;
 		scene.add(newMesh);
 
-		newMesh = new THREE.Mesh(geometryObjects.starbaseA, geometryObjects.starbaseA.matLib[0]);
+		/*newMesh = new THREE.Mesh(geometryObjects.starbase, geometryObjects.starbase.matLib[0]);
 		newMesh.position.x = -70;
 		newMesh.position.z = 10;
-		meshObjects['starbaseA'] = newMesh;
+		enemies.push(newMesh);
 		scene.add(newMesh);
 
-		newMesh = new THREE.Mesh(geometryObjects.starbaseB, geometryObjects.starbaseB.matLib[0]);
+		newMesh = new THREE.Mesh(geometryObjects.starbase, geometryObjects.starbase.matLib[0]);
 		newMesh.position.x = 70;
 		newMesh.position.z = -30;
-		meshObjects['starbaseB'] = newMesh;
-		scene.add(newMesh);
+		enemies.push(newMesh);
+		scene.add(newMesh);*/
 
 
 		var directionalLightA = new THREE.DirectionalLight(0xffffff,2);
@@ -157,20 +164,59 @@
 		directionalLightPointedFromCamera.position.set( -1, 0, 0 );
 		camera.add(directionalLightPointedFromCamera);
 		update();
+		makeLaser(player);
 	};
 
-	var fireLaser = function(){
-		//var rnd = Math.random()*
+	function makeLaser(_source, _target){
+		_target = _target || enemies[/*Math.floor(Math.random() * enemies.length)*/3];
+		console.log("target");
+		console.log(_target);
+
+		var distance = _source.position.distanceTo(_target.position);
+		console.log("distance");
+		console.log(distance);
+		var pMaterial = new THREE.ParticleBasicMaterial({
+    		color: 0xFFFFFF,
+    		size: 20,
+			map: THREE.ImageUtils.loadTexture(
+      			"particle.png"
+    		),
+   			blending: THREE.AdditiveBlending,
+   			transparent: true});
+
+		var newLaser = new THREE.Mesh(
+			new THREE.PlaneGeometry(distance , 2, 1, 1),
+			new THREE.MeshBasicMaterial({color: 0x0000ff})
+			);
+		
+
+		//newLaser.lookAt(_target.position);
+		//var radRot = newLaser.rotation.y;
+		//newLaser.rotation = new THREE.Vector3(0,0,0);
+		//newLaser.rotation.setX(-(90*deg));
+		//newLaser.rotation.setZ(radRot);
+
+		var newRot = Math.atan2(_target.position.z - _source.position.z,
+			_target.position.x - _source.position.x) + (Math.PI*.5) ;
+		newLaser.rotation.setX(-(90*deg));
+		newLaser.rotation.setZ(newRot);
+
+		newLaser.position.x = _source.position.x - (Math.cos(newRot)*distance*.5);
+		newLaser.position.z = _source.position.z + (Math.sin(newRot)*distance*.5);
+		//console.log(radRot);
+		//console.log(newRot+Math.PI*.5);
+
+		scene.add(newLaser);
 	}
+
+
 
 	parseAllGeometry(
 		{
-			'fishShipA': "../models/FishShip.json",
-			'fishShipB': "../models/FishShip.json",
-			'fishShipC': "../models/FishShip.json",
+			/*'missile': "../models.Missile.json",*/
+			'fishShip': "../models/FishShip.json",
 			'spear': "../models/Spear.json",
-			'starbaseA': "../models/Starbase.json",
-			'starbaseB': "../models/Starbase.json",
+			'starbase': "../models/Starbase.json",
 		},
 		whatToDoWhenAllTheGeometriesAreParsedOkayYupSeriously
 	);
@@ -180,21 +226,32 @@
 	var paused = false;
 
 	var last = Date.now()/1000;
+	var timer = 0.0;
+
+	var updateObjects = [];
 
 	var update = function(){
 		requestAnimFrame(update);
 		var now = Date.now()/1000; // get current time
+
 		var dt = ((now-last) > .2) ? .2 : now-last; // calculate time between frames
+
 		last = now; // save new time
 		if(paused == false){ // main 'update' loop
+			timer += dt;
 		/****
 		Add Update Stuff BELOW Here
 		****/
 			// use dt for frame rate independent speed
-			player.rotation.setY(player.rotation.y+(dt*.1));
-			camera.position = distanceElevationHeading(30, 15 * deg, player.rotation.y);
+			//player.rotation.setY(player.rotation.y+(dt*.1));
+			camera.position = distanceElevationHeading(50, 60 * deg, 0/*player.rotation.y*/);
 			camera.lookAt(player.position);
-			
+
+			var i = updateObjects.length;
+			while(i--){
+				updateObjects[i].update();
+			}
+
 			/*var pCount = particleCount;
   			while(pCount--) {
 
