@@ -11,5 +11,6 @@ namespace WebGame
         public int FrontShield;
         public int RearShield;
         public List<EntityUpdate> Entities = new List<EntityUpdate>();
+        public String missionUpdate;
     }
 }

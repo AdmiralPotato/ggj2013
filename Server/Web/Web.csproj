@@ -102,6 +102,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Base.cs" />
+    <Compile Include="Mission.cs" />
     <Compile Include="Framework\BaseViews.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
@@ -119,6 +120,9 @@
     <Compile Include="LT\DBConnection.cs" />
     <Compile Include="LT\HtmlUtils.cs" />
     <Compile Include="Framework\Account.cs" />
+    <Compile Include="MissionDefeatEnemy.cs" />
+    <Compile Include="MissionGoToLocation.cs" />
+    <Compile Include="MissionStatus.cs" />
     <Compile Include="XNA\MathHelper.cs" />
     <Compile Include="XNA\Matrix.cs" />
     <Compile Include="Models\AccountModels.cs" />

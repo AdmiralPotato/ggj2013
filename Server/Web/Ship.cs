@@ -22,6 +22,8 @@ namespace WebGame
         private const double turnRateAnglePerSecond = Math.PI / 4; // this will likely get changed to something from engineering
         private const double maximumAvailableForceMetersPerSecondPerTon = 10000; // force = mass * acceleration
 
+        public MissionStatus missionState;
+
         public override string Type { get { return "Ship"; } }
 
         public Ship() : this(1000)
@@ -74,6 +76,8 @@ namespace WebGame
             TurnShipToDesiredOrientation(elapsed);
             AccelerateShip(elapsed);
             ApplyVelocity(elapsed); // or alternately base.Update
+
+            UpdateMission();
         }
 
         private void AccelerateShip(TimeSpan elapsed)
@@ -122,6 +126,11 @@ namespace WebGame
             return remaining;
         }
 
+        private void UpdateMission()
+        {
+            missionState.checkSuccess();
+        }
+
         //// input methods
         //public void SetAllStop()
         //{
@@ -148,6 +157,7 @@ namespace WebGame
                 {
                     update.Entities.Add(new EntityUpdate() { Id = entity.Id, Type = entity.Type, Rotation = (float)entity.Orientation, Position = entity.Position });
                 }
+                update.missionUpdate = missionState.getMissionStatusUpdate();
                 GameHub.SendUpdate(Game.Id, Id, update);
                 System.Diagnostics.Debug.WriteLine("Update Sent.");
             }
