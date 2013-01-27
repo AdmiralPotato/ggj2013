@@ -85,7 +85,7 @@ namespace WebGame
             if (!game.Started || game.Ended)
                 return View("Lobby", game);
 
-            return Redirect("/client/index2.html#" + game.Id);
+            return Redirect("/client/index.html?Game=" + game.Id);
         }
 
         public ActionResult Local(int id = -1)

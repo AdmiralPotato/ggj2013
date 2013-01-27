@@ -2,7 +2,7 @@
 
 //------START SignalR config
 //$.connection.hub.logging = true;
-if (isUsingRemoteServer) {
+if (client.isUsingRemoteServer) {
     jQuery.support.cors = true;
     $.connection.hub.url = serverPath + 'signalr';
 }
@@ -15,7 +15,7 @@ gameHub.client.handleUpdate = function (update) {
     setGameStateFromServer(update);
 };
 
-if (isUsingRemoteServer) {
+if (client.isUsingRemoteServer) {
     $.connection.hub.start({ jsonp: true, transport: 'longPolling', xdomain: true})
         .done(function () { gameHub.server.setShip(gameId, 0); })
         .fail(function () { alert("Could not Connect!"); });
@@ -44,12 +44,7 @@ gameHub.client.addMessage = function (sourceId, sourceName, message) {
 
 //------START UI event binding
 var sendMessage = function (messageName, messageValue, callback) {
-    if (isUsingRemoteServer) {
-        $.post(serverPath + currentGame + messageName, messageValue, callback);
-    }
-    else {
-        $.post(messageName, messageValue, callback);
-    }
+    $.post(serverPath + currentGame + messageName, messageValue, callback);
 };
 var sendMessageClickHandler = function (event) {
     var element = event.currentTarget,
