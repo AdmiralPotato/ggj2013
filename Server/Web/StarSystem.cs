@@ -37,6 +37,12 @@ namespace WebGame
                 ship.SendUpdate();
             }
 
+            foreach (var entity in Entites)
+            {
+                if (entity.Sounds.Count > 0)
+                    entity.Sounds.Clear();
+            }
+
             if (Utility.Random.Next(480) <= 2)
             {
                 AddEntity(new Enemy() { Position = new Vector3(Utility.Random.Next(1000) - 500, Utility.Random.Next(1000) - 500, 0) });

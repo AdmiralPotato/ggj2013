@@ -68,6 +68,7 @@ namespace WebGame
         private void Detonate()
         {
             Target.Damage(this.EffectiveDamage);
+            PlaySound("MissileDetonate");
             this.Destroy();
         }
 

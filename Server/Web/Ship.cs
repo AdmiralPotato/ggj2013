@@ -129,6 +129,7 @@ namespace WebGame
             {
                 this.ProjectileLoadTime = TimeSpan.Zero;
                 this.ProjectileStatus = ProjectileStatus.Loading;
+                PlaySound("MissileLoad");
             }
         }
 
@@ -139,6 +140,7 @@ namespace WebGame
                 var projectile = new Projectile();
                 projectile.Target = target;
                 this.StarSystem.AddEntity(projectile);
+                PlaySound("MissileLaunch");
                 return projectile;
             }
             return null;
@@ -260,6 +262,8 @@ namespace WebGame
                 var update = new UpdateToClient() { ShipId = Id, Energy = this.Energy, FrontShield = this.FrontShield, RearShield = this.RearShield, LeftShield = this.LeftShield, RightShield = this.RightShield, ShieldsEngaged = this.ShieldsEngaged };
                 foreach (var entity in StarSystem.Entites)
                 {
+                    if (entity.Sounds.Count > 0)
+                        update.Sounds.AddRange(entity.Sounds);
                     update.Entities.Add(new EntityUpdate() { Id = entity.Id, Type = entity.Type, Rotation = (float)entity.Orientation, Position = entity.Position });
                 }
                 GameHub.SendUpdate(Game.Id, Id, update);
