@@ -10,7 +10,7 @@ var n = NPos3d,
 	    entityTypes: {}
 	},
 	playerEntity;
-var gameId = 705884;
+var gameId = 705890;
 var timeSinceLastFrame = 0;
 var timeOfLastFrame = new Date().getTime();
 var timeSinceLastUpdate = 0;

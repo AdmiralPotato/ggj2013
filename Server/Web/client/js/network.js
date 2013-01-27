@@ -75,7 +75,22 @@ var customEventHandlerMap = {
                 client.station = station;
             }
         });
-    }
+    },
+	SetHeadingHandler: function(event) {
+		sendMessage('SetHeading', 'amount=' + $("#desiredHeading").val());
+	},
+	LoadProjectileHandler: function(event){
+		var split = event.currentTarget.id.split('-');
+		sendMessage(split[0], split[1] + '&type=' + $("#projectile").val());
+	},
+	LaunchProjectileHandler: function(event){
+		var split = event.currentTarget.id.split('-');
+		sendMessage(split[0], split[1] + '&targetId=' + $("#desiredTarget").val() + "&type=" + $("#projectile").val());
+	},
+	FireBeamHandler: function(event){
+		var split = event.currentTarget.id.split('-');
+		sendMessage(split[0], split[1] + '&targetId=' + $("#desiredTarget").val() + "&type=" + $("#beam").val());
+	}
 };
 var customEventHandler = function(event) {
     var id = event.currentTarget.id.split('-')[0];
